@@ -1,0 +1,80 @@
+# ==========================================
+# AURA AI - STRICT GITIGNORE
+# Ensures Zero Sensitive Data / PII Leaks
+# ==========================================
+
+# Environment variables & secrets
+.env
+*.env
+.env.*
+!.env.example
+
+# Authentication sessions & tokens
+*.session
+*.session-journal
+telegram_session.session
+
+# User artifacts & Personal Vault (Resumes, cover letters, uploaded PDFs, career stories)
+data/artifacts/
+**/artifacts/
+user_data/
+**/user_data/
+data/aura_v1.db
+data/aura_v1.db-journal
+data/telegram_jobs_latest.csv
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-journal
+
+# Document outputs & User resumes
+*.pdf
+*.docx
+
+# Generated images & scratch crops
+crop_*.png
+section_*.png
+mindmap_upscaled.png
+
+# Python build & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Frontend build & caches
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+.npm
+
+# IDE & OS caches
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

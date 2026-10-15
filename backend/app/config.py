@@ -1,0 +1,30 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env from version 1.0 or parent directory
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_PATH = BASE_DIR / ".env"
+if ENV_PATH.exists():
+    load_dotenv(ENV_PATH)
+else:
+    load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+SERP_API_KEY = os.getenv("SERP_API_KEY", "")
+
+# Directory configurations
+DATA_DIR = BASE_DIR / "data"
+ARTIFACTS_DIR = DATA_DIR / "artifacts" / "user_1"
+ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+
+SQLITE_DB_PATH = DATA_DIR / "aura_v1.db"
+
+# Multi-tier resilient model configuration (tested against Google GenAI API)
+PRIMARY_MODEL = "gemini-3.8-flash"
+FALLBACK_MODELS = [
+    "gemini-3.5-flash-lite",
+    "gemini-3.6-flash",
+    "gemini-flash-latest"
+]
