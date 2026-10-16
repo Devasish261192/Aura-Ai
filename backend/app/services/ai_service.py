@@ -209,59 +209,77 @@ class AIService:
 
         # Try primary model, fallback on temporary server errors
         models_to_try = [PRIMARY_MODEL] + FALLBACK_MODELS
-        response = None
+        stream_iter = None
         last_error = None
 
         for model in models_to_try:
             for attempt in range(2):
                 try:
                     chat = self.get_or_create_chat(session_id, model_name=model, prior_history=prior_history)
-                    response = chat.send_message(user_message)
+                    stream_iter = chat.send_message_stream(user_message)
                     break
                 except Exception as e:
                     err_str = str(e)
                     last_error = e
                     self._active_chats.pop(session_id, None)
                     if ("503" in err_str or "UNAVAILABLE" in err_str) and attempt == 0:
-                        print(f"Model {model} hit 503 spike. Retrying in 1s...")
-                        time.sleep(1.0)
+                        print(f"Model {model} hit 503 spike. Retrying in 0.5s...")
+                        time.sleep(0.5)
                         continue
                     print(f"Model {model} failed: {e}. Trying fallback...")
                     break
-            if response:
+            if stream_iter is not None:
                 break
 
-        if not response:
+        accumulated_text = []
+        tool_calls_executed = []
+        executed_tool_names = set()
+
+        if stream_iter is not None:
+            try:
+                for chunk in stream_iter:
+                    # Check for tool/function calls in chunk candidates
+                    if chunk.candidates:
+                        for cand in chunk.candidates:
+                            if cand.content and cand.content.parts:
+                                for part in cand.content.parts:
+                                    if part.function_call:
+                                        fc_name = part.function_call.name
+                                        if fc_name not in executed_tool_names:
+                                            executed_tool_names.add(fc_name)
+                                            fc_args = dict(part.function_call.args) if part.function_call.args else {}
+                                            tool_calls_executed.append({
+                                                "name": fc_name,
+                                                "args": fc_args
+                                            })
+                                            yield {
+                                                "type": "tool_executed",
+                                                "tool": fc_name,
+                                                "args": fc_args
+                                            }
+
+                    # Stream text chunk immediately as it arrives
+                    chunk_text = ""
+                    try:
+                        chunk_text = chunk.text or ""
+                    except Exception:
+                        pass
+
+                    if chunk_text:
+                        accumulated_text.append(chunk_text)
+                        yield {"type": "token", "content": chunk_text}
+
+            except Exception as e:
+                print(f"Error streaming response chunk: {e}")
+                last_error = e
+
+        response_text = "".join(accumulated_text).strip()
+
+        if not response_text and not tool_calls_executed:
             error_msg = f"Unable to process request with AI providers: {last_error}"
             yield {"type": "error", "content": error_msg}
             save_chat_message(session_id=session_id, role="model", content=error_msg)
             return
-
-        # Inspect candidate parts for executed function calls
-        tool_calls_executed = []
-        if response.candidates:
-            for part in response.candidates[0].content.parts:
-                if part.function_call:
-                    tool_calls_executed.append({
-                        "name": part.function_call.name,
-                        "args": dict(part.function_call.args) if part.function_call.args else {}
-                    })
-
-        # Yield tool execution events so frontend UI can display status badges
-        for tc in tool_calls_executed:
-            yield {
-                "type": "tool_executed",
-                "tool": tc["name"],
-                "args": tc["args"]
-            }
-
-        # Yield the generated text response in chunks for streaming feel
-        response_text = response.text or ""
-        # Simulate smooth word streaming if whole text returned
-        words = response_text.split(" ")
-        for i in range(0, len(words), 3):
-            chunk = " ".join(words[i:i+3]) + " "
-            yield {"type": "token", "content": chunk}
 
         yield {"type": "done", "full_content": response_text}
 

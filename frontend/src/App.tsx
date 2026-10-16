@@ -9,6 +9,7 @@ import { InterviewStudioView } from './components/Studio/InterviewStudioView';
 import { LevelUpTrackerView } from './components/Tracker/LevelUpTrackerView';
 import { JobSearchWidget } from './components/Jobs/JobSearchWidget';
 import { LandingPage } from './components/Landing/LandingPage';
+import { CareerTreeView } from './components/CareerTree/CareerTreeView';
 import { useAppStore } from './store/useAppStore';
 
 export const App: React.FC = () => {
@@ -63,11 +64,7 @@ export const App: React.FC = () => {
 
         {/* Right Main Tool Viewport */}
         <section className="flex-1 h-full overflow-hidden flex flex-col">
-          {activeModule === 'landing' && (
-            <div className="w-full h-full overflow-y-auto">
-              <LandingPage />
-            </div>
-          )}
+          {activeModule === 'landing' && <CareerTreeView />}
           {activeModule === 'traits' && <ArtifactsViewer />}
           {activeModule === 'cvforge' && <CVForgeView />}
           {activeModule === 'trainer' && <InterviewTrainerView />}

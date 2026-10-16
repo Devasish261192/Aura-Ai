@@ -21,6 +21,7 @@ import {
 import type { MarketJob, TelegramReferral } from '../../types';
 import { API_BASE } from '../../config';
 import { useAppStore } from '../../store/useAppStore';
+import { useCurrency, formatCompensation } from '../../utils/currency';
 
 interface JobSearchWidgetProps {
   className?: string;
@@ -30,6 +31,7 @@ interface JobSearchWidgetProps {
 export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = '', isCompact = false }) => {
   const { currentUser } = useAppStore();
   const currentUserId = currentUser?.username || 'user1';
+  const [currency] = useCurrency();
 
   // Use isCompact if passed to adapt padding
   const paddingClass = isCompact ? 'p-2 space-y-2' : 'p-4 space-y-3.5';
@@ -184,15 +186,32 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
   }, [currentUserId]);
 
   // 6. Actions
-  const handleApplyNow = async (job: MarketJob) => {
-    // Open external application url
+  // View job post externally WITHOUT automatically marking applied
+  const handleViewJobPost = (job: MarketJob) => {
     if (job.job_url) {
       window.open(job.job_url, '_blank', 'noopener,noreferrer');
     }
+  };
 
-    // Mark applied on backend
+  // Toggle applied state on backend and in local state
+  const handleToggleApplied = async (job: MarketJob, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const currentlyApplied = appliedUrls.has(job.job_url);
+    const newAppliedState = !currentlyApplied;
+
+    // Optimistically update local applied state
+    setAppliedUrls((prev) => {
+      const next = new Set(prev);
+      if (newAppliedState) {
+        next.add(job.job_url);
+      } else {
+        next.delete(job.job_url);
+      }
+      return next;
+    });
+
     try {
-      await fetch(`${API_BASE}/api/jobs/mark-applied`, {
+      await fetch(`${API_BASE}/api/jobs/toggle-applied`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -200,13 +219,23 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
         },
         body: JSON.stringify({
           job_url: job.job_url,
+          applied: newAppliedState,
           job_title: job.title,
           company: job.company
         })
       });
-      setAppliedUrls((prev) => new Set([...prev, job.job_url]));
     } catch (e) {
-      console.error('Failed to mark job as applied:', e);
+      console.error('Failed to toggle applied status:', e);
+      // Revert state on failure
+      setAppliedUrls((prev) => {
+        const next = new Set(prev);
+        if (currentlyApplied) {
+          next.add(job.job_url);
+        } else {
+          next.delete(job.job_url);
+        }
+        return next;
+      });
     }
   };
 
@@ -381,6 +410,14 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                           <span className="text-gray-300 font-medium">{job.company}</span>
                           <span>•</span>
                           <span>{job.location}</span>
+                          {job.salary && (
+                            <>
+                              <span>•</span>
+                              <span className="text-emerald-400 font-mono font-medium text-xs">
+                                {formatCompensation(job.salary, currency)}
+                              </span>
+                            </>
+                          )}
                           {job.date_posted && (
                             <>
                               <span>•</span>
@@ -417,22 +454,46 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                       {job.why_fit}
                     </p>
 
-                    {/* Action Buttons (Exact Match to Screenshot) */}
+                    {/* Action Buttons */}
                     <div className="flex items-center flex-wrap gap-2 mt-3.5 pt-3 border-t border-gray-800/60">
-                      {/* Apply Now Button */}
+                      {/* View / Review Post Button (Only opens link without marking applied) */}
                       <button
-                        onClick={() => handleApplyNow(job)}
-                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-sky-500 hover:bg-sky-400 active:bg-sky-600 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm shadow-sky-500/20"
+                        onClick={() => handleViewJobPost(job)}
+                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-sky-500 hover:bg-sky-400 active:bg-sky-600 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm shadow-sky-500/20 cursor-pointer"
+                        title="Open original job posting in external tab"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
-                        <span>{isApplied ? 'Review Post' : 'Apply Now'}</span>
+                        <span>View Job Post</span>
+                      </button>
+
+                      {/* Explicit Mark as Applied Toggle */}
+                      <button
+                        onClick={(e) => handleToggleApplied(job, e)}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 border cursor-pointer ${
+                          isApplied
+                            ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50 hover:bg-emerald-900/80 shadow-sm'
+                            : 'bg-gray-800/90 text-gray-300 border-gray-700 hover:border-emerald-500/40 hover:text-white'
+                        }`}
+                        title={isApplied ? 'Click to unmark as applied' : 'Click to mark as applied'}
+                      >
+                        {isApplied ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Applied</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="w-2 h-2 rounded-full border border-gray-400"></span>
+                            <span>Mark as Applied</span>
+                          </>
+                        )}
                       </button>
 
                       {/* Cover Letter Button */}
                       <button
                         onClick={() => handleOpenCoverLetter(job.company)}
                         disabled={isLoadingLetter}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-200 bg-gray-800/90 hover:bg-gray-700/90 border border-gray-700/80 rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-60"
+                        className="px-3 py-1.5 text-xs font-medium text-gray-200 bg-gray-800/90 hover:bg-gray-700/90 border border-gray-700/80 rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-60 cursor-pointer"
                       >
                         {isLoadingLetter ? (
                           <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />

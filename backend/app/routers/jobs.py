@@ -15,6 +15,12 @@ class MarkAppliedRequest(BaseModel):
     job_title: Optional[str] = ""
     company: Optional[str] = ""
 
+class ToggleAppliedRequest(BaseModel):
+    job_url: str
+    applied: bool
+    job_title: Optional[str] = ""
+    company: Optional[str] = ""
+
 class TelegramCheckRequest(BaseModel):
     refresh: Optional[bool] = False
 
@@ -59,6 +65,18 @@ def mark_job_applied(req: MarkAppliedRequest, x_user_id: Optional[str] = Header(
     """Marks a specific job as applied."""
     uid = (x_user_id or "user1").strip().lower()
     return jobs_service.mark_job_applied(user_id=uid, job_url=req.job_url, job_title=req.job_title, company=req.company)
+
+@router.post("/api/jobs/toggle-applied")
+def toggle_job_applied(req: ToggleAppliedRequest, x_user_id: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """Toggles applied state for a job (applied: true/false)."""
+    uid = (x_user_id or "user1").strip().lower()
+    return jobs_service.toggle_job_applied(
+        user_id=uid,
+        job_url=req.job_url,
+        applied=req.applied,
+        job_title=req.job_title,
+        company=req.company
+    )
 
 @router.get("/api/jobs/cover-letter/{company}")
 def get_cover_letter(company: str, x_user_id: Optional[str] = Header(None)) -> Dict[str, Any]:

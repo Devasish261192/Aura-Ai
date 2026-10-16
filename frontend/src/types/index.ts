@@ -87,6 +87,7 @@ export interface MarketJob {
   key_matching_qualities?: string[];
   date_posted?: string;
   is_applied?: boolean;
+  salary?: string;
 }
 
 export interface TelegramReferral {

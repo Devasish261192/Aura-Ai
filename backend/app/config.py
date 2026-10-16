@@ -28,10 +28,10 @@ ARTIFACTS_DIR = get_user_artifacts_dir("user1")
 
 SQLITE_DB_PATH = DATA_DIR / "aura_v1.db"
 
-# Multi-tier resilient model configuration (tested against Google GenAI API)
-PRIMARY_MODEL = "gemini-3.8-flash"
+# Multi-tier resilient model configuration (benchmarked for sub-3s response)
+PRIMARY_MODEL = "gemini-3.6-flash"
 FALLBACK_MODELS = [
-    "gemini-3.5-flash-lite",
-    "gemini-3.6-flash",
-    "gemini-flash-latest"
+    "gemini-3.5-flash",
+    "gemini-flash-lite-latest",
+    "gemini-3.5-flash-lite"
 ]

@@ -593,18 +593,25 @@ Sincerely,
         return []
 
     def mark_job_applied(self, user_id: str = "user1", job_url: str = "", job_title: str = "", company: str = "") -> Dict[str, Any]:
+        return self.toggle_job_applied(user_id=user_id, job_url=job_url, applied=True, job_title=job_title, company=company)
+
+    def toggle_job_applied(self, user_id: str = "user1", job_url: str = "", applied: bool = True, job_title: str = "", company: str = "") -> Dict[str, Any]:
         app_file = self._get_artifacts_dir(user_id) / "applied_jobs.json"
-        applied = self.get_applied_jobs(user_id=user_id)
-        if not any(j.get("job_url") == job_url for j in applied):
-            applied.append({
-                "job_url": job_url,
-                "job_title": job_title,
-                "company": company,
-                "applied_at": datetime.utcnow().isoformat() + "Z"
-            })
-            with open(app_file, "w", encoding="utf-8") as f:
-                json.dump(applied, f, indent=2)
-        return {"status": "success", "applied_count": len(applied)}
+        applied_list = self.get_applied_jobs(user_id=user_id)
+        if applied:
+            if not any(j.get("job_url") == job_url for j in applied_list):
+                applied_list.append({
+                    "job_url": job_url,
+                    "job_title": job_title,
+                    "company": company,
+                    "applied_at": datetime.utcnow().isoformat() + "Z"
+                })
+        else:
+            applied_list = [j for j in applied_list if j.get("job_url") != job_url]
+
+        with open(app_file, "w", encoding="utf-8") as f:
+            json.dump(applied_list, f, indent=2)
+        return {"status": "success", "applied": applied, "applied_count": len(applied_list)}
 
     def get_cover_letter_content(self, user_id: str = "user1", company: str = "") -> Optional[str]:
         clean_company = re.sub(r'[^a-zA-Z0-9_ ]', '', company).strip().replace(' ', '_')

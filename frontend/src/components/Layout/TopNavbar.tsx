@@ -13,9 +13,11 @@ import {
   GitFork
 } from 'lucide-react';
 import { useAppStore, type AppModule } from '../../store/useAppStore';
+import { useCurrency } from '../../utils/currency';
 
 export const TopNavbar: React.FC = () => {
   const { activeModule, setActiveModule, artifacts, isChatCollapsed, toggleChatCollapse, currentUser, logout } = useAppStore();
+  const [currency, setCurrency] = useCurrency();
 
   const candidateName = artifacts?.profile_master?.candidate?.name || currentUser?.name || currentUser?.username || 'Aura Candidate';
   const targetProfiles = artifacts?.traits?.target_profiles || [];
@@ -130,6 +132,17 @@ export const TopNavbar: React.FC = () => {
             </span>
           </div>
         )}
+
+        {/* Currency Quick Toggle */}
+        <button
+          onClick={() => setCurrency(currency === 'INR' ? 'USD' : 'INR')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-gray-900 hover:bg-gray-800 border border-gray-800 transition-colors cursor-pointer"
+          title={`Active currency: ${currency}. Click to switch between INR (₹ Lakhs) and USD ($).`}
+        >
+          <span className={currency === 'INR' ? 'text-amber-400 font-bold' : 'text-gray-500'}>₹ INR</span>
+          <span className="text-gray-600 font-mono">/</span>
+          <span className={currency === 'USD' ? 'text-cyan-400 font-bold' : 'text-gray-500'}>$ USD</span>
+        </button>
 
         {/* Toggle Counselor Chat */}
         <button

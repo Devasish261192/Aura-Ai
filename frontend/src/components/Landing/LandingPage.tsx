@@ -16,6 +16,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
+import { useCurrency, formatCompensation } from '../../utils/currency';
 
 interface CareerNode {
   id: string;
@@ -415,6 +416,7 @@ export const LandingPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLogin
   const [passwordInput, setPasswordInput] = useState('password1234');
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [currency] = useCurrency();
 
   const activeTrack = CAREER_TRACKS.find((t) => t.id === activeTrackId) || CAREER_TRACKS[0];
 
@@ -537,7 +539,7 @@ export const LandingPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLogin
                 Autonomous Career Coach & Predictive Planner
               </span>
               <span className="text-white/20">•</span>
-              <span className="font-mono text-xs text-gray-400">Real-Time EV Calculation</span>
+              <span className="font-mono text-xs text-gray-400">Real-Time CV Calculation</span>
             </div>
 
             <h1 className="font-headline font-bold text-4xl sm:text-6xl text-white tracking-tight leading-[1.15] mb-6">
@@ -1281,7 +1283,7 @@ export const LandingPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLogin
                   {selectedNode.title}
                 </h3>
                 <span className="font-mono text-xs text-emerald-400 font-semibold">
-                  {selectedNode.compRange}
+                  {formatCompensation(selectedNode.compRange, currency)}
                 </span>
               </div>
               <button

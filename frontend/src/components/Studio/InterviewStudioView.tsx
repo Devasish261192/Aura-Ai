@@ -174,10 +174,10 @@ export const InterviewStudioView: React.FC = () => {
         isCeoModel: true,
         cadence: `${wpm} WPM (${words} words recorded • Target: 130–140 WPM)`,
         pillars: {
-          whatYouDo: 'Part 1 (What You Do): Established executive title and US healthcare domain authority.',
-          whoYouHelp: 'Part 2 (Who You Help): Directly targeted healthcare operations and engineering bottlenecks.',
-          howYouHelp: 'Part 3 (How You Help): Quantified mechanism (130+ SPs, 80% automated reporting, 60% SLA jump).',
-          whyDifferent: 'Part 4 (Why You Are Different): Articulated unique moat (8.5 yrs enterprise stability + systems builder).'
+          whatYouDo: 'Part 1 (What You Do): Established executive title and domain scope in first 20 seconds.',
+          whoYouHelp: 'Part 2 (Who You Help): Directly targeted stakeholder operational pain and bottlenecks.',
+          howYouHelp: 'Part 3 (How You Help): Quantified mechanism and metrics turnaround.',
+          whyDifferent: 'Part 4 (Why You Are Different): Articulated unique moat and high-agency execution.'
         },
         deliveryMetrics: {
           downwardInflection: '94% (Authoritative down-pitch statements; zero permission uptalk)',
@@ -217,9 +217,10 @@ export const InterviewStudioView: React.FC = () => {
       <div className="flex items-center justify-between p-3.5 rounded-xl bg-gray-900 border border-gray-800 shrink-0">
         <div className="flex items-center space-x-3">
           <FolderOpen className="w-4 h-4 text-purple-400" />
-          <span className="text-xs text-gray-400 font-medium">Recordings Path:</span>
-          <span className="text-xs font-mono text-purple-300 bg-gray-950 px-3 py-1 rounded-lg border border-gray-800">
-            D:\job search\recordings\session_stream.webm
+          <span className="text-xs text-gray-400 font-medium">Local Stream Storage:</span>
+          <span className="text-xs font-mono text-purple-300 bg-gray-950 px-3 py-1 rounded-lg border border-gray-800 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            Local Browser Media (Encrypted Client Storage)
           </span>
         </div>
 
@@ -227,9 +228,9 @@ export const InterviewStudioView: React.FC = () => {
           <select
             value={selectedRound}
             onChange={(e: any) => setSelectedRound(e.target.value)}
-            className="bg-gray-950 text-xs text-gray-200 border border-gray-800 px-3 py-1.5 rounded-lg focus:outline-none"
+            className="bg-gray-950 text-xs text-gray-200 border border-gray-800 px-3 py-1.5 rounded-lg focus:outline-none cursor-pointer"
           >
-            <option value="CEO_Intro">CEO Introduction (Yasir Khan 4-Part Model)</option>
+            <option value="CEO_Intro">Professional Introduction (Executive 4-Part Pitch)</option>
             <option value="Behavioral">Behavioral (STAR-L)</option>
             <option value="Technical">Technical Round (Database & Architecture)</option>
             <option value="Executive">Executive & Strategy Round</option>
@@ -248,7 +249,7 @@ export const InterviewStudioView: React.FC = () => {
           <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
             <div className="flex items-center justify-between text-xs text-gray-400">
               <span className="font-semibold text-purple-400 uppercase tracking-wider">
-                {selectedRound === 'CEO_Intro' ? 'CEO Executive Pitch' : 'Question 1 of 5'}
+                {selectedRound === 'CEO_Intro' ? 'Executive 4-Part Pitch' : 'Question 1 of 5'}
               </span>
               <span className="font-mono bg-gray-800 px-2 py-0.5 rounded text-[10px]">Round: {selectedRound}</span>
             </div>
@@ -257,15 +258,15 @@ export const InterviewStudioView: React.FC = () => {
                 ? 'Walk me through your background and introduce yourself.'
                 : selectedRound === 'Behavioral'
                 ? 'Can you describe a high-stakes production incident or outage where you led cross-functional resolution under stringent SLAs?'
-                : 'Walk through an enterprise data pipeline or database architecture where you optimized query performance or resolved deadlock bottlenecks.'}
+                : 'Walk through an enterprise system, pipeline or operational workflow where you resolved bottlenecks or improved scalability.'}
             </h3>
             <ul className="text-xs text-gray-400 space-y-1 list-disc pl-4 marker:text-purple-400">
               {selectedRound === 'CEO_Intro' ? (
                 <>
-                  <li><strong>Part 1 (What You Do):</strong> Executive identity & domain authority (no chronological school/job lists).</li>
-                  <li><strong>Part 2 (Who You Help):</strong> Frame target stakeholders & operational pain points eliminated.</li>
-                  <li><strong>Part 3 (How You Help):</strong> Quantified mechanism (130+ SPs, 80% automated reporting, 60% SLA jump).</li>
-                  <li><strong>Part 4 (Why You Are Different):</strong> Your Moat (8.5 yrs enterprise stability + systems builder mindset).</li>
+                  <li><strong>Part 1 (What You Do):</strong> High-status professional title & domain scope (avoid chronological school/job lists).</li>
+                  <li><strong>Part 2 (Who You Help):</strong> Frame target business stakeholders & operational friction you eliminate.</li>
+                  <li><strong>Part 3 (How You Help):</strong> Concrete mechanisms, technical workflows & quantified metrics ROI.</li>
+                  <li><strong>Part 4 (Why You Are Different):</strong> Your unique career Moat & high-agency execution.</li>
                 </>
               ) : (
                 <>
