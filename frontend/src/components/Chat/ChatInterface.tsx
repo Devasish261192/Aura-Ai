@@ -20,6 +20,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useAppStore, type AppModule } from '../../store/useAppStore';
+import { API_BASE } from '../../config';
 import { MessageItem } from './MessageItem';
 
 interface ChatInterfaceProps {
@@ -72,7 +73,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (!inputText.trim() || isPolishing) return;
     try {
       setIsPolishing(true);
-      const res = await fetch('http://127.0.0.1:8000/api/chat/polish', {
+      const res = await fetch(`${API_BASE}/api/chat/polish`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: inputText.trim() })
@@ -142,7 +143,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch('http://127.0.0.1:8000/api/resume/parse-cv', {
+      const res = await fetch(`${API_BASE}/api/resume/parse-cv`, {
         method: 'POST',
         body: formData
       });

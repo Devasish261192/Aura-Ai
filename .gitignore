@@ -16,7 +16,7 @@ telegram_session.session
 
 # User artifacts & Personal Vault (Resumes, cover letters, uploaded PDFs, career stories)
 data/artifacts/
-**/artifacts/
+backend/data/artifacts/
 user_data/
 **/user_data/
 data/aura_v1.db

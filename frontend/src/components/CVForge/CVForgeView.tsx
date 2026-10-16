@@ -6,6 +6,7 @@ import {
   ExternalLink,
   Bookmark
 } from 'lucide-react';
+import { API_BASE } from '../../config';
 
 const TRACK_OPTIONS = [
   {
@@ -41,7 +42,7 @@ export const CVForgeView: React.FC = () => {
 
   const handleDownload = (format: 'pdf' | 'docx') => {
     setIsDownloading(format);
-    const url = `http://127.0.0.1:8000/api/resume/download/${selectedTrack.slug}/${format}`;
+    const url = `${API_BASE}/api/resume/download/${selectedTrack.slug}/${format}`;
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', '');
@@ -120,7 +121,7 @@ export const CVForgeView: React.FC = () => {
           </button>
 
           <a
-            href="http://127.0.0.1:8000/cv-forge/"
+            href={`${API_BASE}/cv-forge/`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs transition-colors border border-gray-700"
@@ -135,7 +136,7 @@ export const CVForgeView: React.FC = () => {
       <div className="flex-1 w-full h-full relative bg-gray-950">
         <iframe
           key={iframeKey}
-          src="http://127.0.0.1:8000/cv-forge/"
+          src={`${API_BASE}/cv-forge/`}
           className="w-full h-full border-none"
           title="CV Forge Studio"
           allow="fullscreen; clipboard-read; clipboard-write"
