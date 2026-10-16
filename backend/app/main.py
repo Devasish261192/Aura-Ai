@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import init_db
-from .routers import chat, artifacts, resume, jobs
+from .routers import chat, artifacts, resume, jobs, auth
 
 app = FastAPI(
     title="Aura Career Engine API (v1.0)",
@@ -47,6 +47,7 @@ app.include_router(artifacts.router)
 app.include_router(resume.router)
 app.include_router(resume.cv_forge_router)
 app.include_router(jobs.router)
+app.include_router(auth.router)
 
 # Mount CV Forge Interactive Studio
 from fastapi.staticfiles import StaticFiles

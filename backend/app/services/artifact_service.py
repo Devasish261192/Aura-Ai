@@ -6,8 +6,23 @@ import tempfile
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, List, Optional
-from ..config import ARTIFACTS_DIR
+from ..config import ARTIFACTS_DIR, get_user_artifacts_dir
 from ..database import log_artifact_mutation
+
+_current_active_user: str = "user1"
+
+def set_active_user(user_id: str):
+    """Sets the active user session context for artifact mutations."""
+    global _current_active_user
+    if user_id:
+        clean = re.sub(r'[^a-zA-Z0-9_-]', '', user_id)
+        if clean:
+            _current_active_user = clean
+
+def get_active_artifacts_dir(user_id: Optional[str] = None) -> Path:
+    """Returns the isolated artifact directory for the target or active user."""
+    target_user = user_id or _current_active_user
+    return get_user_artifacts_dir(target_user)
 
 def _atomic_write_json(file_path: Path, data: Dict[str, Any]):
     """Writes JSON atomically using a temp file and rename to prevent corruption."""
@@ -17,8 +32,8 @@ def _atomic_write_json(file_path: Path, data: Dict[str, Any]):
         temp_name = tf.name
     os.replace(temp_name, file_path)
 
-def get_artifact(name: str) -> Optional[Dict[str, Any]]:
-    target = ARTIFACTS_DIR / f"{name}.json"
+def get_artifact(name: str, user_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    target = get_active_artifacts_dir(user_id) / f"{name}.json"
     if not target.exists():
         return None
     try:
@@ -28,12 +43,12 @@ def get_artifact(name: str) -> Optional[Dict[str, Any]]:
         print(f"Error loading artifact {name}: {e}")
         return None
 
-def get_all_artifacts() -> Dict[str, Any]:
+def get_all_artifacts(user_id: Optional[str] = None) -> Dict[str, Any]:
     return {
-        "career_story": get_artifact("career_story") or {},
-        "traits": get_artifact("traits") or {},
-        "profile_master": get_artifact("profile_master") or {},
-        "skills_matrix": get_artifact("skills_matrix") or {}
+        "career_story": get_artifact("career_story", user_id=user_id) or {},
+        "traits": get_artifact("traits", user_id=user_id) or {},
+        "profile_master": get_artifact("profile_master", user_id=user_id) or {},
+        "skills_matrix": get_artifact("skills_matrix", user_id=user_id) or {}
     }
 
 def add_or_update_career_story(
@@ -106,7 +121,7 @@ def add_or_update_career_story(
     data["version"] = data.get("version", 1) + 1
     data["last_updated"] = datetime.utcnow().isoformat() + "Z"
     
-    _atomic_write_json(ARTIFACTS_DIR / "career_story.json", data)
+    _atomic_write_json(get_active_artifacts_dir() / "career_story.json", data)
     log_artifact_mutation("career_story", "UPDATE" if updated else "INSERT", {"story_id": story_id, "title": title})
     
     return {
@@ -182,7 +197,7 @@ def save_work_experience_entry(
     data["version"] = data.get("version", 1) + 1
     data["last_updated"] = datetime.utcnow().isoformat() + "Z"
     
-    _atomic_write_json(ARTIFACTS_DIR / "profile_master.json", data)
+    _atomic_write_json(get_active_artifacts_dir() / "profile_master.json", data)
     log_artifact_mutation("profile_master", "UPDATE" if updated else "INSERT", {"company": company, "role": role})
     
     return {
@@ -233,7 +248,7 @@ def update_candidate_traits(
     data["version"] = data.get("version", 1) + 1
     data["last_updated"] = datetime.utcnow().isoformat() + "Z"
     
-    _atomic_write_json(ARTIFACTS_DIR / "traits.json", data)
+    _atomic_write_json(get_active_artifacts_dir() / "traits.json", data)
     log_artifact_mutation("traits", "UPDATE", {"traits_count": len(data.get("personality_traits", []))})
     
     return {"status": "success", "traits_version": data["version"]}
@@ -261,7 +276,7 @@ def add_skills_to_matrix(category: str, skills: List[Dict[str, Any]]) -> Dict[st
     data["version"] = data.get("version", 1) + 1
     data["last_updated"] = datetime.utcnow().isoformat() + "Z"
     
-    _atomic_write_json(ARTIFACTS_DIR / "skills_matrix.json", data)
+    _atomic_write_json(get_active_artifacts_dir() / "skills_matrix.json", data)
     log_artifact_mutation("skills_matrix", "UPDATE", {"category": category, "added": len(skills)})
     
     return {"status": "success", "category": category, "matrix_version": data["version"]}
@@ -343,7 +358,7 @@ def edit_existing_story_in_vault(
 
     data["version"] = data.get("version", 1) + 1
     data["last_updated"] = datetime.utcnow().isoformat() + "Z"
-    _atomic_write_json(ARTIFACTS_DIR / "career_story.json", data)
+    _atomic_write_json(get_active_artifacts_dir() / "career_story.json", data)
     log_artifact_mutation("career_story", "UPDATE", {"story_id": matched_story.get("id"), "title": matched_story.get("title")})
 
     return {
@@ -382,7 +397,7 @@ def modify_cv_forge_resume_in_vault(
 
     data["version"] = data.get("version", 1) + 1
     data["last_updated"] = datetime.utcnow().isoformat() + "Z"
-    _atomic_write_json(ARTIFACTS_DIR / "profile_master.json", data)
+    _atomic_write_json(get_active_artifacts_dir() / "profile_master.json", data)
 
     try:
         from .resume_service import resume_service

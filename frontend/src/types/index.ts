@@ -105,6 +105,12 @@ export interface TelegramReferral {
   raw_text?: string;
 }
 
+export interface AuthUser {
+  username: string;
+  name: string;
+  role_track: string;
+}
+
 export interface ArtifactsMap {
   career_story: CareerStoryArtifact;
   traits: TraitsArtifact;

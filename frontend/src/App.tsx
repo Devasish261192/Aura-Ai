@@ -8,16 +8,23 @@ import { InterviewTrainerView } from './components/Trainer/InterviewTrainerView'
 import { InterviewStudioView } from './components/Studio/InterviewStudioView';
 import { LevelUpTrackerView } from './components/Tracker/LevelUpTrackerView';
 import { JobSearchWidget } from './components/Jobs/JobSearchWidget';
+import { LoginView } from './components/Auth/LoginView';
 import { useAppStore } from './store/useAppStore';
 
 export const App: React.FC = () => {
-  const { activeModule, fetchArtifacts, fetchChatHistory, isChatCollapsed, setChatCollapsed } = useAppStore();
+  const { currentUser, activeModule, fetchArtifacts, fetchChatHistory, isChatCollapsed, setChatCollapsed } = useAppStore();
   const [chatWidth, setChatWidth] = useState<'380px' | '50%'>('380px');
 
   useEffect(() => {
-    fetchArtifacts();
-    fetchChatHistory();
-  }, [fetchArtifacts, fetchChatHistory]);
+    if (currentUser) {
+      fetchArtifacts();
+      fetchChatHistory();
+    }
+  }, [currentUser, fetchArtifacts, fetchChatHistory]);
+
+  if (!currentUser) {
+    return <LoginView />;
+  }
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-gray-950 text-gray-100">

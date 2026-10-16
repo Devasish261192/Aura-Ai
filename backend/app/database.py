@@ -35,6 +35,19 @@ def init_db():
                 timestamp TEXT NOT NULL
             );
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS seen_jobs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL,
+                job_hash TEXT NOT NULL,
+                title TEXT NOT NULL,
+                company TEXT NOT NULL,
+                location TEXT,
+                job_url TEXT,
+                seen_at TEXT NOT NULL,
+                UNIQUE(user_id, job_hash)
+            );
+        """)
     conn.close()
 
 def save_chat_message(
@@ -105,4 +118,27 @@ def log_artifact_mutation(artifact_name: str, operation: str, details: Optional[
             json.dumps(details) if details else None,
             datetime.utcnow().isoformat() + "Z"
         ))
+    conn.close()
+
+def is_job_seen(user_id: str, job_hash: str) -> bool:
+    """Checks if a job hash has already been served to this user."""
+    conn = get_db_connection()
+    row = conn.execute("SELECT 1 FROM seen_jobs WHERE user_id = ? AND job_hash = ?", (user_id, job_hash)).fetchone()
+    conn.close()
+    return row is not None
+
+def record_seen_jobs(user_id: str, jobs: List[Dict[str, Any]]):
+    """Inserts a batch of jobs into seen_jobs so they are never served again as fresh duplicates."""
+    conn = get_db_connection()
+    now_iso = datetime.utcnow().isoformat() + "Z"
+    with conn:
+        for j in jobs:
+            title = (j.get("title") or "").strip()
+            company = (j.get("company") or "").strip()
+            url = (j.get("job_url") or "").strip()
+            job_hash = f"{company.lower()}::{title.lower()}"
+            conn.execute("""
+                INSERT OR IGNORE INTO seen_jobs (user_id, job_hash, title, company, location, job_url, seen_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (user_id, job_hash, title, company, j.get("location", ""), url, now_iso))
     conn.close()

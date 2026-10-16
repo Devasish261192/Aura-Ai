@@ -8,14 +8,15 @@ import {
   Dna,
   Activity,
   User,
-  Briefcase
+  Briefcase,
+  LogOut
 } from 'lucide-react';
 import { useAppStore, type AppModule } from '../../store/useAppStore';
 
 export const TopNavbar: React.FC = () => {
-  const { activeModule, setActiveModule, artifacts, isChatCollapsed, toggleChatCollapse } = useAppStore();
+  const { activeModule, setActiveModule, artifacts, isChatCollapsed, toggleChatCollapse, currentUser, logout } = useAppStore();
 
-  const candidateName = artifacts?.profile_master?.candidate?.name || 'Aura Candidate';
+  const candidateName = artifacts?.profile_master?.candidate?.name || currentUser?.name || currentUser?.username || 'Aura Candidate';
   const targetProfiles = artifacts?.traits?.target_profiles || [];
   const topTrack = targetProfiles[0];
 
@@ -141,8 +142,24 @@ export const TopNavbar: React.FC = () => {
           <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
             <User className="w-3 h-3" />
           </div>
-          <span className="font-medium text-xs text-gray-200">{candidateName}</span>
+          <span className="font-medium text-xs text-gray-200 truncate max-w-[120px]">{candidateName}</span>
+          {currentUser && (
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              {currentUser.username}
+            </span>
+          )}
         </div>
+
+        {currentUser && (
+          <button
+            onClick={logout}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-rose-400 hover:bg-rose-950/30 border border-transparent hover:border-rose-900/40 transition-colors cursor-pointer"
+            title="Sign Out / Switch Tester"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sign Out</span>
+          </button>
+        )}
 
         <div className="flex items-center space-x-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-mono">
           <Activity className="w-3 h-3 animate-pulse" />

@@ -118,11 +118,11 @@ CONVERSATIONAL & ASSESSMENT FLOW:
    - Always call the tools deterministically when facts or instructions are provided. Never claim an update was saved unless the tool was executed.
 """
 
-def get_dynamic_vault_system_prompt() -> str:
+def get_dynamic_vault_system_prompt(user_id: str = "user1") -> str:
     """Dynamically checks the canonical career vault and returns a high-priority status block."""
     try:
         from .artifact_service import get_all_artifacts
-        artifacts = get_all_artifacts()
+        artifacts = get_all_artifacts(user_id=user_id)
         stories = artifacts.get("career_story", {}).get("stories", [])
         story_count = len(stories)
         
@@ -168,7 +168,7 @@ class AIService:
                 parts=[types.Part.from_text(text=msg["content"])]
             ))
 
-        dynamic_instruction = SYSTEM_INSTRUCTION + "\n" + get_dynamic_vault_system_prompt()
+        dynamic_instruction = SYSTEM_INSTRUCTION + "\n" + get_dynamic_vault_system_prompt(session_id)
 
         chat = self.client.chats.create(
             model=model_name,
@@ -192,6 +192,10 @@ class AIService:
         Sends a message to Gemini and yields streaming chunks (Server-Sent Events).
         Handles Automatic Function Calling and yields tool events to the frontend.
         """
+        # Set active user context for tools & artifacts
+        from .artifact_service import set_active_user
+        set_active_user(session_id)
+
         # Fetch prior chat history BEFORE saving current user message to prevent duplicates in prompt
         prior_history = get_chat_history(session_id, limit=40)
 

@@ -1,9 +1,32 @@
 import { create } from 'zustand';
-import type { ChatMessage, ArtifactsMap } from '../types';
+import type { ChatMessage, ArtifactsMap, AuthUser } from '../types';
+import { API_BASE } from '../config';
 
 export type AppModule = 'traits' | 'cvforge' | 'trainer' | 'interview' | 'tracker' | 'jobs';
 
+export const getWelcomeMessage = (user: AuthUser | null): ChatMessage => {
+  const roleHint = user?.role_track ? ` tailored for **${user.role_track}**` : '';
+  const greeting = user?.name ? `Hi **${user.name}**` : 'Hi';
+  return {
+    id: 'welcome_1',
+    role: 'model',
+    content: `${greeting}, I am **Aura**, your career personal assistant${roleHint}.\n\nTogether, we will map out your career roadmap, turn your real experience into powerful stories, and guide your growth step-by-step.\n\n### How We Will Work Together:\n1. **One Point at a Time:** We build each story step-by-step (Situation → Plan → Execution → Result). You never have to narrate the whole story at once.\n2. **Effortless & Conversational:** Speak or type naturally—I handle the structuring and metrics extraction.\n3. **Permanent Vault:** Every detail you share is saved directly into your personal career vault.\n\nTo begin: **What is your most recent organization, and at what professional role did you work there?**`,
+    createdAt: new Date().toISOString()
+  };
+};
+
+let storedUser: AuthUser | null = null;
+try {
+  const raw = localStorage.getItem('aura_current_user');
+  if (raw) {
+    storedUser = JSON.parse(raw);
+  }
+} catch {
+  storedUser = null;
+}
+
 interface AppState {
+  currentUser: AuthUser | null;
   messages: ChatMessage[];
   isStreaming: boolean;
   currentToolEvents: Array<{ tool: string; args: Record<string, any> }>;
@@ -13,6 +36,8 @@ interface AppState {
   isChatCollapsed: boolean;
   
   // Actions
+  login: (username: string, password: string) => Promise<boolean>;
+  logout: () => void;
   addMessage: (msg: ChatMessage) => void;
   fetchArtifacts: () => Promise<void>;
   fetchChatHistory: () => Promise<void>;
@@ -24,17 +49,9 @@ interface AppState {
   clearChat: () => void;
 }
 
-import { API_BASE } from '../config';
-
 export const useAppStore = create<AppState>((set, get) => ({
-  messages: [
-    {
-      id: 'welcome_1',
-      role: 'model',
-      content: "Hi, I am **Aura**, your career personal assistant.\n\nTogether, we will map out your career roadmap, turn your real experience into powerful stories, and guide your growth step-by-step.\n\n### How We Will Work Together:\n1. **One Point at a Time:** We build each story step-by-step (Situation → Plan → Execution → Result). You never have to narrate the whole story at once.\n2. **Effortless & Conversational:** Speak or type naturally—I handle the structuring and metrics extraction.\n3. **Permanent Vault:** Every detail you share is saved directly into your personal career vault.\n\nTo begin: **What is your most recent organization, and at what professional role did you work there?**",
-      createdAt: new Date().toISOString()
-    }
-  ],
+  currentUser: storedUser,
+  messages: [getWelcomeMessage(storedUser)],
   isStreaming: false,
   currentToolEvents: [],
   artifacts: null,
@@ -42,17 +59,58 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeModule: 'traits',
   isChatCollapsed: false,
 
+  login: async (username: string, password: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      if (data.status === 'success' && data.user) {
+        localStorage.setItem('aura_current_user', JSON.stringify(data.user));
+        set({
+          currentUser: data.user,
+          messages: [getWelcomeMessage(data.user)],
+          artifacts: null
+        });
+        await get().fetchArtifacts();
+        await get().fetchChatHistory();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Login error:', err);
+      return false;
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem('aura_current_user');
+    set({
+      currentUser: null,
+      artifacts: null,
+      messages: [getWelcomeMessage(null)]
+    });
+  },
+
   setActiveModule: (m) => set({ activeModule: m }),
   setActiveProfileTab: (tab) => set({ activeProfileTab: tab }),
   toggleChatCollapse: () => set((state) => ({ isChatCollapsed: !state.isChatCollapsed })),
   setChatCollapsed: (collapsed) => set({ isChatCollapsed: collapsed }),
-  clearChat: () => set((state) => ({ messages: [state.messages[0]] })),
+  clearChat: () => set((state) => ({ messages: [getWelcomeMessage(state.currentUser)] })),
 
   addMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),
 
   fetchArtifacts: async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/artifacts`);
+      const user = get().currentUser?.username || 'user1';
+      const res = await fetch(`${API_BASE}/api/artifacts`, {
+        headers: {
+          'X-User-Id': user
+        }
+      });
       if (res.ok) {
         const data = await res.json();
         set({ artifacts: data });
@@ -64,9 +122,15 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   fetchChatHistory: async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/chat/history?session_id=default_session`);
+      const user = get().currentUser?.username || 'user1';
+      const res = await fetch(`${API_BASE}/api/chat/history?session_id=${encodeURIComponent(user)}`, {
+        headers: {
+          'X-User-Id': user
+        }
+      });
       if (res.ok) {
         const data = await res.json();
+        const welcomeMsg = getWelcomeMessage(get().currentUser);
         if (Array.isArray(data) && data.length > 0) {
           const loadedMessages: ChatMessage[] = data.map((item: any) => ({
             id: `msg_${item.id}`,
@@ -77,8 +141,9 @@ export const useAppStore = create<AppState>((set, get) => ({
             createdAt: item.created_at || new Date().toISOString()
           }));
 
-          const welcomeMsg = get().messages[0];
           set({ messages: [welcomeMsg, ...loadedMessages] });
+        } else {
+          set({ messages: [welcomeMsg] });
         }
       }
     } catch (e) {
@@ -88,6 +153,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   sendMessage: async (content: string, isVoice = false) => {
     if (!content.trim() || get().isStreaming) return;
+
+    const user = get().currentUser?.username || 'user1';
 
     const userMessage: ChatMessage = {
       id: `usr_${Date.now()}`,
@@ -106,10 +173,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-User-Id': user
+        },
         body: JSON.stringify({
           message: content,
-          session_id: 'default_session',
+          session_id: user,
           is_voice: isVoice
         })
       });

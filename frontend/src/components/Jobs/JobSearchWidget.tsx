@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import type { MarketJob, TelegramReferral } from '../../types';
 import { API_BASE } from '../../config';
+import { useAppStore } from '../../store/useAppStore';
 
 interface JobSearchWidgetProps {
   className?: string;
@@ -27,6 +28,9 @@ interface JobSearchWidgetProps {
 }
 
 export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = '', isCompact = false }) => {
+  const { currentUser } = useAppStore();
+  const currentUserId = currentUser?.username || 'user1';
+
   // Use isCompact if passed to adapt padding
   const paddingClass = isCompact ? 'p-2 space-y-2' : 'p-4 space-y-3.5';
   const [activeSubTab, setActiveSubTab] = useState<'market' | 'telegram'>('market');
@@ -40,7 +44,11 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
   const [isLoadingMarket, setIsLoadingMarket] = useState(false);
   const [appliedUrls, setAppliedUrls] = useState<Set<string>>(new Set());
 
-  // Telegram Referrals State
+  // Telegram Group State (blank by default for privacy & configurable by user)
+  const [telegramGroup, setTelegramGroup] = useState<string>(() => {
+    return localStorage.getItem('aura_telegram_group') || '';
+  });
+  const [telegramInput, setTelegramInput] = useState<string>(telegramGroup);
   const [telegramReferrals, setTelegramReferrals] = useState<TelegramReferral[]>([]);
   const [isLoadingTelegram, setIsLoadingTelegram] = useState(false);
   const [copiedPitchId, setCopiedPitchId] = useState<number | null>(null);
@@ -57,7 +65,9 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
   const fetchMarketJobs = async (page: number = 1, loc: string = locationInput) => {
     setIsLoadingMarket(true);
     try {
-      const res = await fetch(`${API_BASE}/api/jobs/matched?page=${page}&location=${encodeURIComponent(loc)}`);
+      const res = await fetch(`${API_BASE}/api/jobs/matched?page=${page}&location=${encodeURIComponent(loc)}`, {
+        headers: { 'X-User-Id': currentUserId }
+      });
       if (res.ok) {
         const json = await res.json();
         const data = json.data || {};
@@ -76,7 +86,9 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
   // 2. Fetch Applied Jobs
   const fetchAppliedJobs = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/jobs/applied`);
+      const res = await fetch(`${API_BASE}/api/jobs/applied`, {
+        headers: { 'X-User-Id': currentUserId }
+      });
       if (res.ok) {
         const json = await res.json();
         const urls = new Set<string>((json.applied_jobs || []).map((j: any) => j.job_url));
@@ -87,14 +99,17 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
     }
   };
 
-  // 3. Discover / Re-fetch Fresh Market Jobs
+  // 3. Discover / Re-fetch Fresh Market Jobs (Adaptable to logged-in user domain)
   const handleDiscoverLiveRoles = async () => {
     setIsLoadingMarket(true);
     try {
       const res = await fetch(`${API_BASE}/api/jobs/fetch-next-batch`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ location: locationInput, query: 'Senior Data Analyst' })
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-User-Id': currentUserId
+        },
+        body: JSON.stringify({ location: locationInput, query: '' })
       });
       if (res.ok) {
         await fetchMarketJobs(1, locationInput);
@@ -108,16 +123,25 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
 
   // 4. Fetch Telegram Referrals
   const fetchTelegramReferrals = async (forceRefresh: boolean = false) => {
+    if (!telegramGroup) {
+      setTelegramReferrals([]);
+      return;
+    }
     setIsLoadingTelegram(true);
     try {
       const url = forceRefresh ? `${API_BASE}/api/telegram/check-referrals` : `${API_BASE}/api/telegram/referrals`;
       const res = forceRefresh
         ? await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'X-User-Id': currentUserId
+            },
             body: JSON.stringify({ refresh: true })
           })
-        : await fetch(url);
+        : await fetch(url, {
+            headers: { 'X-User-Id': currentUserId }
+          });
 
       if (res.ok) {
         const json = await res.json();
@@ -130,12 +154,34 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
     }
   };
 
+  const handleSaveTelegramGroup = () => {
+    const trimmed = telegramInput.trim();
+    localStorage.setItem('aura_telegram_group', trimmed);
+    setTelegramGroup(trimmed);
+    if (trimmed) {
+      fetchTelegramReferrals(true);
+    } else {
+      setTelegramReferrals([]);
+    }
+  };
+
+  const handleClearTelegramGroup = () => {
+    localStorage.removeItem('aura_telegram_group');
+    setTelegramGroup('');
+    setTelegramInput('');
+    setTelegramReferrals([]);
+  };
+
   // 5. Initial Load
   useEffect(() => {
     fetchMarketJobs(1);
     fetchAppliedJobs();
-    fetchTelegramReferrals(false);
-  }, []);
+    if (telegramGroup) {
+      fetchTelegramReferrals(false);
+    } else {
+      setTelegramReferrals([]);
+    }
+  }, [currentUserId]);
 
   // 6. Actions
   const handleApplyNow = async (job: MarketJob) => {
@@ -148,7 +194,10 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
     try {
       await fetch(`${API_BASE}/api/jobs/mark-applied`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-User-Id': currentUserId
+        },
         body: JSON.stringify({
           job_url: job.job_url,
           job_title: job.title,
@@ -165,7 +214,9 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
     setIsLoadingLetter(true);
     setCopiedLetter(false);
     try {
-      const res = await fetch(`${API_BASE}/api/jobs/cover-letter/${encodeURIComponent(company)}`);
+      const res = await fetch(`${API_BASE}/api/jobs/cover-letter/${encodeURIComponent(company)}`, {
+        headers: { 'X-User-Id': currentUserId }
+      });
       if (res.ok) {
         const json = await res.json();
         setCoverLetterModal({ company, content: json.content || '' });
@@ -437,21 +488,55 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
         {/* ----------------- TELEGRAM REFERRALS TAB ----------------- */}
         {activeSubTab === 'telegram' && (
           <>
-            {/* Telegram Channel Info Banner */}
-            <div className="p-3 bg-sky-950/30 border border-sky-800/40 rounded-xl flex items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <Send className="w-4 h-4 text-sky-400 shrink-0" />
-                <div>
-                  <span className="font-semibold text-sky-200">Private Tech Referral Supergroup</span>
-                  <p className="text-[10px] text-sky-400/80 font-mono truncate max-w-xs">
-                    https://t.me/c/1590800657/28269
-                  </p>
+            {/* Telegram Channel / Group Connection Box */}
+            <div className="p-3 bg-gray-900/80 border border-gray-800 rounded-xl space-y-2.5 text-xs">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Send className="w-4 h-4 text-sky-400 shrink-0" />
+                  <div>
+                    <span className="font-semibold text-gray-200">Telegram Channel & Group Connector</span>
+                    <p className="text-[10px] text-gray-400">Connect any public channel username or group link to scan live referral posts</p>
+                  </div>
                 </div>
+                {telegramGroup ? (
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1 shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Connected
+                  </span>
+                ) : (
+                  <span className="text-[10px] bg-gray-800 text-gray-400 font-medium px-2 py-0.5 rounded-full border border-gray-700 shrink-0">
+                    Not Configured
+                  </span>
+                )}
               </div>
-              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1 shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Connected
-              </span>
+
+              {/* Group ID / Link Input */}
+              <div className="flex items-center gap-2 pt-1 border-t border-gray-800/60">
+                <input
+                  type="text"
+                  value={telegramInput}
+                  onChange={(e) => setTelegramInput(e.target.value)}
+                  placeholder="Enter Telegram Group ID or link (e.g. @tech_jobs or https://t.me/...)"
+                  className="flex-1 px-3 py-1.5 bg-gray-950 border border-gray-800 rounded-lg text-xs text-white placeholder-gray-600 focus:outline-none focus:border-sky-500 font-mono transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveTelegramGroup}
+                  className="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold shadow-md shadow-sky-600/20 transition-all cursor-pointer shrink-0"
+                >
+                  Save Group
+                </button>
+                {telegramGroup && (
+                  <button
+                    type="button"
+                    onClick={handleClearTelegramGroup}
+                    className="px-2 py-1.5 bg-gray-800 hover:bg-rose-950/40 hover:text-rose-300 text-gray-400 rounded-lg text-xs transition-colors cursor-pointer shrink-0"
+                    title="Disconnect Group"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
 
             {isLoadingTelegram ? (
@@ -459,10 +544,18 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                 <RefreshCw className="w-6 h-6 animate-spin text-sky-400 mb-2" />
                 <p className="text-xs">Analyzing Telegram group posts & drafting referral pitches...</p>
               </div>
+            ) : !telegramGroup ? (
+              <div className="text-center py-12 px-4 bg-gray-900/40 rounded-xl border border-gray-800/80 space-y-2">
+                <Send className="w-8 h-8 text-sky-500/30 mx-auto" />
+                <p className="text-xs text-gray-200 font-semibold">No Telegram Group Connected</p>
+                <p className="text-[11px] text-gray-400 max-w-sm mx-auto">
+                  To scan real-time tech referral posts, enter your Telegram community or channel ID in the field above and click <strong>Save Group</strong>.
+                </p>
+              </div>
             ) : telegramReferrals.length === 0 ? (
               <div className="text-center py-12 px-4 bg-gray-900/40 rounded-xl border border-gray-800/80">
                 <Send className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                <p className="text-xs text-gray-300 font-medium">No verified referrals cached.</p>
+                <p className="text-xs text-gray-300 font-medium">No verified referrals cached for this group.</p>
                 <p className="text-[11px] text-gray-500 mt-1 mb-3">Re-scan Telegram group messages to identify real hiring posts.</p>
                 <button
                   onClick={() => fetchTelegramReferrals(true)}

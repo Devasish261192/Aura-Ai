@@ -16,8 +16,15 @@ SERP_API_KEY = os.getenv("SERP_API_KEY", "")
 
 # Directory configurations
 DATA_DIR = BASE_DIR / "data"
-ARTIFACTS_DIR = DATA_DIR / "artifacts" / "user_1"
-ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+
+def get_user_artifacts_dir(user_id: str = "user1") -> Path:
+    """Returns the isolated artifact directory for a specific test user."""
+    safe_user = "".join(c for c in user_id if c.isalnum() or c in ("_", "-")) or "user1"
+    target = DATA_DIR / "artifacts" / safe_user
+    target.mkdir(parents=True, exist_ok=True)
+    return target
+
+ARTIFACTS_DIR = get_user_artifacts_dir("user1")
 
 SQLITE_DB_PATH = DATA_DIR / "aura_v1.db"
 
