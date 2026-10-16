@@ -207,71 +207,71 @@ class AIService:
             is_voice=is_voice
         )
 
-        # Try primary model, fallback on temporary server errors
-        models_to_try = [PRIMARY_MODEL] + FALLBACK_MODELS
-        stream_iter = None
-        last_error = None
-
-        for model in models_to_try:
-            for attempt in range(2):
-                try:
-                    chat = self.get_or_create_chat(session_id, model_name=model, prior_history=prior_history)
-                    stream_iter = chat.send_message_stream(user_message)
-                    break
-                except Exception as e:
-                    err_str = str(e)
-                    last_error = e
-                    self._active_chats.pop(session_id, None)
-                    if ("503" in err_str or "UNAVAILABLE" in err_str) and attempt == 0:
-                        print(f"Model {model} hit 503 spike. Retrying in 0.5s...")
-                        time.sleep(0.5)
-                        continue
-                    print(f"Model {model} failed: {e}. Trying fallback...")
-                    break
-            if stream_iter is not None:
-                break
+        # Try primary model, fallback on temporary server errors or quota exhaustion
+        unique_models = []
+        for m in [PRIMARY_MODEL] + FALLBACK_MODELS:
+            if m not in unique_models:
+                unique_models.append(m)
 
         accumulated_text = []
         tool_calls_executed = []
         executed_tool_names = set()
+        stream_succeeded = False
+        last_error = None
 
-        if stream_iter is not None:
-            try:
-                for chunk in stream_iter:
-                    # Check for tool/function calls in chunk candidates
-                    if chunk.candidates:
-                        for cand in chunk.candidates:
-                            if cand.content and cand.content.parts:
-                                for part in cand.content.parts:
-                                    if part.function_call:
-                                        fc_name = part.function_call.name
-                                        if fc_name not in executed_tool_names:
-                                            executed_tool_names.add(fc_name)
-                                            fc_args = dict(part.function_call.args) if part.function_call.args else {}
-                                            tool_calls_executed.append({
-                                                "name": fc_name,
-                                                "args": fc_args
-                                            })
-                                            yield {
-                                                "type": "tool_executed",
-                                                "tool": fc_name,
-                                                "args": fc_args
-                                            }
+        for model in unique_models:
+            for attempt in range(2):
+                try:
+                    chat = self.get_or_create_chat(session_id, model_name=model, prior_history=prior_history)
+                    stream_iter = chat.send_message_stream(user_message)
 
-                    # Stream text chunk immediately as it arrives
-                    chunk_text = ""
-                    try:
-                        chunk_text = chunk.text or ""
-                    except Exception:
-                        pass
+                    for chunk in stream_iter:
+                        # Check for tool/function calls in chunk candidates
+                        if chunk.candidates:
+                            for cand in chunk.candidates:
+                                if cand.content and cand.content.parts:
+                                    for part in cand.content.parts:
+                                        if part.function_call:
+                                            fc_name = part.function_call.name
+                                            if fc_name not in executed_tool_names:
+                                                executed_tool_names.add(fc_name)
+                                                fc_args = dict(part.function_call.args) if part.function_call.args else {}
+                                                tool_calls_executed.append({
+                                                    "name": fc_name,
+                                                    "args": fc_args
+                                                })
+                                                yield {
+                                                    "type": "tool_executed",
+                                                    "tool": fc_name,
+                                                    "args": fc_args
+                                                }
 
-                    if chunk_text:
-                        accumulated_text.append(chunk_text)
-                        yield {"type": "token", "content": chunk_text}
+                        chunk_text = ""
+                        try:
+                            chunk_text = chunk.text or ""
+                        except Exception:
+                            pass
 
-            except Exception as e:
-                print(f"Error streaming response chunk: {e}")
-                last_error = e
+                        if chunk_text:
+                            accumulated_text.append(chunk_text)
+                            yield {"type": "token", "content": chunk_text}
+
+                    stream_succeeded = True
+                    break
+
+                except Exception as e:
+                    err_str = str(e)
+                    last_error = e
+                    self._active_chats.pop(session_id, None)
+                    print(f"Model {model} (attempt {attempt+1}) error: {err_str[:120]}")
+                    if ("503" in err_str or "UNAVAILABLE" in err_str) and attempt == 0:
+                        print(f"Retrying {model} in 0.8s...")
+                        time.sleep(0.8)
+                        continue
+                    break
+
+            if stream_succeeded:
+                break
 
         response_text = "".join(accumulated_text).strip()
 
