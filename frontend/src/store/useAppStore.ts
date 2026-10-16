@@ -24,7 +24,9 @@ interface AppState {
   clearChat: () => void;
 }
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = typeof window !== 'undefined' && window.location.port === '5173'
+  ? 'http://127.0.0.1:8000'
+  : '';
 
 export const useAppStore = create<AppState>((set, get) => ({
   messages: [
