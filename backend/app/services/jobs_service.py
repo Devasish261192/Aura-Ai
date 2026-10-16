@@ -311,11 +311,36 @@ class JobsService:
             }
         }
 
-    def _detect_user_domain(self, profile: Dict[str, Any], search_term: str = "") -> str:
+    USER_PRESET_DOMAINS = {
+        "user1": "wfm",
+        "user2": "hr",
+        "user3": "consulting",
+        "user4": "app_support",
+        "user5": "data",
+        "test1": "wfm",
+        "test2": "hr",
+        "test3": "consulting",
+        "test4": "app_support",
+        "test5": "data",
+    }
+
+    def _detect_user_domain(self, profile: Dict[str, Any], search_term: str = "", user_id: str = "user1") -> str:
         """Detects whether user is WFM, HR, Consulting, App Support, or Data."""
-        text_corpus = f"{search_term} {profile.get('candidate', {}).get('headline', '')} ".lower()
-        
-        # Check experiences/timeline phases
+        # 1. Direct explicit search term keywords
+        term = (search_term or "").lower()
+        if any(k in term for k in ["wfm", "workforce", "rta", "scheduling"]):
+            return "wfm"
+        if any(k in term for k in ["hr", "human resource", "talent", "recruitment", "recruiter", "people ops", "hrbp"]):
+            return "hr"
+        if any(k in term for k in ["consult", "advisory", "strategy", "transformation", "pmo"]):
+            return "consulting"
+        if any(k in term for k in ["app support", "application support", "l2", "l3", "incident"]):
+            return "app_support"
+        if any(k in term for k in ["data", "analytics", "sql", "pipeline", "etl"]):
+            return "data"
+
+        # 2. Candidate profile / resume / timeline text
+        text_corpus = f"{profile.get('candidate', {}).get('headline', '')} ".lower()
         for p in profile.get("timeline_phases", []) + profile.get("work_history", []):
             text_corpus += f" {p.get('role', '')} {p.get('company', '')} {p.get('summary', '')}".lower()
         
@@ -333,7 +358,12 @@ class JobsService:
         if any(k in text_corpus for k in ["data", "analytics", "sql", "analyst", "pipeline", "etl"]):
             return "data"
         
-        return "wfm"  # Default clean demo domain
+        # 3. Fallback to preset test account domain (user1: WFM, user2: HR, user3: Consulting, user4: App Support, user5: Data)
+        clean_uid = user_id.lower().strip()
+        if clean_uid in self.USER_PRESET_DOMAINS:
+            return self.USER_PRESET_DOMAINS[clean_uid]
+
+        return "wfm"
 
     def get_matched_jobs(self, user_id: str = "user1", page: int = 1, page_size: int = 5, location: str = "") -> Dict[str, Any]:
         """Retrieves paginated market jobs scored against candidate's profile."""
@@ -351,7 +381,7 @@ class JobsService:
         # If user has no jobs yet, initialize their first batch automatically
         if not jobs:
             profile = self._load_profile(user_id)
-            domain = self._detect_user_domain(profile)
+            domain = self._detect_user_domain(profile, user_id=user_id)
             return self.fetch_next_job_batch(user_id=user_id, search_term="", location=location or "Pune, India")
 
         # Location filter
@@ -387,7 +417,7 @@ class JobsService:
         """
         udir = self._get_artifacts_dir(user_id)
         profile = self._load_profile(user_id)
-        domain = self._detect_user_domain(profile, search_term)
+        domain = self._detect_user_domain(profile, search_term, user_id=user_id)
 
         # Resolve search title based on domain
         domain_titles = {
