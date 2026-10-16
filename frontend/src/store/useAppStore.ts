@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { ChatMessage, ArtifactsMap, AuthUser } from '../types';
 import { API_BASE } from '../config';
 
-export type AppModule = 'traits' | 'cvforge' | 'trainer' | 'interview' | 'tracker' | 'jobs';
+export type AppModule = 'landing' | 'traits' | 'cvforge' | 'trainer' | 'interview' | 'tracker' | 'jobs';
 
 export const getWelcomeMessage = (user: AuthUser | null): ChatMessage => {
   const roleHint = user?.role_track ? ` tailored for **${user.role_track}**` : '';

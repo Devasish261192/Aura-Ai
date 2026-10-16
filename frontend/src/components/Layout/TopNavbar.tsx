@@ -9,7 +9,8 @@ import {
   Activity,
   User,
   Briefcase,
-  LogOut
+  LogOut,
+  GitFork
 } from 'lucide-react';
 import { useAppStore, type AppModule } from '../../store/useAppStore';
 
@@ -21,6 +22,13 @@ export const TopNavbar: React.FC = () => {
   const topTrack = targetProfiles[0];
 
   const navItems: Array<{ id: AppModule; label: string; icon: React.ComponentType<{ className?: string }>; badge?: string; color: string }> = [
+    {
+      id: 'landing',
+      label: 'Career Trajectory Tree',
+      icon: GitFork,
+      badge: 'Interactive',
+      color: 'text-cyan-400'
+    },
     {
       id: 'tracker',
       label: '30-Day Level-Up OS & Tracker',

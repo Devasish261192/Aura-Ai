@@ -6,10 +6,46 @@
 
 body {
   margin: 0;
-  background-color: #0b0f19;
-  color: #f3f4f6;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #0c0f18;
+  color: #f1f3fd;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.font-headline {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(0, 242, 254, 0.25);
+}
+
+.glow-cyan-strong {
+  box-shadow: 0 0 35px rgba(0, 242, 254, 0.45);
+}
+
+.glow-purple {
+  box-shadow: 0 0 25px rgba(121, 40, 202, 0.3);
+}
+
+.neon-border {
+  border: 1px solid rgba(0, 242, 254, 0.5);
+}
+
+.dim-node {
+  opacity: 0.45;
+  filter: grayscale(40%);
+  transition: all 0.3s ease;
+}
+
+.dim-node:hover {
+  opacity: 0.95;
+  filter: grayscale(0%);
 }
 
 /* Custom scrollbars */

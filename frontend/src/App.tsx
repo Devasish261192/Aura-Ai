@@ -8,7 +8,7 @@ import { InterviewTrainerView } from './components/Trainer/InterviewTrainerView'
 import { InterviewStudioView } from './components/Studio/InterviewStudioView';
 import { LevelUpTrackerView } from './components/Tracker/LevelUpTrackerView';
 import { JobSearchWidget } from './components/Jobs/JobSearchWidget';
-import { LoginView } from './components/Auth/LoginView';
+import { LandingPage } from './components/Landing/LandingPage';
 import { useAppStore } from './store/useAppStore';
 
 export const App: React.FC = () => {
@@ -23,7 +23,7 @@ export const App: React.FC = () => {
   }, [currentUser, fetchArtifacts, fetchChatHistory]);
 
   if (!currentUser) {
-    return <LoginView />;
+    return <LandingPage />;
   }
 
   return (
@@ -63,6 +63,11 @@ export const App: React.FC = () => {
 
         {/* Right Main Tool Viewport */}
         <section className="flex-1 h-full overflow-hidden flex flex-col">
+          {activeModule === 'landing' && (
+            <div className="w-full h-full overflow-y-auto">
+              <LandingPage />
+            </div>
+          )}
           {activeModule === 'traits' && <ArtifactsViewer />}
           {activeModule === 'cvforge' && <CVForgeView />}
           {activeModule === 'trainer' && <InterviewTrainerView />}
