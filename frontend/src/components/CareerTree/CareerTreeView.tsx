@@ -466,7 +466,7 @@ export const CareerTreeView: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-[#0a0d14] text-gray-100 overflow-y-auto">
       {/* Integrated Workspace Header Bar */}
-      <div className="border-b border-gray-800 bg-[#0f121d]/90 backdrop-blur-md px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20">
+      <div className="border-b border-gray-800 bg-[#0f121d]/90 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-20">
         <div>
           <div className="flex items-center gap-2">
             <GitFork className="w-4 h-4 text-cyan-400" />
@@ -480,8 +480,8 @@ export const CareerTreeView: React.FC = () => {
           </p>
         </div>
 
-        {/* Track Switcher */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-900 border border-gray-800">
+        {/* Track Switcher (Scrollable on mobile/laptop viewports) */}
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-900 border border-gray-800 overflow-x-auto no-scrollbar max-w-full shrink">
           {CAREER_TRACKS.map((t) => {
             const Icon = t.icon;
             const isSelected = t.id === activeTrack.id;
@@ -492,7 +492,7 @@ export const CareerTreeView: React.FC = () => {
                   setActiveTrackId(t.id);
                   setSelectedNode(null);
                 }}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                   isSelected
                     ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
                     : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/60'
@@ -507,7 +507,7 @@ export const CareerTreeView: React.FC = () => {
       </div>
 
       {/* Main Workspace Body */}
-      <div className="flex-1 p-6 max-w-6xl mx-auto w-full space-y-8">
+      <div className="flex-1 p-3 sm:p-6 max-w-6xl mx-auto w-full space-y-6 sm:space-y-8">
         {/* Track Summary Banner */}
         <div className="rounded-2xl bg-gradient-to-r from-cyan-950/40 via-blue-950/20 to-purple-950/40 border border-cyan-500/30 p-5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">

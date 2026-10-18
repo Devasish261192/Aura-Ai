@@ -1113,41 +1113,41 @@ export const InterviewTrainerView: React.FC = () => {
         </div>
       </div>
 
-      {/* Mode Selector Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-800 pb-3">
+      {/* Mode Selector Tabs (Scrollable on small/laptop screens) */}
+      <div className="flex items-center gap-2 border-b border-gray-800 pb-3 overflow-x-auto no-scrollbar shrink-0">
         <button
           onClick={() => setActiveTrainerMode('intro')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
             activeTrainerMode === 'intro'
               ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20'
               : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'
           }`}
         >
-          <Video className="w-3.5 h-3.5" />
-          <span>1. Executive Introduction Trainer (Model-A)</span>
+          <Video className="w-3.5 h-3.5 shrink-0" />
+          <span>1. Introduction Trainer</span>
         </button>
 
         <button
           onClick={() => setActiveTrainerMode('communication')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
             activeTrainerMode === 'communication'
               ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20'
               : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'
           }`}
         >
-          <MessageSquare className="w-3.5 h-3.5" />
-          <span>2. Executive Communication Masterclass</span>
+          <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+          <span>2. Communication Masterclass</span>
         </button>
 
         <button
           onClick={() => setActiveTrainerMode('technical')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
             activeTrainerMode === 'technical'
               ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20'
               : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'
           }`}
         >
-          <Database className="w-3.5 h-3.5" />
+          <Database className="w-3.5 h-3.5 shrink-0" />
           <span>3. Technical Delivery Trainer</span>
         </button>
       </div>
@@ -1168,12 +1168,12 @@ export const InterviewTrainerView: React.FC = () => {
             </div>
 
             {/* Track Switcher Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 shrink max-w-full">
               {(Object.keys(TRACK_INFO) as TrackKey[]).map((key) => (
                 <button
                   key={key}
                   onClick={() => setSelectedTrack(key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 border ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 border cursor-pointer ${
                     selectedTrack === key
                       ? 'bg-cyan-600 text-white border-cyan-500 shadow-sm'
                       : 'bg-gray-950 text-gray-400 hover:text-gray-200 border-gray-800'
