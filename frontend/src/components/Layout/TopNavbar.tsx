@@ -6,7 +6,6 @@ import {
   Video,
   Layers,
   Dna,
-  Activity,
   User,
   Briefcase,
   LogOut,
@@ -37,14 +36,11 @@ export const TopNavbar: React.FC = () => {
     currentUser?.name ||
     currentUser?.username ||
     'Aura Candidate';
-  const targetProfiles = artifacts?.traits?.target_profiles || [];
-  const topTrack = targetProfiles[0];
 
   const navItems: Array<{
     id: AppModule;
     label: string;
     icon: React.ComponentType<{ className?: string }>;
-    badge?: string;
     color: string;
     desc?: string;
   }> = [
@@ -52,13 +48,12 @@ export const TopNavbar: React.FC = () => {
       id: 'landing',
       label: 'Career Tree',
       icon: GitFork,
-      badge: 'Interactive',
       color: 'text-cyan-400',
       desc: 'Predictive 4-tier trajectory & forks'
     },
     {
       id: 'tracker',
-      label: 'Level-Up OS',
+      label: 'Level-Up',
       icon: Gamepad2,
       color: 'text-amber-400',
       desc: '30-Day sprint accountability'
@@ -81,13 +76,12 @@ export const TopNavbar: React.FC = () => {
       id: 'cvforge',
       label: 'CV Forge',
       icon: Layers,
-      badge: 'Interactive',
       color: 'text-amber-300',
       desc: 'Multi-track ATS resume compiler'
     },
     {
       id: 'traits',
-      label: 'Traits & Vault',
+      label: 'Vault',
       icon: Dna,
       color: 'text-emerald-400',
       desc: 'Permanent story & competency vault'
@@ -96,7 +90,6 @@ export const TopNavbar: React.FC = () => {
       id: 'jobs',
       label: 'Job Radar',
       icon: Briefcase,
-      badge: 'Market + 5 TG',
       color: 'text-sky-400',
       desc: 'Dynamic job matcher & referrals'
     }
@@ -111,27 +104,22 @@ export const TopNavbar: React.FC = () => {
 
   return (
     <>
-      <header className="h-14 border-b border-gray-800 bg-gray-950/95 px-3 sm:px-5 flex items-center justify-between z-20 shrink-0 relative">
+      <header className="h-14 border-b border-gray-800 bg-gray-950 px-3 sm:px-4 flex items-center justify-between z-20 shrink-0 w-full overflow-hidden">
         {/* Left: Brand */}
         <div className="flex items-center space-x-2.5 shrink-0">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <div>
-            <div className="flex items-center space-x-1.5 leading-none">
-              <span className="font-bold text-sm text-white tracking-tight">Aura AI</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-400 font-mono font-medium border border-blue-500/20">
-                v1.0
-              </span>
-            </div>
-            <p className="hidden 2xl:block text-[10px] text-gray-400 leading-none mt-1">
-              Job Counselor & Trait Compiler
-            </p>
+          <div className="flex items-center space-x-1.5 leading-none">
+            <span className="font-bold text-sm text-white tracking-tight">Aura AI</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-400 font-mono font-medium border border-blue-500/20">
+              v1.0
+            </span>
           </div>
         </div>
 
-        {/* Center: Module Navigation Tabs (Compact & Responsively Scrollable for 13–15" Laptops) */}
-        <nav className="hidden md:flex items-center space-x-1 bg-gray-900/90 p-1 rounded-xl border border-gray-800 overflow-x-auto no-scrollbar shrink min-w-0 max-w-[50vw] xl:max-w-[58vw]">
+        {/* Center: Module Navigation Tabs - Part of the top ribbon (no floating box!) */}
+        <nav className="hidden md:flex items-center space-x-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mx-2 lg:mx-4 h-full">
           {navItems.map((item) => {
             const isActive = activeModule === item.id;
             const Icon = item.icon;
@@ -140,65 +128,41 @@ export const TopNavbar: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveModule(item.id)}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`h-9 px-2.5 lg:px-3 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-semibold ring-1 ring-blue-400/40'
-                    : 'text-gray-400 hover:text-gray-100 hover:bg-gray-800/60'
+                    ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                    : 'text-gray-400 hover:text-gray-100 hover:bg-gray-900/80'
                 }`}
                 title={item.desc}
               >
                 <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : item.color}`} />
                 <span>{item.label}</span>
-                {item.badge && (
-                  <span
-                    className={`hidden 2xl:inline-block text-[9px] px-1.5 py-0.2 rounded font-mono ${
-                      isActive
-                        ? 'bg-amber-400 text-gray-950 font-bold'
-                        : 'bg-amber-400/10 text-amber-300 border border-amber-400/20'
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
               </button>
             );
           })}
         </nav>
 
-        {/* Right Action Cluster: ALWAYS Pinned & Visible on 15" Laptops and Small Screens */}
-        <div className="flex items-center space-x-2 shrink-0 z-10">
-          {/* Top Track Pill (Visible only on ultra-wide 2xl screens) */}
-          {topTrack && (
-            <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-900 border border-gray-800 text-[11px] text-gray-300">
-              <span className="text-gray-500 font-mono">Track:</span>
-              <span className="font-semibold text-blue-300 truncate max-w-[120px]">
-                {topTrack.title.split('/')[0]}
-              </span>
-              <span className="text-emerald-400 font-mono font-bold text-[10px] bg-emerald-500/10 px-1 rounded">
-                {topTrack.match_score}%
-              </span>
-            </div>
-          )}
-
+        {/* Right Action Cluster: ALWAYS Pinned & Visible with Prominent Sign Out */}
+        <div className="flex items-center space-x-2 shrink-0 z-30">
           {/* Currency Quick Toggle */}
           <button
             onClick={() => setCurrency(currency === 'INR' ? 'USD' : 'INR')}
-            className="flex items-center gap-1 px-2 py-1.5 sm:px-2.5 rounded-lg text-xs font-semibold bg-gray-900 hover:bg-gray-800 border border-gray-800 transition-colors cursor-pointer shrink-0"
-            title={`Active currency: ${currency}. Click to switch between INR (₹ Lakhs) and USD ($).`}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold bg-gray-900 hover:bg-gray-800 border border-gray-800 transition-colors cursor-pointer shrink-0"
+            title={`Active currency: ${currency}. Click to switch between INR (₹) and USD ($).`}
           >
             <span className={currency === 'INR' ? 'text-amber-400 font-bold' : 'text-gray-500'}>
-              ₹<span className="hidden sm:inline"> INR</span>
+              ₹
             </span>
             <span className="text-gray-600 font-mono">/</span>
             <span className={currency === 'USD' ? 'text-cyan-400 font-bold' : 'text-gray-500'}>
-              $<span className="hidden sm:inline"> USD</span>
+              $
             </span>
           </button>
 
           {/* Toggle Counselor Chat (Desktop / Laptop View) */}
           <button
             onClick={toggleChatCollapse}
-            className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer shrink-0 ${
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer shrink-0 ${
               !isChatCollapsed
                 ? 'bg-blue-600/20 text-blue-300 border-blue-500/40 shadow-sm'
                 : 'bg-gray-900 text-gray-400 hover:text-white border-gray-800'
@@ -210,38 +174,27 @@ export const TopNavbar: React.FC = () => {
             <span className={`w-1.5 h-1.5 rounded-full ${!isChatCollapsed ? 'bg-emerald-400' : 'bg-gray-600'}`}></span>
           </button>
 
-          {/* User Profile Pill */}
-          <div className="flex items-center space-x-1.5 text-xs bg-gray-900 px-2 sm:px-2.5 py-1.5 rounded-lg border border-gray-800 text-gray-200 shrink-0">
-            <div className="w-4 h-4 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-              <User className="w-2.5 h-2.5" />
-            </div>
-            <span className="hidden xl:inline font-medium text-xs text-gray-200 truncate max-w-[90px]">
-              {candidateName}
-            </span>
-            {currentUser && (
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold">
+          {/* User Account Tag (Compact so it never eats screen width) */}
+          {currentUser && (
+            <div className="flex items-center space-x-1.5 text-xs bg-gray-900 px-2 sm:px-2.5 py-1.5 rounded-lg border border-gray-800 text-gray-200 shrink-0">
+              <User className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <span className="text-xs font-mono font-bold text-blue-400">
                 {currentUser.username}
               </span>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Prominent Sign Out Button: ALWAYS PINNED AND VISIBLE */}
+          {/* Prominent Red Sign Out Button: ALWAYS VISIBLE AND UNCLIPPED */}
           {currentUser && (
             <button
               onClick={logout}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-300 hover:text-white bg-rose-950/40 hover:bg-rose-900/80 border border-rose-800/60 shadow-sm transition-all cursor-pointer shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-sm shadow-rose-950 transition-all cursor-pointer shrink-0"
               title="Sign Out / Switch Beta Tester Account"
             >
-              <LogOut className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-              <span className="hidden sm:inline">Sign Out</span>
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
+              <span>Sign Out</span>
             </button>
           )}
-
-          {/* Live Status Indicator */}
-          <div className="hidden xl:flex items-center space-x-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20 font-mono shrink-0">
-            <Activity className="w-3 h-3 animate-pulse" />
-            <span>Live</span>
-          </div>
 
           {/* Mobile Hamburger Menu Toggle Button */}
           <button
@@ -337,11 +290,6 @@ export const TopNavbar: React.FC = () => {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-xs text-white">{item.label}</span>
-                            {item.badge && (
-                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-400/10 text-amber-300 border border-amber-400/20 font-mono">
-                                {item.badge}
-                              </span>
-                            )}
                           </div>
                           <span className="text-[11px] text-gray-400 block mt-0.5">{item.desc}</span>
                         </div>
@@ -361,10 +309,10 @@ export const TopNavbar: React.FC = () => {
                 logout();
                 setIsMobileMenuOpen(false);
               }}
-              className="w-full py-3 px-4 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 hover:text-white border border-rose-500/40 font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
             >
-              <LogOut className="w-4 h-4 text-rose-400" />
-              <span>Sign Out from Beta Portal ({currentUser?.username})</span>
+              <LogOut className="w-4 h-4 text-white" />
+              <span>Sign Out ({currentUser?.username})</span>
             </button>
 
             <div className="text-center">
