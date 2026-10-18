@@ -12,31 +12,31 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 # Initial Seed configurations for known beta tracks
 SEED_TESTERS: Dict[str, Dict[str, Any]] = {
     "user1": {
-        "name": "Beta Tester 1 (WFM Lead)",
+        "name": "Tester 1",
         "default_role": "Workforce Management (WFM)",
         "default_badge": "WFM / RTA",
         "color": "border-cyan-500/40 bg-cyan-950/40 text-cyan-300"
     },
     "user2": {
-        "name": "Beta Tester 2 (HRBP Lead)",
+        "name": "Tester 2",
         "default_role": "Human Resources & Talent Acquisition",
         "default_badge": "HR / Talent",
         "color": "border-emerald-500/40 bg-emerald-950/40 text-emerald-300"
     },
     "user3": {
-        "name": "Beta Tester 3 (Strategy Consultant)",
+        "name": "Tester 3",
         "default_role": "Management & Business Consulting",
         "default_badge": "Consulting",
         "color": "border-purple-500/40 bg-purple-950/40 text-purple-300"
     },
     "user4": {
-        "name": "Beta Tester 4 (App Support Lead)",
+        "name": "Tester 4",
         "default_role": "Application Support & Operations",
         "default_badge": "App Support",
         "color": "border-blue-500/40 bg-blue-950/40 text-blue-300"
     },
     "user5": {
-        "name": "Beta Tester 5 (Data & Analytics)",
+        "name": "Tester 5",
         "default_role": "Data Engineering & Analytics",
         "default_badge": "Data Analytics",
         "color": "border-amber-500/40 bg-amber-950/40 text-amber-300"
@@ -88,27 +88,25 @@ def evaluate_tester_profile(username: str) -> Dict[str, Any]:
 
     if is_customized:
         display_role = f"{latest_role} ({company})" if company else latest_role
-        display_name = candidate_name or f"Tester {num} ({latest_role})"
         badge = (latest_role[:14] + "..") if len(latest_role) > 14 else latest_role
         status = "ASSIGNED"
         color = "border-sky-500/40 bg-sky-950/40 text-sky-300"
     elif seed:
         display_role = seed["default_role"]
-        display_name = seed["name"]
         badge = seed["default_badge"]
         status = "ASSIGNED"
         color = seed.get("color", "border-cyan-500/40 bg-cyan-950/40 text-cyan-300")
     else:
         # user6 to user20 initially open / available
-        display_role = f"Open Career Track {num}"
-        display_name = f"Tester {num}: Open Slot"
+        display_role = "Open Career Track · Available Slot"
         badge = "OPEN"
         status = "OPEN"
         color = "border-emerald-500/30 bg-emerald-950/20 text-emerald-400"
 
     return {
         "username": canonical_user,
-        "name": display_name,
+        "name": f"Tester {num}",
+        "candidate_name": candidate_name,
         "role_track": display_role,
         "status": status,
         "is_assigned": status == "ASSIGNED",

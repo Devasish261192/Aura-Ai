@@ -8,17 +8,17 @@ interface LoginViewProps {
 }
 
 const DEFAULT_TESTERS: AuthUser[] = [
-  { username: 'user1', name: 'Tester 1: Workforce Management (WFM)', role_track: 'Workforce Management (WFM)', status: 'ASSIGNED', badge: 'WFM / RTA', color: 'border-cyan-500/40 bg-cyan-950/30 text-cyan-300' },
-  { username: 'user2', name: 'Tester 2: HR Business Partner (HRBP)', role_track: 'Human Resources & Talent Acquisition', status: 'ASSIGNED', badge: 'HR / Talent', color: 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300' },
-  { username: 'user3', name: 'Tester 3: Management Consulting', role_track: 'Management & Business Consulting', status: 'ASSIGNED', badge: 'Consulting', color: 'border-purple-500/40 bg-purple-950/30 text-purple-300' },
-  { username: 'user4', name: 'Tester 4: Application Support Lead', role_track: 'Application Support & Operations', status: 'ASSIGNED', badge: 'App Support', color: 'border-blue-500/40 bg-blue-950/30 text-blue-300' },
-  { username: 'user5', name: 'Tester 5: Data & Analytics Lead', role_track: 'Data Engineering & Analytics', status: 'ASSIGNED', badge: 'Data Analytics', color: 'border-amber-500/40 bg-amber-950/30 text-amber-300' },
+  { username: 'user1', name: 'Tester 1', role_track: 'Workforce Management (WFM)', status: 'ASSIGNED', badge: 'WFM / RTA', color: 'border-cyan-500/40 bg-cyan-950/30 text-cyan-300' },
+  { username: 'user2', name: 'Tester 2', role_track: 'Human Resources & Talent Acquisition', status: 'ASSIGNED', badge: 'HR / Talent', color: 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300' },
+  { username: 'user3', name: 'Tester 3', role_track: 'Management & Business Consulting', status: 'ASSIGNED', badge: 'Consulting', color: 'border-purple-500/40 bg-purple-950/30 text-purple-300' },
+  { username: 'user4', name: 'Tester 4', role_track: 'Application Support & Operations', status: 'ASSIGNED', badge: 'App Support', color: 'border-blue-500/40 bg-blue-950/30 text-blue-300' },
+  { username: 'user5', name: 'Tester 5', role_track: 'Data Engineering & Analytics', status: 'ASSIGNED', badge: 'Data Analytics', color: 'border-amber-500/40 bg-amber-950/30 text-amber-300' },
   ...Array.from({ length: 15 }, (_, i) => {
     const num = i + 6;
     return {
       username: `user${num}`,
-      name: `Tester ${num}: Open Slot`,
-      role_track: `Open Career Track ${num}`,
+      name: `Tester ${num}`,
+      role_track: 'Open Career Track · Available Slot',
       status: 'OPEN' as const,
       badge: 'OPEN',
       color: 'border-emerald-500/30 bg-emerald-950/20 text-emerald-400'
@@ -156,9 +156,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
                   }`}
                 >
                   <div className="truncate pr-2">
-                    <span className="text-xs font-semibold block truncate text-white">{t.name}</span>
-                    <span className="text-[10px] font-mono text-gray-400 opacity-80 block truncate">
-                      {t.username} • {t.role_track}
+                    <span className="text-xs font-bold block truncate text-white">{t.name}</span>
+                    <span className="text-[11px] text-gray-400 block truncate font-medium">
+                      {t.role_track}
                     </span>
                   </div>
                   <span
@@ -168,7 +168,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
                         : 'bg-blue-500/20 text-blue-300 border-blue-500/30'
                     }`}
                   >
-                    {isOpen ? 'AVAILABLE' : (t.badge || 'ASSIGNED')}
+                    {isOpen ? 'OPEN' : (t.badge || 'ASSIGNED')}
                   </span>
                 </button>
               );
