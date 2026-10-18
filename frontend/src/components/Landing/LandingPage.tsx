@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useCurrency, formatCompensation } from '../../utils/currency';
+import type { AuthUser } from '../../types';
 
 interface CareerNode {
   id: string;
@@ -392,31 +393,42 @@ const CAREER_TRACKS: CareerTrack[] = [
   }
 ];
 
-const PRESET_TESTERS = [
-  { username: 'user1', label: 'Tester 1: Workforce Management (WFM)', badge: 'WFM / RTA', color: 'border-cyan-500/40 bg-cyan-950/40 text-cyan-300' },
-  { username: 'user2', label: 'Tester 2: HR Business Partner (HRBP)', badge: 'HR / Talent', color: 'border-emerald-500/40 bg-emerald-950/40 text-emerald-300' },
-  { username: 'user3', label: 'Tester 3: Management Consulting', badge: 'Consulting', color: 'border-purple-500/40 bg-purple-950/40 text-purple-300' },
-  { username: 'user4', label: 'Tester 4: Application Support Lead', badge: 'App Support', color: 'border-blue-500/40 bg-blue-950/40 text-blue-300' },
-  { username: 'user5', label: 'Tester 5: Data & Analytics Lead', badge: 'Data Analytics', color: 'border-amber-500/40 bg-amber-950/40 text-amber-300' },
-  { username: 'user6', label: 'Tester 6: Open Career Track 6', badge: 'Track 6', color: 'border-gray-700 bg-gray-900/60 text-gray-300' },
-  { username: 'user7', label: 'Tester 7: Open Career Track 7', badge: 'Track 7', color: 'border-gray-700 bg-gray-900/60 text-gray-300' },
-  { username: 'user8', label: 'Tester 8: Open Career Track 8', badge: 'Track 8', color: 'border-gray-700 bg-gray-900/60 text-gray-300' },
-  { username: 'user9', label: 'Tester 9: Open Career Track 9', badge: 'Track 9', color: 'border-gray-700 bg-gray-900/60 text-gray-300' },
-  { username: 'user10', label: 'Tester 10: Open Career Track 10', badge: 'Track 10', color: 'border-gray-700 bg-gray-900/60 text-gray-300' },
+const DEFAULT_TESTERS: AuthUser[] = [
+  { username: 'user1', name: 'Tester 1: Workforce Management (WFM)', role_track: 'Workforce Management (WFM)', status: 'ASSIGNED', badge: 'WFM / RTA', color: 'border-cyan-500/40 bg-cyan-950/40 text-cyan-300' },
+  { username: 'user2', name: 'Tester 2: HR Business Partner (HRBP)', role_track: 'Human Resources & Talent Acquisition', status: 'ASSIGNED', badge: 'HR / Talent', color: 'border-emerald-500/40 bg-emerald-950/40 text-emerald-300' },
+  { username: 'user3', name: 'Tester 3: Management Consulting', role_track: 'Management & Business Consulting', status: 'ASSIGNED', badge: 'Consulting', color: 'border-purple-500/40 bg-purple-950/40 text-purple-300' },
+  { username: 'user4', name: 'Tester 4: Application Support Lead', role_track: 'Application Support & Operations', status: 'ASSIGNED', badge: 'App Support', color: 'border-blue-500/40 bg-blue-950/40 text-blue-300' },
+  { username: 'user5', name: 'Tester 5: Data & Analytics Lead', role_track: 'Data Engineering & Analytics', status: 'ASSIGNED', badge: 'Data Analytics', color: 'border-amber-500/40 bg-amber-950/40 text-amber-300' },
+  ...Array.from({ length: 15 }, (_, i) => {
+    const num = i + 6;
+    return {
+      username: `user${num}`,
+      name: `Tester ${num}: Open Slot`,
+      role_track: `Open Career Track ${num}`,
+      status: 'OPEN' as const,
+      badge: 'OPEN',
+      color: 'border-emerald-500/30 bg-emerald-950/20 text-emerald-400'
+    };
+  })
 ];
 
 export const LandingPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLoginSuccess }) => {
-  const { login } = useAppStore();
+  const { login, testers, fetchTesters } = useAppStore();
   const [activeTrackId, setActiveTrackId] = useState<string>('engineering_mgmt');
   const [selectedNode, setSelectedNode] = useState<CareerNode | null>(null);
 
   // Auth State
   const [authTab, setAuthTab] = useState<'quick' | 'manual'>('quick');
+  const [testerFilter, setTesterFilter] = useState<'all' | 'open' | 'assigned'>('all');
   const [usernameInput, setUsernameInput] = useState('user1');
   const [passwordInput, setPasswordInput] = useState('password1234');
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [currency] = useCurrency();
+
+  React.useEffect(() => {
+    fetchTesters();
+  }, [fetchTesters]);
 
   const activeTrack = CAREER_TRACKS.find((t) => t.id === activeTrackId) || CAREER_TRACKS[0];
 
@@ -1185,30 +1197,100 @@ export const LandingPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLogin
 
                   {authTab === 'quick' ? (
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-gray-400 gap-1.5 mb-1">
                         <span>Click any tester track to enter directly:</span>
                         <span className="font-mono text-cyan-400 font-semibold">Shared Password: password1234</span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-1 border border-white/5 rounded-xl bg-[#141724]/60">
-                        {PRESET_TESTERS.map((t) => (
-                          <button
-                            key={t.username}
-                            type="button"
-                            disabled={isAuthenticating}
-                            onClick={() => handleQuickLogin(t.username)}
-                            className={`flex items-center justify-between p-2.5 rounded-lg border text-left transition-all hover:scale-[1.01] cursor-pointer disabled:opacity-50 ${t.color}`}
-                          >
-                            <div className="truncate pr-2">
-                              <span className="text-xs font-semibold block truncate">{t.label}</span>
-                              <span className="text-[10px] font-mono opacity-80">{t.username}</span>
+                      {/* Filter Segmented Control: All / Available Open / Assigned */}
+                      {(() => {
+                        const rawTesters = testers && testers.length > 0 ? testers : DEFAULT_TESTERS;
+                        const openCount = rawTesters.filter((t) => t.status === 'OPEN').length;
+                        const assignedCount = rawTesters.filter((t) => t.status === 'ASSIGNED').length;
+                        const filteredTesters = rawTesters.filter((t) => {
+                          if (testerFilter === 'open') return t.status === 'OPEN';
+                          if (testerFilter === 'assigned') return t.status === 'ASSIGNED';
+                          return true;
+                        });
+
+                        return (
+                          <>
+                            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#141724] border border-white/5 text-xs">
+                              <button
+                                type="button"
+                                onClick={() => setTesterFilter('all')}
+                                className={`flex-1 py-1 px-2 rounded-lg font-medium transition-all cursor-pointer ${
+                                  testerFilter === 'all'
+                                    ? 'bg-cyan-400 text-black font-bold shadow-sm'
+                                    : 'text-gray-400 hover:text-white'
+                                }`}
+                              >
+                                All (20)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setTesterFilter('open')}
+                                className={`flex-1 py-1 px-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                                  testerFilter === 'open'
+                                    ? 'bg-emerald-400 text-black font-bold shadow-sm'
+                                    : 'text-emerald-400 hover:text-emerald-300'
+                                }`}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span>Open Slots ({openCount})</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setTesterFilter('assigned')}
+                                className={`flex-1 py-1 px-2 rounded-lg font-medium transition-all cursor-pointer ${
+                                  testerFilter === 'assigned'
+                                    ? 'bg-blue-400 text-black font-bold shadow-sm'
+                                    : 'text-blue-400 hover:text-blue-300'
+                                }`}
+                              >
+                                Assigned ({assignedCount})
+                              </button>
                             </div>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gray-950/80 border border-white/10 shrink-0">
-                              {t.badge}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto p-1.5 border border-white/5 rounded-xl bg-[#141724]/60">
+                              {filteredTesters.map((t) => {
+                                const isOpen = t.status === 'OPEN';
+                                return (
+                                  <button
+                                    key={t.username}
+                                    type="button"
+                                    disabled={isAuthenticating}
+                                    onClick={() => handleQuickLogin(t.username)}
+                                    className={`flex items-center justify-between p-2.5 rounded-xl border text-left transition-all hover:scale-[1.01] cursor-pointer disabled:opacity-50 ${
+                                      isOpen
+                                        ? 'border-emerald-500/40 bg-emerald-950/20 hover:bg-emerald-950/40 text-emerald-200'
+                                        : 'border-blue-500/30 bg-blue-950/30 hover:bg-blue-950/50 text-blue-200'
+                                    }`}
+                                  >
+                                    <div className="truncate pr-2">
+                                      <span className="text-xs font-bold block truncate text-white">
+                                        {t.name}
+                                      </span>
+                                      <span className="text-[10px] font-mono text-gray-400 block truncate">
+                                        {t.username} • {t.role_track}
+                                      </span>
+                                    </div>
+                                    <span
+                                      className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full shrink-0 border ${
+                                        isOpen
+                                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 animate-pulse'
+                                          : 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                                      }`}
+                                    >
+                                      {isOpen ? 'AVAILABLE' : (t.badge || 'ASSIGNED')}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </>
+                        );
+                      })()}
 
                       <p className="font-mono text-[11px] text-center text-gray-500 pt-2">
                         100% private data sandbox per tester in OCI cloud VM.

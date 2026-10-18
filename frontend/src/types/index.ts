@@ -110,6 +110,12 @@ export interface AuthUser {
   username: string;
   name: string;
   role_track: string;
+  status?: 'OPEN' | 'ASSIGNED';
+  is_assigned?: boolean;
+  badge?: string;
+  latest_role?: string;
+  company?: string;
+  color?: string;
 }
 
 export interface ArtifactsMap {

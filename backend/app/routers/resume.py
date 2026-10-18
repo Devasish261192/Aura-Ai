@@ -1,14 +1,14 @@
 import os
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form, Header
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from ..services.resume_service import resume_service, RESUMES_DIR
 from ..services.cv_extractor_service import cv_extractor_service
 from ..services.artifact_service import get_artifact, _atomic_write_json
-from ..config import ARTIFACTS_DIR
+from ..config import ARTIFACTS_DIR, get_user_artifacts_dir
 
 router = APIRouter(prefix="/api/resume", tags=["resume"])
 
@@ -89,17 +89,19 @@ class ConfirmTimelineRequest(BaseModel):
     skills: Optional[List[str]] = None
 
 @router.post("/parse-cv")
-async def parse_uploaded_cv(file: UploadFile = File(...)):
+async def parse_uploaded_cv(file: UploadFile = File(...), x_user_id: Optional[str] = Header(None)):
     """
     Extracts text from uploaded PDF/DOCX and parses chronological timeline, roles,
     and gap phase using AI with deterministic fallbacks.
     """
+    uid = (x_user_id or "user1").strip().lower()
+    user_artifacts_dir = get_user_artifacts_dir(uid)
     try:
         content = await file.read()
         raw_text = cv_extractor_service.extract_text_from_bytes(content, file.filename)
         
         # Save copy to user artifacts directory
-        upload_save_path = ARTIFACTS_DIR / f"uploaded_{file.filename}"
+        upload_save_path = user_artifacts_dir / f"uploaded_{file.filename}"
         with open(upload_save_path, "wb") as f:
             f.write(content)
             
@@ -113,14 +115,16 @@ async def parse_uploaded_cv(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"CV parsing failed: {str(e)}")
 
 @router.post("/parse-stored-cv")
-def parse_stored_sample_cv():
+def parse_stored_sample_cv(x_user_id: Optional[str] = Header(None)):
     """
     Parses existing CV from system storage for instant 1-click verification.
     """
-    candidate_paths = list(ARTIFACTS_DIR.glob("*.pdf"))
+    uid = (x_user_id or "user1").strip().lower()
+    user_artifacts_dir = get_user_artifacts_dir(uid)
+    candidate_paths = list(user_artifacts_dir.glob("*.pdf"))
     target_file = candidate_paths[0] if candidate_paths else None
     if not target_file:
-        raise HTTPException(status_code=404, detail="No stored CV file found in user artifacts directory.")
+        raise HTTPException(status_code=404, detail=f"No stored CV file found in {uid} artifacts directory.")
         
     with open(target_file, "rb") as f:
         content = f.read()
@@ -134,11 +138,13 @@ def parse_stored_sample_cv():
     }
 
 @router.post("/confirm-timeline")
-def confirm_career_timeline(req: ConfirmTimelineRequest):
+def confirm_career_timeline(req: ConfirmTimelineRequest, x_user_id: Optional[str] = Header(None)):
     """
     Confirms extracted timeline, updates profile_master.json, and recompiles track resumes.
     """
-    profile = get_artifact("profile_master") or {
+    uid = (x_user_id or "user1").strip().lower()
+    user_artifacts_dir = get_user_artifacts_dir(uid)
+    profile = get_artifact("profile_master", user_id=uid) or {
         "version": 1,
         "candidate": {},
         "work_history": [],
@@ -169,18 +175,18 @@ def confirm_career_timeline(req: ConfirmTimelineRequest):
     profile["version"] = profile.get("version", 1) + 1
     profile["last_updated"] = datetime.utcnow().isoformat() + "Z"
     
-    _atomic_write_json(ARTIFACTS_DIR / "profile_master.json", profile)
+    _atomic_write_json(user_artifacts_dir / "profile_master.json", profile)
     
     # If new skills provided, add them to skills_matrix.json
     if req.skills:
-        skills_art = get_artifact("skills_matrix") or {"categories": {}}
+        skills_art = get_artifact("skills_matrix", user_id=uid) or {"categories": {}}
         cats = skills_art.setdefault("categories", {})
         gen_list = cats.setdefault("core_technical", [])
         existing_skill_names = {s.get("name") for s in gen_list if isinstance(s, dict)}
         for sk in req.skills:
             if sk not in existing_skill_names:
                 gen_list.append({"name": sk, "proficiency": "Advanced"})
-        _atomic_write_json(ARTIFACTS_DIR / "skills_matrix.json", skills_art)
+        _atomic_write_json(user_artifacts_dir / "skills_matrix.json", skills_art)
         
     # Recompile resumes for all tracks
     compiled_tracks = []
@@ -188,12 +194,12 @@ def confirm_career_timeline(req: ConfirmTimelineRequest):
         try:
             resume_service.generate_tailored_pdf(t["slug"])
             compiled_tracks.append(t["slug"])
-        except Exception as e:
+        except Exception:
             pass
             
     return {
         "status": "success",
-        "message": "Career timeline confirmed and saved to Canonical Vault. Resumes recompiled.",
+        "message": f"Career timeline confirmed and saved to {uid} Canonical Vault. Resumes recompiled.",
         "work_history_count": len(clean_work_history),
         "recompiled_tracks": compiled_tracks
     }

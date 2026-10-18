@@ -14,17 +14,29 @@ import {
   ChevronDown,
   ChevronUp,
   Filter,
-  ArrowRight
+  ArrowRight,
+  Edit3,
+  UserCheck,
+  X,
+  Loader2
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { TimelineExtractorModal } from './TimelineExtractorModal';
 
 export const ArtifactsViewer: React.FC = () => {
-  const { artifacts, fetchArtifacts, activeProfileTab, setActiveModule } = useAppStore();
+  const { artifacts, fetchArtifacts, activeProfileTab, setActiveModule, currentUser, updateTesterRole } = useAppStore();
   const [activeTab, setActiveTab] = useState<'timeline' | 'stories' | 'traits' | 'skills'>('timeline');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
   const [showRawJson, setShowRawJson] = useState(false);
+
+  // Quick Role Calibration Modal state
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [roleInput, setRoleInput] = useState('');
+  const [companyInput, setCompanyInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
+  const [isSavingRole, setIsSavingRole] = useState(false);
+  const [roleSaveSuccess, setRoleSaveSuccess] = useState(false);
 
   // Story accordion states
   const [expandedStoryIds, setExpandedStoryIds] = useState<Record<string, boolean>>({
@@ -55,6 +67,29 @@ export const ArtifactsViewer: React.FC = () => {
   const skillsMatrix = artifacts?.skills_matrix?.categories || {};
   const workHistory = artifacts?.profile_master?.work_history || [];
   const candidate = artifacts?.profile_master?.candidate;
+
+  const openRoleModal = () => {
+    setRoleInput(candidate?.headline || currentUser?.latest_role || '');
+    setCompanyInput(workHistory?.[0]?.company || currentUser?.company || '');
+    setNameInput(candidate?.name || currentUser?.name || '');
+    setRoleSaveSuccess(false);
+    setIsRoleModalOpen(true);
+  };
+
+  const handleSaveRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!roleInput.trim()) return;
+    setIsSavingRole(true);
+    const ok = await updateTesterRole(roleInput.trim(), companyInput.trim(), nameInput.trim());
+    setIsSavingRole(false);
+    if (ok) {
+      setRoleSaveSuccess(true);
+      setTimeout(() => {
+        setIsRoleModalOpen(false);
+        setRoleSaveSuccess(false);
+      }, 1000);
+    }
+  };
 
   // Filtered stories
   const filteredStories = stories.filter((s: any) => {
@@ -219,10 +254,18 @@ export const ArtifactsViewer: React.FC = () => {
                   {/* Actions Right */}
                   <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0 md:min-w-[190px]">
                     <button
-                      onClick={() => setIsTimelineModalOpen(true)}
-                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-950 cursor-pointer"
+                      onClick={openRoleModal}
+                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-950 cursor-pointer"
                     >
-                      <Upload className="w-3.5 h-3.5" />
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>{currentUser?.is_assigned ? 'Calibrate Role' : 'Assign My Role'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setIsTimelineModalOpen(true)}
+                      className="px-3.5 py-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-xs font-medium flex items-center justify-center gap-1.5 border border-gray-700 transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-blue-400" />
                       <span>Upload & Extract CV</span>
                     </button>
 
@@ -655,6 +698,109 @@ export const ArtifactsViewer: React.FC = () => {
         isOpen={isTimelineModalOpen}
         onClose={() => setIsTimelineModalOpen(false)}
       />
+
+      {/* Role Calibration & Assignment Modal */}
+      {isRoleModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+            <button
+              onClick={() => setIsRoleModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <UserCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Calibrate Role & Assignment</h3>
+                <p className="text-[11px] text-gray-400">
+                  Account: <span className="font-mono text-indigo-400 font-bold">{currentUser?.username}</span>
+                </p>
+              </div>
+            </div>
+
+            {roleSaveSuccess ? (
+              <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-center space-y-1">
+                <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
+                <p className="text-xs font-bold">Role Updated Successfully!</p>
+                <p className="text-[11px] text-emerald-400/80">Account is now ASSIGNED and synchronized across the platform.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSaveRole} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
+                    Job Title / Professional Role <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Workforce Management Lead, HR Specialist, Cloud Architect"
+                    value={roleInput}
+                    onChange={(e) => setRoleInput(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
+                    Organization / Company
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Concentrix, TCS, Deloitte, Freelance"
+                    value={companyInput}
+                    onChange={(e) => setCompanyInput(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
+                    Candidate Full Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Rahul Sharma"
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsRoleModalOpen(false)}
+                    className="px-3.5 py-1.5 rounded-xl bg-gray-800 text-gray-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingRole || !roleInput.trim()}
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-indigo-950 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {isSavingRole ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>Save & Assign Account</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

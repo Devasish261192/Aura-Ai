@@ -26,7 +26,7 @@ export const TimelineExtractorModal: React.FC<TimelineExtractorModalProps> = ({
   onClose,
   onSuccess
 }) => {
-  const { fetchArtifacts } = useAppStore();
+  const { fetchArtifacts, currentUser } = useAppStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +52,9 @@ export const TimelineExtractorModal: React.FC<TimelineExtractorModalProps> = ({
 
       const res = await fetch(`${API_BASE}/api/resume/parse-cv`, {
         method: 'POST',
+        headers: {
+          'X-User-Id': currentUser?.username || 'user1'
+        },
         body: formData
       });
 
@@ -78,7 +81,10 @@ export const TimelineExtractorModal: React.FC<TimelineExtractorModalProps> = ({
 
     try {
       const res = await fetch(`${API_BASE}/api/resume/parse-stored-cv`, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'X-User-Id': currentUser?.username || 'user1'
+        }
       });
 
       if (!res.ok) {
@@ -149,7 +155,10 @@ export const TimelineExtractorModal: React.FC<TimelineExtractorModalProps> = ({
 
       const res = await fetch(`${API_BASE}/api/resume/confirm-timeline`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': currentUser?.username || 'user1'
+        },
         body: JSON.stringify(payload)
       });
 

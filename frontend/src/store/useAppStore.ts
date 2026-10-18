@@ -34,10 +34,13 @@ interface AppState {
   activeProfileTab: string;
   activeModule: AppModule;
   isChatCollapsed: boolean;
+  testers: AuthUser[];
   
   // Actions
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
+  fetchTesters: () => Promise<void>;
+  updateTesterRole: (role: string, company?: string, candidateName?: string) => Promise<boolean>;
   addMessage: (msg: ChatMessage) => void;
   fetchArtifacts: () => Promise<void>;
   fetchChatHistory: () => Promise<void>;
@@ -58,6 +61,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeProfileTab: '',
   activeModule: 'traits',
   isChatCollapsed: false,
+  testers: [],
 
   login: async (username: string, password: string): Promise<boolean> => {
     try {
@@ -93,6 +97,50 @@ export const useAppStore = create<AppState>((set, get) => ({
       artifacts: null,
       messages: [getWelcomeMessage(null)]
     });
+  },
+
+  fetchTesters: async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/testers`);
+      if (res.ok) {
+        const data = await res.json();
+        set({ testers: data });
+      }
+    } catch (e) {
+      console.error('Failed to fetch testers:', e);
+    }
+  },
+
+  updateTesterRole: async (role: string, company?: string, candidateName?: string) => {
+    try {
+      const user = get().currentUser?.username || 'user1';
+      const res = await fetch(`${API_BASE}/api/auth/update-role`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': user
+        },
+        body: JSON.stringify({
+          role,
+          company: company || '',
+          candidate_name: candidateName || ''
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          localStorage.setItem('aura_current_user', JSON.stringify(data.user));
+          set({ currentUser: data.user });
+          await get().fetchArtifacts();
+          await get().fetchTesters();
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      console.error('Failed to update tester role:', e);
+      return false;
+    }
   },
 
   setActiveModule: (m) => set({ activeModule: m }),
