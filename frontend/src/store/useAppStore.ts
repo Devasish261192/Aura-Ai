@@ -5,12 +5,13 @@ import { API_BASE } from '../config';
 export type AppModule = 'landing' | 'traits' | 'cvforge' | 'trainer' | 'interview' | 'tracker' | 'jobs';
 
 export const getWelcomeMessage = (user: AuthUser | null): ChatMessage => {
-  const roleHint = user?.role_track ? ` tailored for **${user.role_track}**` : '';
-  const greeting = user?.name ? `Hi **${user.name}**` : 'Hi';
+  const isAssigned = user?.is_assigned && user?.latest_role;
+  const roleHint = isAssigned ? ` (Calibrated for **${user.latest_role}**)` : '';
+  const greeting = user?.name ? `Hi **${user.name}**` : 'Welcome';
   return {
     id: 'welcome_1',
     role: 'model',
-    content: `${greeting}, I am **Aura**, your career personal assistant${roleHint}.\n\nTogether, we will map out your career roadmap, turn your real experience into powerful stories, and guide your growth step-by-step.\n\n### How We Will Work Together:\n1. **One Point at a Time:** We build each story step-by-step (Situation → Plan → Execution → Result). You never have to narrate the whole story at once.\n2. **Effortless & Conversational:** Speak or type naturally—I handle the structuring and metrics extraction.\n3. **Permanent Vault:** Every detail you share is saved directly into your personal career vault.\n\nTo begin: **What is your most recent organization, and at what professional role did you work there?**`,
+    content: `${greeting}! I am **Aura**, your autonomous career architect and intelligence partner${roleHint}.\n\nTogether, we will map your complete career trajectory from the ground up through 4 progressive stages:\n\n1. **Recent Role Calibration:** Pin your current or most recent job title and organization.\n2. **Skills, Tools & Daily Workflow:** Catalog your core domain skills, software/platforms used, and operational workflow.\n3. **Career Timeline Mapping:** Record all prior professional titles and organizations (from your career start to current) so your full Career Tree is plotted from day one. You can list them here or click **'Upload CV / Timeline'**.\n4. **Targeted Story Mining (STARR):** Capture high-impact, verified achievement stories role by role.\n\nTo begin: **What is your most recent organization, and what was your exact professional job title there?**`,
     createdAt: new Date().toISOString()
   };
 };

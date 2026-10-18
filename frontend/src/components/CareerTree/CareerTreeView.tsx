@@ -17,7 +17,8 @@ import {
   EyeOff,
   X,
   Loader2,
-  CheckCircle2
+  CheckCircle2,
+  Clock
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useCurrency, formatCompensation } from '../../utils/currency';
@@ -601,14 +602,81 @@ const buildDynamicTrack = (
   } else if (isHr) {
     forkNodes = CAREER_TRACKS.find(t => t.id === 'hr_track')?.forkNodes || [];
   } else {
-    forkNodes = CAREER_TRACKS.find(t => t.id === 'engineering_mgmt')?.forkNodes || [];
+    // Universal dynamic domain forks generated for ANY professional background
+    const cleanRole = recentRole.replace(/^(Senior|Lead|Junior|Staff|Principal|Associate)\s+/i, '').trim();
+    forkNodes = [
+      {
+        id: 'fork_univ_a',
+        level: 'Fork 2A • Specialized Domain Depth',
+        title: `Principal ${cleanRole} Specialist`,
+        description: `Deep specialized mastery in ${cleanRole}, owning high-impact standards, strategic workflows, and operational excellence.`,
+        compRange: '₹28L – ₹44L',
+        evScore: 79,
+        skills: rootSkills.slice(0, 3).concat(['Domain Specialization', 'Strategic Standards']),
+        isAlternate: true,
+        details: {
+          overview: `Focused deep-expertise pathway within ${cleanRole}.`,
+          unlockedPathways: [`Distinguished ${cleanRole}`, `Director of ${cleanRole}`],
+          skillsMastered: rootSkills.slice(0, 2).map((s, idx) => ({ name: s, score: 90 - idx * 4, color: 'text-cyan-400' })),
+          counselorAdvice: 'Build quantifiable frameworks and automated benchmarks to stand out as the top domain expert.'
+        }
+      },
+      {
+        id: 'fork_univ_b',
+        level: 'Fork 2B • Optimal Leap (Cross-Functional / Strategy)',
+        title: `${cleanRole} Strategy & Solutions Architect`,
+        subtitle: 'OPTIMAL CROSS-FUNCTIONAL FORK',
+        description: `Bridging deep ${cleanRole} execution with cross-functional business strategy, executive alignment, and scale initiatives.`,
+        compRange: '₹34L – ₹52L',
+        evScore: 88,
+        skills: rootSkills.slice(0, 2).concat(['Cross-Functional Strategy', 'Business Architecture', 'Stakeholder Leadership']),
+        isChosen: true,
+        details: {
+          overview: `High-agency bridge between ${cleanRole} and executive business operations.`,
+          unlockedPathways: ['Director of Operations', 'VP of Strategic Growth'],
+          skillsMastered: [
+            { name: 'Business Strategy', score: 92, color: 'text-emerald-400' },
+            { name: 'Executive Alignment', score: 88, color: 'text-cyan-400' }
+          ],
+          counselorAdvice: 'Translate your technical and operational metrics directly into revenue, savings, or efficiency gains.'
+        }
+      },
+      {
+        id: 'fork_univ_c',
+        level: 'Fork 2C • People & Operations Leadership',
+        title: `Head of ${cleanRole} & Operational Excellence`,
+        description: `Leading high-performance squads, mentoring teams, governing departmental KPIs, and optimizing organizational workflows.`,
+        compRange: '₹32L – ₹48L',
+        evScore: 82,
+        skills: ['Team Mentorship', 'KPI Governance', 'Operational Scale', 'Resource Optimization'],
+        isAlternate: true,
+        details: {
+          overview: `Management and departmental leadership track in ${cleanRole}.`,
+          unlockedPathways: [`Director of ${cleanRole}`, 'VP of Global Operations'],
+          skillsMastered: [
+            { name: 'People Leadership', score: 91, color: 'text-amber-400' },
+            { name: 'Scale Governance', score: 87, color: 'text-cyan-400' }
+          ],
+          counselorAdvice: 'Document team productivity multipliers and retention metrics to justify senior management banding.'
+        }
+      }
+    ];
   }
 
   // Level 03: Incline Milestone
+  const cleanRole = recentRole.replace(/^(Senior|Lead|Junior|Staff|Principal|Associate)\s+/i, '').trim();
+  const inclineTitle = isSupport
+    ? 'Director of Enterprise Systems & Reliability'
+    : isWfm
+    ? 'Director of Global Workforce Strategy'
+    : isHr
+    ? 'Head of People Operations & Technology'
+    : `Director of ${cleanRole} & Strategic Operations`;
+
   const inclineNode: CareerNode = {
     id: 'dynamic_incline',
     level: 'Level 03 • Incline Milestone (Promoted Mid-Point)',
-    title: isSupport ? 'Director of Enterprise Systems & Reliability' : isWfm ? 'Director of Global Workforce Strategy' : isHr ? 'Head of People Operations & Technology' : 'Director of Strategic Transformation',
+    title: inclineTitle,
     description: `Enterprise scale-up bridge role synthesized from your ${recentRole} foundation and demonstrated competencies.`,
     compRange: '₹55L – ₹85L',
     evScore: 92,
@@ -853,34 +921,44 @@ export const CareerTreeView: React.FC = () => {
               </div>
 
               {/* Architectural Blueprint Flow */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-[#141724]/80 border border-white/5 text-left text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-[#141724]/80 border border-white/5 text-left text-xs">
                 <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
                   <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs">
                     <span className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center font-mono text-[10px]">1</span>
-                    <span>Anchor Recent Role</span>
+                    <span>Role & Skills</span>
                   </div>
                   <p className="text-[11px] text-gray-400 leading-relaxed">
-                    Sets your Level 01 Baseline Root node and recent organization.
+                    Anchor your recent role, tools used, and daily operational workflow.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
+                  <div className="flex items-center gap-2 text-blue-400 font-bold text-xs">
+                    <span className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center font-mono text-[10px]">2</span>
+                    <span>Timeline & Prior Titles</span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 leading-relaxed">
+                    Plot past roles from career start (list in chat or 1-click CV upload).
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
                   <div className="flex items-center gap-2 text-purple-400 font-bold text-xs">
-                    <span className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center font-mono text-[10px]">2</span>
-                    <span>Mine 1 STARR Story</span>
+                    <span className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center font-mono text-[10px]">3</span>
+                    <span>Mine STARR Stories</span>
                   </div>
                   <p className="text-[11px] text-gray-400 leading-relaxed">
-                    Aura extracts verified metrics, incident recovery, and technical competencies.
+                    Aura mines verified metrics, incident recoveries, and retrospective learnings.
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
                   <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center font-mono text-[10px]">3</span>
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center font-mono text-[10px]">4</span>
                     <span>Pivots & Canopy Sprout</span>
                   </div>
                   <p className="text-[11px] text-gray-400 leading-relaxed">
-                    Forks (L2) and executive targets (L4) emerge dynamically from compounding skills.
+                    Predictive forks (L2) and executive canopy targets (L4) emerge dynamically.
                   </p>
                 </div>
               </div>
@@ -982,8 +1060,56 @@ export const CareerTreeView: React.FC = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 blur-[120px] pointer-events-none rounded-full"></div>
 
           <div className="flex flex-col-reverse gap-10 relative z-10">
-            {/* 1. ROOT LEVEL (Foundation) */}
+            {/* 1. ROOT LEVEL (Foundation & Timeline) */}
             <div className="flex flex-col items-center">
+              {/* Plotted Career Origins & Progression Timeline (from startup to current) */}
+              {workHistory.length > 1 ? (
+                <div className="w-full max-w-xl mb-4 p-4 rounded-2xl bg-[#141724]/90 border border-cyan-500/30 shadow-lg">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-gray-400 mb-2">
+                    <span className="flex items-center gap-1.5 text-cyan-400 font-bold uppercase tracking-wider">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Plotted Career Progression ({workHistory.length} Titles from Career Start)</span>
+                    </span>
+                    <button
+                      onClick={() => setIsTimelineModalOpen(true)}
+                      className="text-[10px] text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer underline flex items-center gap-1"
+                    >
+                      <Upload className="w-3 h-3" />
+                      <span>Update Timeline</span>
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {[...workHistory].reverse().map((wh, idx) => {
+                      const isCurrent = idx === workHistory.length - 1;
+                      return (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div
+                            className={`px-3 py-1.5 rounded-xl text-xs font-mono border transition-all ${
+                              isCurrent
+                                ? 'bg-cyan-500/15 border-cyan-400 text-cyan-200 font-bold shadow-[0_0_12px_rgba(0,242,254,0.15)]'
+                                : 'bg-gray-900/80 border-gray-800 text-gray-400'
+                            }`}
+                          >
+                            <span className={isCurrent ? 'text-white' : 'text-gray-300'}>{wh.role}</span>
+                            {wh.company && <span className="text-gray-500 ml-1 text-[11px]">@ {wh.company}</span>}
+                            {wh.period && <span className="text-[10px] text-gray-500 block">{wh.period}</span>}
+                          </div>
+                          {!isCurrent && <ChevronRight className="w-3.5 h-3.5 text-gray-600 shrink-0" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsTimelineModalOpen(true)}
+                  className="mb-3 px-3 py-1.5 rounded-xl bg-gray-900/60 hover:bg-gray-800/80 border border-dashed border-gray-700 hover:border-cyan-500/40 text-gray-400 hover:text-cyan-300 text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Upload className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>+ Plot Earlier Career Titles / Upload CV</span>
+                </button>
+              )}
+
               <div className="flex items-center gap-2 font-mono text-[11px] text-gray-400 uppercase tracking-widest mb-3">
                 <Shield className="w-3.5 h-3.5 text-cyan-400" />
                 <span>{activeTrack.rootNode.level}</span>
