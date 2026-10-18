@@ -9,10 +9,20 @@ import {
   Compass,
   Cpu,
   Users,
-  Briefcase
+  Briefcase,
+  Upload,
+  Edit3,
+  UserCheck,
+  Eye,
+  EyeOff,
+  X,
+  Loader2,
+  CheckCircle2
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useCurrency, formatCompensation } from '../../utils/currency';
+import { TimelineExtractorModal } from '../Artifacts/TimelineExtractorModal';
+import type { ArtifactsMap, AuthUser } from '../../types';
 
 interface CareerNode {
   id: string;
@@ -446,22 +456,300 @@ const CAREER_TRACKS: CareerTrack[] = [
   }
 ];
 
+const buildDynamicTrack = (
+  artifacts: ArtifactsMap | null,
+  user: AuthUser | null
+): CareerTrack => {
+  const stories = artifacts?.career_story?.stories || [];
+  const workHistory = artifacts?.profile_master?.work_history || [];
+  const candidate = artifacts?.profile_master?.candidate;
+  const traits = artifacts?.traits;
+  const skillsMatrix = artifacts?.skills_matrix?.categories || {};
+
+  const recentRole =
+    workHistory[0]?.role ||
+    candidate?.headline ||
+    user?.latest_role ||
+    user?.role_track ||
+    'Application Support Lead';
+
+  const recentCompany =
+    workHistory[0]?.company ||
+    user?.company ||
+    'Enterprise Operations Platform';
+
+  const recentSummary =
+    candidate?.experience_summary ||
+    workHistory[0]?.summary ||
+    `Specialist with demonstrated track record in ${recentRole} governing enterprise reliability, triage, and systems operations.`;
+
+  // Collect demonstrated skills from stories and matrix
+  const extractedSkills = Array.from(
+    new Set([
+      ...stories.flatMap((s: any) => s.demonstrated_skills || []),
+      ...Object.values(skillsMatrix).flat().map((sk: any) => sk.name || sk),
+      ...(workHistory[0]?.responsibilities || []).slice(0, 3)
+    ])
+  ).filter(Boolean);
+
+  const roleLower = recentRole.toLowerCase();
+  const isWfm = roleLower.includes('wfm') || roleLower.includes('workforce') || roleLower.includes('rta');
+  const isHr = roleLower.includes('hr') || roleLower.includes('talent') || roleLower.includes('people');
+  const isConsulting = roleLower.includes('consult') || roleLower.includes('strategy');
+  const isData = roleLower.includes('data') || roleLower.includes('analytic');
+  const isSupport = roleLower.includes('support') || roleLower.includes('incident') || roleLower.includes('operation') || roleLower.includes('systems');
+
+  const fallbackSkills = isSupport
+    ? ['Production Triage', 'T-SQL & Databases', 'SLA Recovery', 'Incident Command']
+    : isWfm
+    ? ['Capacity Planning', 'Erlang Modeling', 'Real-Time Adherence', 'BPO Governance']
+    : isHr
+    ? ['Talent Architecture', 'Total Rewards', 'People Analytics', 'HR SaaS']
+    : isData
+    ? ['SQL Pipelines', 'Data Modeling', 'Data Pipelines', 'Analytics Engineering']
+    : ['Systems Architecture', 'Operational Strategy', 'Cross-Functional Execution', 'Process Automation'];
+
+  const rootSkills = extractedSkills.length > 0 ? extractedSkills.slice(0, 4) : fallbackSkills;
+
+  // Level 01: Root Node
+  const rootNode: CareerNode = {
+    id: 'dynamic_root',
+    level: `Level 01 • Baseline Root (${recentCompany})`,
+    title: `ROOT: ${recentRole}`,
+    description: recentSummary,
+    compRange: isSupport ? '₹16L – ₹26L' : isWfm ? '₹18L – ₹28L' : isHr ? '₹16L – ₹24L' : isConsulting ? '₹24L – ₹38L' : '₹22L – ₹34L',
+    evScore: 55 + Math.min(stories.length * 6, 25),
+    skills: rootSkills,
+    isChosen: true,
+    details: {
+      overview: `Anchored to your verified Career Vault at ${recentCompany}. Reflects ${stories.length} verified incident/project stories in your vault.`,
+      unlockedPathways: ['Specialist Systems Depth', 'Forward-Deployed Architecture', 'Enterprise Transformation Leadership'],
+      skillsMastered: rootSkills.map((s, idx) => ({
+        name: s,
+        score: 85 + (idx * 4) % 12,
+        color: idx === 0 ? 'text-cyan-400' : idx === 1 ? 'text-emerald-400' : 'text-blue-400'
+      })),
+      counselorAdvice: 'Your verified execution track record is the definitive anchor for commanding higher-status pivot roles.'
+    }
+  };
+
+  // Level 02: Decision Crossroads (Forks)
+  let forkNodes: CareerNode[] = [];
+  if (isSupport) {
+    forkNodes = [
+      {
+        id: 'fork_support_a',
+        level: 'Fork 2A • Technical Depth',
+        title: 'Senior / Staff Platform Systems Engineer',
+        description: 'Deep dive into high-availability distributed architecture, automated observability, and infrastructure fault tolerance.',
+        compRange: '₹28L – ₹42L',
+        evScore: 78,
+        skills: ['Distributed Systems', 'Observability (Prometheus/Datadog)', 'Database Internals'],
+        isAlternate: true,
+        details: {
+          overview: 'Specialized systems engineering track. Maximizes infrastructure ownership and platform resilience.',
+          unlockedPathways: ['Principal Systems Engineer', 'Director of Infrastructure'],
+          skillsMastered: [
+            { name: 'System Internals', score: 92, color: 'text-cyan-400' },
+            { name: 'High Availability', score: 88, color: 'text-blue-400' }
+          ],
+          counselorAdvice: 'Add cloud-native infrastructure automation to prevent ceiling limits.'
+        }
+      },
+      {
+        id: 'fork_support_b',
+        level: 'Fork 2B • Optimal Leap',
+        title: 'Forward-Deployed Engineer (FDE) / Solutions Architect',
+        subtitle: 'RECOMMENDED OPTIMAL FORK',
+        description: 'Bridges deep operational triage with strategic client architecture and enterprise platform integration.',
+        compRange: '₹36L – ₹58L',
+        evScore: 94,
+        skills: ['Client Architecture', 'API Integrations', 'Cross-Functional Governance', 'Autonomous AI Workflows'],
+        isChosen: true,
+        details: {
+          overview: 'Highest leverage trajectory for production operations leaders. Palantir / enterprise high-growth model.',
+          unlockedPathways: ['VP of Solutions Engineering', 'Chief Technology Officer (CTO)'],
+          skillsMastered: [
+            { name: 'Architecture Design', score: 96, color: 'text-cyan-400' },
+            { name: 'Client Governance', score: 92, color: 'text-emerald-400' }
+          ],
+          counselorAdvice: 'Package real production incident post-mortems as client architectural proofs of work.'
+        }
+      },
+      {
+        id: 'fork_support_c',
+        level: 'Fork 2C • Management',
+        title: 'Technical Service Delivery & Operations Manager',
+        description: 'Governance over enterprise SLA thresholds, major incident command, and operational vendor steering.',
+        compRange: '₹30L – ₹46L',
+        evScore: 82,
+        skills: ['ITIL Governance', 'Incident Command', 'Vendor Steering'],
+        isAlternate: true,
+        details: {
+          overview: 'Leadership track governing mission-critical SLAs and resolver teams across multiple client accounts.',
+          unlockedPathways: ['Director of Operations', 'VP of Service Delivery'],
+          skillsMastered: [
+            { name: 'SLA Governance', score: 94, color: 'text-amber-400' },
+            { name: 'Incident Command', score: 90, color: 'text-cyan-400' }
+          ],
+          counselorAdvice: 'Automate reporting feeds early to free time for strategic roadmap leadership.'
+        }
+      }
+    ];
+  } else if (isWfm) {
+    forkNodes = CAREER_TRACKS.find(t => t.id === 'wfm_track')?.forkNodes || [];
+  } else if (isHr) {
+    forkNodes = CAREER_TRACKS.find(t => t.id === 'hr_track')?.forkNodes || [];
+  } else {
+    forkNodes = CAREER_TRACKS.find(t => t.id === 'engineering_mgmt')?.forkNodes || [];
+  }
+
+  // Level 03: Incline Milestone
+  const inclineNode: CareerNode = {
+    id: 'dynamic_incline',
+    level: 'Level 03 • Incline Milestone (Promoted Mid-Point)',
+    title: isSupport ? 'Director of Enterprise Systems & Reliability' : isWfm ? 'Director of Global Workforce Strategy' : isHr ? 'Head of People Operations & Technology' : 'Director of Strategic Transformation',
+    description: `Enterprise scale-up bridge role synthesized from your ${recentRole} foundation and demonstrated competencies.`,
+    compRange: '₹55L – ₹85L',
+    evScore: 92,
+    skills: ['Executive Communication', 'Scale Governance', 'Strategic Roadmap', 'Enterprise Reliability'],
+    isChosen: true,
+    details: {
+      overview: 'Synthesizes deep technical/operational mastery with executive steering and capital governance.',
+      unlockedPathways: ['Executive Canopy', 'Board Advisory'],
+      skillsMastered: [
+        { name: 'Executive Presence', score: 94, color: 'text-cyan-400' },
+        { name: 'P&L Strategy', score: 88, color: 'text-emerald-400' }
+      ],
+      counselorAdvice: 'Adopt downward inflection and deliberate executive pauses when presenting metrics to board members.'
+    }
+  };
+
+  // Level 04: Canopy Executive Destinations
+  const targetProfiles = traits?.target_profiles || [];
+  const canopyNodes: CareerNode[] = targetProfiles.length > 0
+    ? targetProfiles.slice(0, 4).map((tp: any, idx: number) => ({
+        id: `canopy_dyn_${idx}`,
+        level: `Canopy Pivot 4${String.fromCharCode(65 + idx)}`,
+        title: tp.title || 'Executive Leadership Principal',
+        description: tp.rationale || 'High-leverage executive destination synthesized from your vault competencies.',
+        compRange: '₹85L – ₹1.5Cr',
+        evScore: 95 - idx * 2,
+        skills: rootSkills.concat(['Executive Strategy', 'P&L Ownership']),
+        isChosen: idx === 1,
+        isTarget: idx === 1,
+        isAlternate: idx !== 1
+      }))
+    : [
+        {
+          id: 'canopy_dyn_a',
+          level: 'Canopy Pivot 4A',
+          title: isSupport ? 'VP of Infrastructure & Platform Operations' : 'VP of Operations & Enterprise Strategy',
+          description: 'Top canopy executive destination overseeing multi-million operational portfolios.',
+          compRange: '₹85L – ₹1.3Cr',
+          evScore: 94,
+          skills: ['Enterprise Strategy', 'Operational Scale', 'P&L Management'],
+          isAlternate: true
+        },
+        {
+          id: 'canopy_dyn_b',
+          level: 'Canopy Pivot 4B • Optimal Leap',
+          title: isSupport ? 'VP of Solutions Engineering & Global Operations' : 'Chief Operating Officer (COO)',
+          subtitle: 'TARGET DESTINATION',
+          description: 'High-status executive leadership governing global platforms, AI workflows, and strategic organizational execution.',
+          compRange: '₹1.1Cr – ₹1.8Cr',
+          evScore: 98,
+          skills: ['Executive Governance', 'Strategic Transformation', 'Autonomous Systems'],
+          isChosen: true,
+          isTarget: true
+        },
+        {
+          id: 'canopy_dyn_c',
+          level: 'Canopy Pivot 4C',
+          title: 'Chief Technology Officer (CTO) / Platform Lead',
+          description: 'Strategic technology steering governing enterprise availability, software innovation, and architectural roadmap.',
+          compRange: '₹1.2Cr – ₹2.0Cr',
+          evScore: 93,
+          skills: ['Technology Strategy', 'Architecture Vision', 'Executive Leadership'],
+          isAlternate: true
+        },
+        {
+          id: 'canopy_dyn_d',
+          level: 'Canopy Pivot 4D',
+          title: 'DeepTech Founder / Autonomous Systems Principal',
+          description: 'Founder or early principal equity holder building high-leverage agentic or operational platforms.',
+          compRange: 'Asymmetric Equity + ₹1.5Cr',
+          evScore: 91,
+          skills: ['Zero-to-One Product', 'Autonomous AI', 'Fundraising Strategy'],
+          isAlternate: true
+        }
+      ];
+
+  return {
+    id: 'vault_dynamic_track',
+    name: `${recentRole} Trajectory`,
+    badge: `${stories.length} Story Powered`,
+    icon: Compass,
+    rootNode,
+    forkNodes,
+    inclineNode,
+    canopyNodes
+  };
+};
+
 export const CareerTreeView: React.FC = () => {
-  const { currentUser, setActiveModule } = useAppStore();
+  const { currentUser, artifacts, setActiveModule, setChatCollapsed, updateTesterRole } = useAppStore();
   const [currency] = useCurrency();
+  const [showSamplePreview, setShowSamplePreview] = useState(false);
 
-  // Auto-detect initial track based on user id or default
-  const defaultTrackId = (() => {
-    const uid = (currentUser?.username || '').toLowerCase();
-    if (uid === 'test1' || uid === 'user1') return 'wfm_track';
-    if (uid === 'test2' || uid === 'user2') return 'hr_track';
-    return 'engineering_mgmt';
-  })();
+  const stories = artifacts?.career_story?.stories || [];
+  const workHistory = artifacts?.profile_master?.work_history || [];
+  const candidate = artifacts?.profile_master?.candidate;
 
-  const [activeTrackId, setActiveTrackId] = useState<string>(defaultTrackId);
+  const hasData = stories.length > 0 || workHistory.length > 0 || Boolean(candidate?.headline);
+
+  // Quick Role Calibration Modal state
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [roleInput, setRoleInput] = useState('');
+  const [companyInput, setCompanyInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
+  const [isSavingRole, setIsSavingRole] = useState(false);
+  const [roleSaveSuccess, setRoleSaveSuccess] = useState(false);
+  const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
+
+  const openRoleModal = () => {
+    setRoleInput(candidate?.headline || currentUser?.latest_role || '');
+    setCompanyInput(workHistory?.[0]?.company || currentUser?.company || '');
+    setNameInput(candidate?.name || currentUser?.name || '');
+    setRoleSaveSuccess(false);
+    setIsRoleModalOpen(true);
+  };
+
+  const handleSaveRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!roleInput.trim()) return;
+    setIsSavingRole(true);
+    const ok = await updateTesterRole(roleInput.trim(), companyInput.trim(), nameInput.trim());
+    setIsSavingRole(false);
+    if (ok) {
+      setRoleSaveSuccess(true);
+      setTimeout(() => {
+        setIsRoleModalOpen(false);
+        setRoleSaveSuccess(false);
+      }, 1000);
+    }
+  };
+
+  // Build dynamic track if user has data
+  const dynamicTrack = hasData ? buildDynamicTrack(artifacts, currentUser) : null;
+  const availableTracks = dynamicTrack ? [dynamicTrack, ...CAREER_TRACKS] : CAREER_TRACKS;
+
+  const [activeTrackId, setActiveTrackId] = useState<string>(
+    hasData ? 'vault_dynamic_track' : 'engineering_mgmt'
+  );
   const [selectedNode, setSelectedNode] = useState<CareerNode | null>(null);
 
-  const activeTrack = CAREER_TRACKS.find((t) => t.id === activeTrackId) || CAREER_TRACKS[0];
+  const activeTrack = availableTracks.find((t) => t.id === activeTrackId) || availableTracks[0];
 
   return (
     <div className="flex flex-col h-full bg-[#0a0d14] text-gray-100 overflow-y-auto">
@@ -471,8 +759,14 @@ export const CareerTreeView: React.FC = () => {
           <div className="flex items-center gap-2">
             <GitFork className="w-4 h-4 text-cyan-400" />
             <h1 className="text-base font-bold text-white tracking-tight">Predictive Career Trajectory Tree</h1>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-400/10 border border-cyan-400/30 text-cyan-400">
-              Interactive 4-Tier Model
+            <span
+              className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full border ${
+                hasData
+                  ? 'bg-emerald-400/10 border-emerald-400/30 text-emerald-400'
+                  : 'bg-amber-400/10 border-amber-400/30 text-amber-300'
+              }`}
+            >
+              {hasData ? `${stories.length} Stories · Dynamic Vault Tree` : 'Genesis State (Empty Canvas)'}
             </span>
           </div>
           <p className="text-xs text-gray-400 mt-0.5">
@@ -480,36 +774,179 @@ export const CareerTreeView: React.FC = () => {
           </p>
         </div>
 
-        {/* Track Switcher (Scrollable on mobile/laptop viewports) */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-900 border border-gray-800 overflow-x-auto no-scrollbar max-w-full shrink">
-          {CAREER_TRACKS.map((t) => {
-            const Icon = t.icon;
-            const isSelected = t.id === activeTrack.id;
-            return (
+        {/* Track Switcher */}
+        {hasData ? (
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-900 border border-gray-800 overflow-x-auto no-scrollbar max-w-full shrink">
+            {availableTracks.map((t) => {
+              const Icon = t.icon;
+              const isSelected = t.id === activeTrack.id;
+              const isVaultTrack = t.id === 'vault_dynamic_track';
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    setActiveTrackId(t.id);
+                    setSelectedNode(null);
+                  }}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                    isSelected
+                      ? isVaultTrack
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
+                        : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/60'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isSelected ? (isVaultTrack ? 'text-emerald-400' : 'text-cyan-400') : 'text-gray-500'}`} />
+                  <span>{t.name}</span>
+                  {isVaultTrack && (
+                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300 font-bold">
+                      Personal Vault
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs font-mono">
+            {showSamplePreview ? (
               <button
-                key={t.id}
-                onClick={() => {
-                  setActiveTrackId(t.id);
-                  setSelectedNode(null);
-                }}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
-                  isSelected
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/60'
-                }`}
+                onClick={() => setShowSamplePreview(false)}
+                className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold hover:bg-amber-500/30 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
-                <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-cyan-400' : 'text-gray-500'}`} />
-                <span>{t.name}</span>
+                <EyeOff className="w-3.5 h-3.5" />
+                <span>Return to Blank Personal Canvas</span>
               </button>
-            );
-          })}
-        </div>
+            ) : (
+              <div className="flex items-center gap-2 text-gray-400 bg-gray-900 px-3 py-1.5 rounded-xl border border-gray-800">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>Awaiting Story / Profile in Vault</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Main Workspace Body */}
       <div className="flex-1 p-3 sm:p-6 max-w-6xl mx-auto w-full space-y-6 sm:space-y-8">
-        {/* Track Summary Banner */}
-        <div className="rounded-2xl bg-gradient-to-r from-cyan-950/40 via-blue-950/20 to-purple-950/40 border border-cyan-500/30 p-5 flex flex-wrap items-center justify-between gap-4">
+        {!hasData && !showSamplePreview ? (
+          /* BLANK / GENESIS STATE WHEN NO STORIES OR TIMELINE EXIST */
+          <div className="relative rounded-3xl bg-[#0c0f18] border border-gray-800 p-8 sm:p-12 overflow-hidden shadow-2xl text-center">
+            {/* Subtle Ambient Radial Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] pointer-events-none rounded-full"></div>
+
+            <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-950 via-blue-950 to-indigo-950 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400 shadow-xl shadow-cyan-950">
+                <GitFork className="w-8 h-8 animate-pulse" />
+              </div>
+
+              <div className="space-y-2">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400 bg-cyan-400/10 px-3 py-1 rounded-full border border-cyan-400/20 font-bold">
+                  Genesis State • Awaiting Stories in Vault
+                </span>
+                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  Your Career Trajectory Tree Has Not Sprouted Yet
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-xl mx-auto">
+                  The Career Tree is built dynamically from your verified career stories, recent organization role, and demonstrated skill set in your Career Vault. Currently, your account (<span className="text-cyan-300 font-bold">{currentUser?.name || currentUser?.username}</span> · <span className="text-gray-300">{currentUser?.role_track}</span>) has 0 stories and 0 timeline roles recorded.
+                </p>
+              </div>
+
+              {/* Architectural Blueprint Flow */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-[#141724]/80 border border-white/5 text-left text-xs">
+                <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
+                  <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs">
+                    <span className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center font-mono text-[10px]">1</span>
+                    <span>Anchor Recent Role</span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 leading-relaxed">
+                    Sets your Level 01 Baseline Root node and recent organization.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
+                  <div className="flex items-center gap-2 text-purple-400 font-bold text-xs">
+                    <span className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center font-mono text-[10px]">2</span>
+                    <span>Mine 1 STARR Story</span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 leading-relaxed">
+                    Aura extracts verified metrics, incident recovery, and technical competencies.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
+                  <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center font-mono text-[10px]">3</span>
+                    <span>Pivots & Canopy Sprout</span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 leading-relaxed">
+                    Forks (L2) and executive targets (L4) emerge dynamically from compounding skills.
+                  </p>
+                </div>
+              </div>
+
+              {/* Direct 1-Click Action Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <button
+                  onClick={() => {
+                    setChatCollapsed(false);
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-lg shadow-blue-950 flex items-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>Start Story Mining with Aura</span>
+                </button>
+
+                <button
+                  onClick={openRoleModal}
+                  className="px-4 py-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Edit3 className="w-4 h-4 text-indigo-300" />
+                  <span>Calibrate Recent Role</span>
+                </button>
+
+                <button
+                  onClick={() => setIsTimelineModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700 text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Upload className="w-4 h-4 text-cyan-400" />
+                  <span>Upload CV / Timeline</span>
+                </button>
+              </div>
+
+              {/* Optional Sample Preview Toggle */}
+              <div className="pt-4 border-t border-white/5">
+                <button
+                  onClick={() => setShowSamplePreview(true)}
+                  className="text-xs text-gray-500 hover:text-gray-300 font-mono transition-colors flex items-center gap-1.5 mx-auto cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Preview Interactive Sample Architecture</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {showSamplePreview && !hasData && (
+              <div className="bg-amber-950/40 border border-amber-500/40 p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs text-amber-200">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>
+                    Viewing <strong>Interactive Sample Tree Architecture</strong>. Your personal tree is currently blank because no stories or roles are recorded in your vault yet.
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowSamplePreview(false)}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold border border-amber-500/40 shrink-0 transition-colors cursor-pointer"
+                >
+                  Return to Blank Personal Canvas
+                </button>
+              </div>
+            )}
+
+            {/* Track Summary Banner */}
+            <div className="rounded-2xl bg-gradient-to-r from-cyan-950/40 via-blue-950/20 to-purple-950/40 border border-cyan-500/30 p-5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center text-cyan-300 font-bold">
               <Compass className="w-5 h-5" />
@@ -753,6 +1190,8 @@ export const CareerTreeView: React.FC = () => {
             </div>
           </div>
         </div>
+      </>
+    )}
 
         {/* NODE INSPECTOR DRAWER / MODAL */}
         {selectedNode && (
@@ -862,6 +1301,115 @@ export const CareerTreeView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Career Timeline Extraction Modal */}
+      <TimelineExtractorModal
+        isOpen={isTimelineModalOpen}
+        onClose={() => setIsTimelineModalOpen(false)}
+      />
+
+      {/* Role Calibration & Assignment Modal */}
+      {isRoleModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+            <button
+              onClick={() => setIsRoleModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <UserCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Anchor Recent Role & Sprout Tree</h3>
+                <p className="text-[11px] text-gray-400">
+                  Account: <span className="font-mono text-indigo-400 font-bold">{currentUser?.username}</span>
+                </p>
+              </div>
+            </div>
+
+            {roleSaveSuccess ? (
+              <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-center space-y-1">
+                <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
+                <p className="text-xs font-bold">Role Saved & Tree Sprouted!</p>
+                <p className="text-[11px] text-emerald-400/80">Your Career Trajectory Root is now anchored in the Career Vault.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSaveRole} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
+                    Job Title / Professional Role <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Application Support Lead, Platform Engineer, WFM Lead"
+                    value={roleInput}
+                    onChange={(e) => setRoleInput(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
+                    Organization / Company
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. TCS, Concentrix, Evolent Health, Deloitte"
+                    value={companyInput}
+                    onChange={(e) => setCompanyInput(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
+                    Candidate Full Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Rahul Sharma"
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsRoleModalOpen(false)}
+                    className="px-3.5 py-1.5 rounded-xl bg-gray-800 text-gray-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingRole || !roleInput.trim()}
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-indigo-950 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {isSavingRole ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>Save & Sprout Tree</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
