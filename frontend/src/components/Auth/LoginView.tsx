@@ -18,7 +18,7 @@ const DEFAULT_TESTERS: AuthUser[] = [
     return {
       username: `user${num}`,
       name: `Tester ${num}`,
-      role_track: 'Open Career Track · Available Slot',
+      role_track: 'Open Career Track - Available Slot',
       status: 'OPEN' as const,
       badge: 'OPEN',
       color: 'border-emerald-500/30 bg-emerald-950/20 text-emerald-400'

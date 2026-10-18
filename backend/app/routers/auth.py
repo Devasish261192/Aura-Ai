@@ -98,7 +98,7 @@ def evaluate_tester_profile(username: str) -> Dict[str, Any]:
         color = seed.get("color", "border-cyan-500/40 bg-cyan-950/40 text-cyan-300")
     else:
         # user6 to user20 initially open / available
-        display_role = "Open Career Track · Available Slot"
+        display_role = "Open Career Track - Available Slot"
         badge = "OPEN"
         status = "OPEN"
         color = "border-emerald-500/30 bg-emerald-950/20 text-emerald-400"
