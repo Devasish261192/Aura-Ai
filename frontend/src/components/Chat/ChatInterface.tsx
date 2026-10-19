@@ -36,7 +36,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   isHalfWidth = false,
   activeModule = 'traits'
 }) => {
-  const { messages, isStreaming, sendMessage, clearChat, addMessage, fetchArtifacts } = useAppStore();
+  const { messages, isStreaming, sendMessage, clearChat, addMessage, fetchArtifacts, currentUser } = useAppStore();
   const [inputText, setInputText] = useState('');
   const [isPolishing, setIsPolishing] = useState(false);
   const [isAllCopied, setIsAllCopied] = useState(false);
@@ -143,8 +143,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch(`${API_BASE}/api/resume/parse-cv`, {
+      const res = await fetch(`${API_BASE}/api/resume/parse-cv?auto_save=true`, {
         method: 'POST',
+        headers: {
+          'X-User-Id': currentUser?.username || 'user1'
+        },
         body: formData
       });
 
@@ -169,7 +172,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         reply += `${gapInfo.strategic_recommendation || 'Framed as Self-Employed / Independent Technical Systems Builder. Dedicated projects: Algorithmic Trading Bot, Aura AI, Sovereign Ledger.'}\n\n`;
       }
 
-      reply += `\n*Your Canonical Vault and CV Forge resumes have been synchronized with this unbroken timeline.*`;
+      reply += `\n*Your Canonical Vault (Timeline, Traits, and Career Tree) has been synchronized with this unbroken timeline.*`;
 
       addMessage({
         id: `ai_${Date.now()}`,
@@ -179,6 +182,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       });
 
       await fetchArtifacts();
+      await useAppStore.getState().fetchTesters();
     } catch (err: any) {
       addMessage({
         id: `ai_err_${Date.now()}`,

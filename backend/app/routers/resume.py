@@ -82,6 +82,146 @@ def download_resume(track_slug: str, file_format: str):
 # CV Parsing, Role/Phase Extraction & Timeline Confirmation Endpoints
 # -----------------------------------------------------------------------------
 
+import re
+from datetime import datetime
+
+def synthesize_and_save_artifacts_from_cv(parsed_data: Dict[str, Any], user_id: str) -> Dict[str, Any]:
+    """
+    Takes extracted CV data and commits it to profile_master.json, skills_matrix.json,
+    and synthesizes traits.json (archetype, competencies, traits, target_profiles).
+    This immediately populates Timeline, Traits, and Career Tree in the user's Canonical Vault.
+    """
+    uid = (user_id or "user1").strip().lower()
+    user_artifacts_dir = get_user_artifacts_dir(uid)
+
+    candidate_info = parsed_data.get("candidate", {}) or {}
+    timeline_phases = parsed_data.get("timeline_phases", []) or []
+    work_history = parsed_data.get("work_history", []) or timeline_phases
+    education = parsed_data.get("education", []) or []
+    skills = parsed_data.get("skills", []) or []
+
+    # 1. Clean work history
+    clean_work_history = []
+    for wh in work_history:
+        clean_work_history.append({
+            "company": (wh.get("company") or "").strip(),
+            "role": (wh.get("role") or "").strip(),
+            "period": (wh.get("period") or "Recent").strip(),
+            "location": (wh.get("location") or "").strip(),
+            "is_gap_phase": bool(wh.get("is_gap_phase", False)),
+            "summary": (wh.get("summary") or "").strip(),
+            "responsibilities": [str(r).strip() for r in wh.get("responsibilities", []) if str(r).strip()]
+        })
+
+    # 2. Update profile_master.json
+    profile = get_artifact("profile_master", user_id=uid) or {
+        "version": 1,
+        "candidate": {},
+        "work_history": [],
+        "education": []
+    }
+    cand = profile.setdefault("candidate", {})
+    for k in ["name", "headline", "phone", "email", "location", "linkedin", "experience_summary"]:
+        if candidate_info.get(k):
+            cand[k] = candidate_info[k].strip()
+
+    if clean_work_history:
+        profile["work_history"] = clean_work_history
+    if education:
+        profile["education"] = education
+
+    profile["version"] = profile.get("version", 1) + 1
+    profile["last_updated"] = datetime.utcnow().isoformat() + "Z"
+    _atomic_write_json(user_artifacts_dir / "profile_master.json", profile)
+
+    # 3. Update skills_matrix.json
+    skills_art = get_artifact("skills_matrix", user_id=uid) or {"version": 1, "categories": {}}
+    cats = skills_art.setdefault("categories", {})
+    core_domain = cats.setdefault("core_domain", [])
+    existing_skills = {s.get("name") if isinstance(s, dict) else str(s) for s in core_domain}
+    for sk in skills:
+        sk_str = str(sk).strip()
+        if sk_str and sk_str not in existing_skills:
+            core_domain.append({"name": sk_str, "proficiency": "Advanced"})
+            existing_skills.add(sk_str)
+    skills_art["version"] = skills_art.get("version", 1) + 1
+    skills_art["last_updated"] = datetime.utcnow().isoformat() + "Z"
+    _atomic_write_json(user_artifacts_dir / "skills_matrix.json", skills_art)
+
+    # 4. Synthesize traits.json
+    cand_name = cand.get("name") or candidate_info.get("name") or f"Tester {uid}"
+    recent_role = (clean_work_history[0].get("role") if clean_work_history else cand.get("headline")) or "Strategic Professional"
+    recent_company = (clean_work_history[0].get("company") if clean_work_history else "") or "Enterprise Platform"
+
+    clean_role = re.sub(r'^(Senior|Lead|Junior|Staff|Principal|Associate)\s+', '', recent_role, flags=re.I).strip()
+    if not clean_role:
+        clean_role = recent_role
+
+    role_slug = re.sub(r'[^a-zA-Z0-9]+', '_', clean_role.lower()).strip('_')
+    target_profiles = [
+        {
+            "id": "track-1",
+            "slug": f"lead_{role_slug}_architect",
+            "title": f"Lead / Principal {clean_role} Systems Architect",
+            "match_score": 96,
+            "core_pitch": f"Combines deep hands-on expertise in {clean_role} execution with scalable cross-functional architectures, governance, and quantifiable delivery."
+        },
+        {
+            "id": "track-2",
+            "slug": f"forward_deployed_{role_slug}",
+            "title": f"Forward-Deployed Solutions Lead / Enterprise Consultant",
+            "match_score": 94,
+            "core_pitch": f"Leverages demonstrated track record at {recent_company} to diagnose operational bottlenecks, interface with executive stakeholders, and deploy production-grade solutions."
+        },
+        {
+            "id": "track-3",
+            "slug": f"director_{role_slug}_ops",
+            "title": f"Director of {clean_role} & Strategic Operations",
+            "match_score": 91,
+            "core_pitch": f"Enterprise management trajectory leading high-performance squads, mentoring teams, governing departmental KPIs, and optimizing organizational workflows."
+        },
+        {
+            "id": "track-4",
+            "slug": "autonomous_systems_principal",
+            "title": "Autonomous Systems & Transformation Principal",
+            "match_score": 88,
+            "core_pitch": "Directs modern AI-augmented workflows, agentic automation, and zero-defect data operations to multiply enterprise productivity."
+        }
+    ]
+
+    competency_pool = [
+        f"{clean_role} Lifecycle & Domain Architecture",
+        "Cross-Functional Stakeholder Alignment & Requirement Gathering",
+        "Operational Risk Mitigation & SLA Governance",
+        "Data-Driven Process Optimization & KPI Tracking"
+    ]
+    extracted_names = [s.get("name") if isinstance(s, dict) else str(s) for s in core_domain]
+    for sk in extracted_names[:6]:
+        if sk not in competency_pool:
+            competency_pool.append(sk)
+
+    traits_art = {
+        "version": 1,
+        "last_updated": datetime.utcnow().isoformat() + "Z",
+        "candidate_name": cand_name,
+        "career_archetype": f"{recent_role} Strategic Leader & Domain Architect",
+        "personality_traits": [
+            "High Cognitive Complexity & Learning Agility: Demonstrates rapid mastery over complex domain architectures and operational systems without formal hand-holding.",
+            "Systems-Thinking & Resilience: Focuses on building autonomous, zero-downtime, and high-availability operational frameworks rather than superficial fixes.",
+            "Analytical Rigor & Cross-Functional Alignment: Proven track record of translating complex domain requirements into quantifiable deliverables and stakeholder value.",
+            "Strategic Communicator & Translator: Bridges business objectives with technical execution, aligning operational metrics directly with company-wide KPIs."
+        ],
+        "core_competencies": competency_pool[:8],
+        "target_profiles": target_profiles
+    }
+    _atomic_write_json(user_artifacts_dir / "traits.json", traits_art)
+
+    return {
+        "profile": profile,
+        "skills_matrix": skills_art,
+        "traits": traits_art
+    }
+
 class ConfirmTimelineRequest(BaseModel):
     candidate: Optional[Dict[str, Any]] = None
     work_history: List[Dict[str, Any]]
@@ -89,10 +229,16 @@ class ConfirmTimelineRequest(BaseModel):
     skills: Optional[List[str]] = None
 
 @router.post("/parse-cv")
-async def parse_uploaded_cv(file: UploadFile = File(...), x_user_id: Optional[str] = Header(None)):
+async def parse_uploaded_cv(
+    file: UploadFile = File(...),
+    auto_save: bool = Query(True),
+    x_user_id: Optional[str] = Header(None)
+):
     """
     Extracts text from uploaded PDF/DOCX and parses chronological timeline, roles,
     and gap phase using AI with deterministic fallbacks.
+    When auto_save=True (default), automatically writes to profile_master.json,
+    skills_matrix.json, and synthesizes traits.json in the user's Canonical Vault.
     """
     uid = (x_user_id or "user1").strip().lower()
     user_artifacts_dir = get_user_artifacts_dir(uid)
@@ -106,6 +252,10 @@ async def parse_uploaded_cv(file: UploadFile = File(...), x_user_id: Optional[st
             f.write(content)
             
         parsed = cv_extractor_service.parse_cv_text(raw_text)
+
+        if auto_save:
+            synthesize_and_save_artifacts_from_cv(parsed, uid)
+
         return {
             "status": "success",
             "filename": file.filename,
@@ -115,9 +265,13 @@ async def parse_uploaded_cv(file: UploadFile = File(...), x_user_id: Optional[st
         raise HTTPException(status_code=500, detail=f"CV parsing failed: {str(e)}")
 
 @router.post("/parse-stored-cv")
-def parse_stored_sample_cv(x_user_id: Optional[str] = Header(None)):
+def parse_stored_sample_cv(
+    auto_save: bool = Query(True),
+    x_user_id: Optional[str] = Header(None)
+):
     """
     Parses existing CV from system storage for instant 1-click verification.
+    When auto_save=True (default), automatically updates the user's Canonical Vault.
     """
     uid = (x_user_id or "user1").strip().lower()
     user_artifacts_dir = get_user_artifacts_dir(uid)
@@ -131,6 +285,10 @@ def parse_stored_sample_cv(x_user_id: Optional[str] = Header(None)):
         
     raw_text = cv_extractor_service.extract_text_from_bytes(content, target_file.name)
     parsed = cv_extractor_service.parse_cv_text(raw_text)
+
+    if auto_save:
+        synthesize_and_save_artifacts_from_cv(parsed, uid)
+
     return {
         "status": "success",
         "filename": target_file.name,
@@ -140,54 +298,20 @@ def parse_stored_sample_cv(x_user_id: Optional[str] = Header(None)):
 @router.post("/confirm-timeline")
 def confirm_career_timeline(req: ConfirmTimelineRequest, x_user_id: Optional[str] = Header(None)):
     """
-    Confirms extracted timeline, updates profile_master.json, and recompiles track resumes.
+    Confirms extracted timeline, updates profile_master.json, skills_matrix.json,
+    synthesizes traits.json, and recompiles track resumes.
     """
     uid = (x_user_id or "user1").strip().lower()
-    user_artifacts_dir = get_user_artifacts_dir(uid)
-    profile = get_artifact("profile_master", user_id=uid) or {
-        "version": 1,
-        "candidate": {},
-        "work_history": [],
-        "education": []
+
+    parsed_payload = {
+        "candidate": req.candidate or {},
+        "work_history": req.work_history,
+        "education": req.education or [],
+        "skills": req.skills or []
     }
     
-    if req.candidate:
-        profile.setdefault("candidate", {}).update(req.candidate)
-        
-    clean_work_history = []
-    for wh in req.work_history:
-        clean_work_history.append({
-            "company": wh.get("company", ""),
-            "role": wh.get("role", ""),
-            "period": wh.get("period", "Recent"),
-            "location": wh.get("location", ""),
-            "is_gap_phase": wh.get("is_gap_phase", False),
-            "summary": wh.get("summary", ""),
-            "responsibilities": wh.get("responsibilities", [])
-        })
-        
-    profile["work_history"] = clean_work_history
+    saved_artifacts = synthesize_and_save_artifacts_from_cv(parsed_payload, uid)
     
-    if req.education:
-        profile["education"] = req.education
-        
-    from datetime import datetime
-    profile["version"] = profile.get("version", 1) + 1
-    profile["last_updated"] = datetime.utcnow().isoformat() + "Z"
-    
-    _atomic_write_json(user_artifacts_dir / "profile_master.json", profile)
-    
-    # If new skills provided, add them to skills_matrix.json
-    if req.skills:
-        skills_art = get_artifact("skills_matrix", user_id=uid) or {"categories": {}}
-        cats = skills_art.setdefault("categories", {})
-        gen_list = cats.setdefault("core_technical", [])
-        existing_skill_names = {s.get("name") for s in gen_list if isinstance(s, dict)}
-        for sk in req.skills:
-            if sk not in existing_skill_names:
-                gen_list.append({"name": sk, "proficiency": "Advanced"})
-        _atomic_write_json(user_artifacts_dir / "skills_matrix.json", skills_art)
-        
     # Recompile resumes for all tracks
     compiled_tracks = []
     for t in resume_service.get_available_tracks():
@@ -200,7 +324,7 @@ def confirm_career_timeline(req: ConfirmTimelineRequest, x_user_id: Optional[str
     return {
         "status": "success",
         "message": f"Career timeline confirmed and saved to {uid} Canonical Vault. Resumes recompiled.",
-        "work_history_count": len(clean_work_history),
+        "work_history_count": len(req.work_history),
         "recompiled_tracks": compiled_tracks
     }
 

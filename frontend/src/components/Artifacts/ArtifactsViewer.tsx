@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Database,
   FileText,
@@ -43,6 +43,13 @@ export const ArtifactsViewer: React.FC = () => {
     'story-01': true // default open first story
   });
   const [storyFilter, setStoryFilter] = useState<'all' | 'incident' | 'automation' | 'architecture' | 'ai'>('all');
+
+  useEffect(() => {
+    if (activeProfileTab && ['timeline', 'stories', 'traits', 'skills'].includes(activeProfileTab)) {
+      setActiveTab(activeProfileTab as any);
+      setShowRawJson(false);
+    }
+  }, [activeProfileTab]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -551,100 +558,123 @@ export const ArtifactsViewer: React.FC = () => {
             {/* TAB 3: ARCHETYPES & TRAITS */}
             {activeTab === 'traits' && (
               <div className="space-y-5 max-w-5xl mx-auto">
-                {/* Archetype banner */}
-                {traits?.career_archetype && (
-                  <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-950/50 via-gray-900 to-indigo-950/40 border border-blue-800/40 flex items-center justify-between">
-                    <div>
-                      <span className="text-[11px] uppercase tracking-wider text-blue-400 font-semibold block mb-0.5">
-                        Calibrated Career Archetype
-                      </span>
-                      <h3 className="text-base font-bold text-white">{traits.career_archetype}</h3>
-                      <p className="text-xs text-gray-400 mt-1">
-                        High-assurance enterprise reliability paired with autonomous engineering capability.
+                {!traits?.career_archetype && (!traits?.target_profiles || traits.target_profiles.length === 0) ? (
+                  <div className="p-8 sm:p-12 rounded-2xl bg-gray-900/60 border border-gray-800 text-center space-y-4">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto">
+                      <Award className="w-6 h-6" />
+                    </div>
+                    <div className="space-y-1.5 max-w-md mx-auto">
+                      <h3 className="text-base font-bold text-white">Traits Awaiting Calibration</h3>
+                      <p className="text-xs text-gray-400 leading-relaxed">
+                        Upload your CV in the chat or from the Timeline tab. Aura will automatically synthesize your calibrated Career Archetype, Target Role match scores, and Evaluated Competencies.
                       </p>
                     </div>
                     <button
-                      onClick={() => setActiveModule('cvforge')}
-                      className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+                      onClick={() => setIsTimelineModalOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer shadow-lg shadow-blue-900/20"
                     >
-                      <span>Tailor in CV Forge</span>
-                      <ArrowRight className="w-3 h-3" />
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload CV / Timeline</span>
                     </button>
                   </div>
-                )}
-
-                {/* Target Role Match Cards Grid */}
-                {traits?.target_profiles && traits.target_profiles.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                      Qualified Role Pathways & Match Scores
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {traits.target_profiles.map((tp) => (
-                        <div
-                          key={tp.id}
-                          className="p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 transition-all space-y-2.5"
+                ) : (
+                  <>
+                    {/* Archetype banner */}
+                    {traits?.career_archetype && (
+                      <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-950/50 via-gray-900 to-indigo-950/40 border border-blue-800/40 flex items-center justify-between">
+                        <div>
+                          <span className="text-[11px] uppercase tracking-wider text-blue-400 font-semibold block mb-0.5">
+                            Calibrated Career Archetype
+                          </span>
+                          <h3 className="text-base font-bold text-white">{traits.career_archetype}</h3>
+                          <p className="text-xs text-gray-400 mt-1">
+                            High-assurance enterprise reliability paired with autonomous engineering capability.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setActiveModule('cvforge')}
+                          className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
                         >
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-bold text-white">{tp.title}</h4>
-                            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                              {tp.match_score}% Match
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-400 leading-relaxed">{tp.core_pitch}</p>
-                          <div className="pt-2 border-t border-gray-800 flex items-center justify-between text-[11px]">
-                            <span className="text-gray-500 font-mono">Track: {tp.id}</span>
-                            <button
-                              onClick={() => setActiveModule('cvforge')}
-                              className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1"
+                          <span>Tailor in CV Forge</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Target Role Match Cards Grid */}
+                    {traits?.target_profiles && traits.target_profiles.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                          Qualified Role Pathways & Match Scores
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {traits.target_profiles.map((tp) => (
+                            <div
+                              key={tp.id}
+                              className="p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 transition-all space-y-2.5"
                             >
-                              <span>Inspect in CV Forge</span>
-                              <ArrowRight className="w-3 h-3" />
-                            </button>
+                              <div className="flex items-center justify-between">
+                                <h4 className="text-sm font-bold text-white">{tp.title}</h4>
+                                <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                  {tp.match_score}% Match
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-400 leading-relaxed">{tp.core_pitch}</p>
+                              <div className="pt-2 border-t border-gray-800 flex items-center justify-between text-[11px]">
+                                <span className="text-gray-500 font-mono">Track: {tp.id}</span>
+                                <button
+                                  onClick={() => setActiveModule('cvforge')}
+                                  className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1"
+                                >
+                                  <span>Inspect in CV Forge</span>
+                                  <ArrowRight className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Core Competencies & Evaluated Traits */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Competencies */}
+                      {traits?.core_competencies && traits.core_competencies.length > 0 && (
+                        <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
+                          <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                            Core Competencies
+                          </h4>
+                          <div className="flex flex-wrap gap-1.5">
+                            {traits.core_competencies.map((cc, i) => (
+                              <span
+                                key={i}
+                                className="text-xs bg-gray-950 border border-gray-800 text-gray-200 px-2.5 py-1 rounded-lg"
+                              >
+                                {cc}
+                              </span>
+                            ))}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      )}
 
-                {/* Core Competencies & Evaluated Traits */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Competencies */}
-                  {traits?.core_competencies && traits.core_competencies.length > 0 && (
-                    <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
-                      <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                        Core Competencies
-                      </h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {traits.core_competencies.map((cc, i) => (
-                          <span
-                            key={i}
-                            className="text-xs bg-gray-950 border border-gray-800 text-gray-200 px-2.5 py-1 rounded-lg"
-                          >
-                            {cc}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Personality Traits */}
-                  {traits?.personality_traits && traits.personality_traits.length > 0 && (
-                    <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
-                      <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                        Evaluated Traits & Mindset
-                      </h4>
-                      <div className="space-y-1.5 text-xs text-gray-300">
-                        {traits.personality_traits.map((pt, i) => (
-                          <div key={i} className="p-2 rounded-lg bg-gray-950/60 border border-gray-800/80">
-                            {pt}
+                      {/* Personality Traits */}
+                      {traits?.personality_traits && traits.personality_traits.length > 0 && (
+                        <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
+                          <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
+                            Evaluated Traits & Mindset
+                          </h4>
+                          <div className="space-y-1.5 text-xs text-gray-300">
+                            {traits.personality_traits.map((pt, i) => (
+                              <div key={i} className="p-2 rounded-lg bg-gray-950/60 border border-gray-800/80">
+                                {pt}
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
             )}
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   GitFork,
   TrendingUp,
@@ -497,7 +497,7 @@ const buildDynamicTrack = (
   const isWfm = roleLower.includes('wfm') || roleLower.includes('workforce') || roleLower.includes('rta');
   const isHr = roleLower.includes('hr') || roleLower.includes('talent') || roleLower.includes('people');
   const isConsulting = roleLower.includes('consult') || roleLower.includes('strategy');
-  const isData = roleLower.includes('data') || roleLower.includes('analytic');
+  const isData = roleLower.includes('data') || roleLower.includes('analytic') || roleLower.includes('analyst') || roleLower.includes('business analyst') || roleLower.includes('bi ');
   const isSupport = roleLower.includes('support') || roleLower.includes('incident') || roleLower.includes('operation') || roleLower.includes('systems');
 
   const fallbackSkills = isSupport
@@ -507,7 +507,7 @@ const buildDynamicTrack = (
     : isHr
     ? ['Talent Architecture', 'Total Rewards', 'People Analytics', 'HR SaaS']
     : isData
-    ? ['SQL Pipelines', 'Data Modeling', 'Data Pipelines', 'Analytics Engineering']
+    ? ['Business Specifications', 'Data Modeling', 'SQL Pipelines', 'Stakeholder Analytics']
     : ['Systems Architecture', 'Operational Strategy', 'Cross-Functional Execution', 'Process Automation'];
 
   const rootSkills = extractedSkills.length > 0 ? extractedSkills.slice(0, 4) : fallbackSkills;
@@ -700,7 +700,7 @@ const buildDynamicTrack = (
         id: `canopy_dyn_${idx}`,
         level: `Canopy Pivot 4${String.fromCharCode(65 + idx)}`,
         title: tp.title || 'Executive Leadership Principal',
-        description: tp.rationale || 'High-leverage executive destination synthesized from your vault competencies.',
+        description: tp.core_pitch || tp.rationale || 'High-leverage executive destination synthesized from your vault competencies.',
         compRange: '₹85L – ₹1.5Cr',
         evScore: 95 - idx * 2,
         skills: rootSkills.concat(['Executive Strategy', 'P&L Ownership']),
@@ -815,6 +815,13 @@ export const CareerTreeView: React.FC = () => {
   const [activeTrackId, setActiveTrackId] = useState<string>(
     hasData ? 'vault_dynamic_track' : 'engineering_mgmt'
   );
+
+  useEffect(() => {
+    if (hasData) {
+      setActiveTrackId('vault_dynamic_track');
+    }
+  }, [hasData]);
+
   const [selectedNode, setSelectedNode] = useState<CareerNode | null>(null);
 
   const activeTrack = availableTracks.find((t) => t.id === activeTrackId) || availableTracks[0];
