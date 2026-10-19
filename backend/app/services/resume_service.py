@@ -531,7 +531,12 @@ class ResumeService:
         # 1. Try LibreOffice / soffice CLI (works on Linux headless and Windows if installed)
         import shutil
         import subprocess
-        soffice_bin = shutil.which("soffice") or shutil.which("libreoffice")
+        soffice_bin = (
+            shutil.which("soffice")
+            or shutil.which("libreoffice")
+            or ("/usr/bin/soffice" if os.path.exists("/usr/bin/soffice") else None)
+            or ("/usr/bin/libreoffice" if os.path.exists("/usr/bin/libreoffice") else None)
+        )
         if soffice_bin:
             try:
                 cmd = [soffice_bin, "--headless", "--convert-to", "pdf", "--outdir", out_dir, abs_docx]
