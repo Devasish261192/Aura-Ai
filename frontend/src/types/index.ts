@@ -36,6 +36,7 @@ export interface CareerStoryArtifact {
 
 export interface TargetProfile {
   id: string;
+  slug?: string;
   title: string;
   match_score: number;
   core_pitch: string;

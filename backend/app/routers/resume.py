@@ -64,7 +64,10 @@ def download_resume(track_slug: str, file_format: str):
 
     # If file does not exist, trigger generation
     if not target_path.exists():
-        resume_service.generate_tailored_pdf(clean_slug)
+        if file_format == "docx":
+            resume_service.generate_docx(data, str(target_path))
+        else:
+            resume_service.generate_tailored_pdf(clean_slug)
 
     if not target_path.exists():
         raise HTTPException(status_code=404, detail=f"Generated file not found at {target_path}")

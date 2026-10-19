@@ -52,7 +52,16 @@ app.include_router(auth.router)
 # Mount CV Forge Interactive Studio
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-CV_FORGE_DIST = Path(r"D:\job search\version 0.0\CV_forge\cvforge-studio\dist")
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+CV_FORGE_DIST = BASE_DIR / "cvforge-dist"
+if not CV_FORGE_DIST.exists():
+    CV_FORGE_DIST = Path(__file__).resolve().parent.parent / "cvforge-dist"
+if not CV_FORGE_DIST.exists():
+    dev_path = Path(r"D:\job search\version 0.0\CV_forge\cvforge-studio\dist")
+    if dev_path.exists():
+        CV_FORGE_DIST = dev_path
+
 if CV_FORGE_DIST.exists():
     app.mount("/cv-forge", StaticFiles(directory=str(CV_FORGE_DIST), html=True), name="cv-forge")
     assets_dir = CV_FORGE_DIST / "assets"

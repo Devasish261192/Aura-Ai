@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Layers,
   Download,
@@ -6,6 +6,7 @@ import {
   ExternalLink,
   Bookmark
 } from 'lucide-react';
+import { useAppStore } from '../../store/useAppStore';
 import { API_BASE } from '../../config';
 
 const TRACK_OPTIONS = [
@@ -36,9 +37,24 @@ const TRACK_OPTIONS = [
 ];
 
 export const CVForgeView: React.FC = () => {
-  const [selectedTrack, setSelectedTrack] = useState(TRACK_OPTIONS[0]);
+  const { artifacts } = useAppStore();
+  const dynamicTracks = (artifacts?.traits?.target_profiles || []).map((tp) => ({
+    id: tp.id,
+    slug: tp.slug || tp.id,
+    title: tp.title,
+    score: tp.match_score || 90
+  }));
+  const trackOptions = dynamicTracks.length > 0 ? dynamicTracks : TRACK_OPTIONS;
+
+  const [selectedTrack, setSelectedTrack] = useState(trackOptions[0]);
   const [isDownloading, setIsDownloading] = useState<'pdf' | 'docx' | null>(null);
   const [iframeKey, setIframeKey] = useState(0);
+
+  useEffect(() => {
+    if (dynamicTracks.length > 0) {
+      setSelectedTrack(dynamicTracks[0]);
+    }
+  }, [artifacts?.traits?.target_profiles]);
 
   const handleDownload = (format: 'pdf' | 'docx') => {
     setIsDownloading(format);
@@ -53,7 +69,7 @@ export const CVForgeView: React.FC = () => {
   };
 
   const handleTrackChange = (trackSlug: string) => {
-    const track = TRACK_OPTIONS.find((t) => t.slug === trackSlug) || TRACK_OPTIONS[0];
+    const track = trackOptions.find((t) => t.slug === trackSlug) || trackOptions[0];
     setSelectedTrack(track);
     // Reload iframe to ensure fresh track context
     setIframeKey((prev) => prev + 1);
@@ -87,7 +103,7 @@ export const CVForgeView: React.FC = () => {
             onChange={(e) => handleTrackChange(e.target.value)}
             className="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer pr-1 truncate max-w-[180px] sm:max-w-[260px]"
           >
-            {TRACK_OPTIONS.map((t) => (
+            {trackOptions.map((t) => (
               <option key={t.id} value={t.slug} className="bg-gray-900 text-gray-200">
                 {t.title} ({t.score}% Match)
               </option>

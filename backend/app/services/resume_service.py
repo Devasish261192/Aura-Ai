@@ -521,26 +521,56 @@ class ResumeService:
 
     def convert_docx_to_pdf(self, docx_path: str, pdf_path: str) -> str:
         """
-        Converts OpenXML .docx into native, ATS-compliant PDF using Microsoft Word COM automation.
-        Produces pristine 100% white vector rendering without any browser artifacts.
+        Converts OpenXML .docx into native, ATS-compliant PDF using LibreOffice (Linux / cross-platform)
+        or Microsoft Word COM automation (Windows).
         """
-        import pythoncom
-        import win32com.client
-        pythoncom.CoInitialize()
-        try:
-            word = win32com.client.DispatchEx("Word.Application")
-            word.Visible = False
-            word.DisplayAlerts = 0
-            abs_docx = os.path.abspath(docx_path)
-            abs_pdf = os.path.abspath(pdf_path)
-            doc = word.Documents.Open(abs_docx)
-            # 17 = wdExportFormatPDF
-            doc.ExportAsFixedFormat(abs_pdf, 17)
-            doc.Close(False)
-            word.Quit()
-            return abs_pdf
-        finally:
-            pythoncom.CoUninitialize()
+        abs_docx = os.path.abspath(docx_path)
+        abs_pdf = os.path.abspath(pdf_path)
+        out_dir = os.path.dirname(abs_pdf)
+
+        # 1. Try LibreOffice / soffice CLI (works on Linux headless and Windows if installed)
+        import shutil
+        import subprocess
+        soffice_bin = shutil.which("soffice") or shutil.which("libreoffice")
+        if soffice_bin:
+            try:
+                cmd = [soffice_bin, "--headless", "--convert-to", "pdf", "--outdir", out_dir, abs_docx]
+                res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=35)
+                if os.path.exists(abs_pdf):
+                    return abs_pdf
+                # LibreOffice names the output using the base name of input
+                generated = os.path.join(out_dir, Path(abs_docx).stem + ".pdf")
+                if os.path.exists(generated):
+                    if generated != abs_pdf:
+                        shutil.move(generated, abs_pdf)
+                    return abs_pdf
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"LibreOffice conversion failed: {e}")
+
+        # 2. On Windows, fallback to Word COM
+        if sys.platform == "win32":
+            try:
+                import pythoncom
+                import win32com.client
+                pythoncom.CoInitialize()
+                try:
+                    word = win32com.client.DispatchEx("Word.Application")
+                    word.Visible = False
+                    word.DisplayAlerts = 0
+                    doc = word.Documents.Open(abs_docx)
+                    # 17 = wdExportFormatPDF
+                    doc.ExportAsFixedFormat(abs_pdf, 17)
+                    doc.Close(False)
+                    word.Quit()
+                    return abs_pdf
+                finally:
+                    pythoncom.CoUninitialize()
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"Word COM conversion failed: {e}")
+
+        raise RuntimeError("PDF conversion engine unavailable. Please ensure LibreOffice is installed on Linux or Microsoft Word on Windows.")
 
     def generate_tailored_pdf(self, track_slug: str = "technical_business_analyst") -> Dict[str, Any]:
         """
