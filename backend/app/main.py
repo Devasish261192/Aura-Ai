@@ -29,6 +29,10 @@ async def add_security_headers(request, call_next):
         "Strict-Transport-Security",
         "max-age=31536000; includeSubDomains"
     )
+    response.headers.setdefault(
+        "X-Frame-Options",
+        "SAMEORIGIN"
+    )
     return response
 
 @app.on_event("startup")
