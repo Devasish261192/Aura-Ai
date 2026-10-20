@@ -40,16 +40,12 @@ def ats_tailor_endpoint(
             track_slug=req.track_slug or "custom",
             user_id=target_uid
         )
+        slug = result.get("track_slug", "custom")
+        result["download_pdf_url"] = f"/api/resume/download/{slug}/pdf?user_id={target_uid}"
+        result["download_docx_url"] = f"/api/resume/download/{slug}/docx?user_id={target_uid}"
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"ATS tailoring failed: {str(e)}")
-        )
-        slug = result["track_slug"]
-        result["download_pdf_url"] = f"/api/resume/download/{slug}/pdf"
-        result["download_docx_url"] = f"/api/resume/download/{slug}/docx"
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to tailor resume: {str(e)}")
 
 @router.get("/tracks")
 def get_resume_tracks(
