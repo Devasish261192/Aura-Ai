@@ -633,66 +633,66 @@ export const InterviewTrainerView: React.FC = () => {
 
         <div className="flex items-center gap-3">
           {/* Font size */}
-          <div className="flex items-center gap-1 bg-gray-950 px-2 py-0.5 rounded-lg border border-gray-800">
-            <span className="text-[10px] text-gray-500">Size:</span>
+          <div className="flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200 text-slate-700">
+            <span className="text-[10px] text-slate-500 font-medium">Size:</span>
             <button
               onClick={() => setFontSize('normal')}
-              className={`text-[10px] px-1 rounded ${fontSize === 'normal' ? 'text-cyan-400 font-bold' : 'text-gray-400'}`}
+              className={`text-[10px] px-1 rounded ${fontSize === 'normal' ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-slate-900'}`}
             >
               A
             </button>
             <button
               onClick={() => setFontSize('large')}
-              className={`text-xs px-1 rounded ${fontSize === 'large' ? 'text-cyan-400 font-bold' : 'text-gray-400'}`}
+              className={`text-xs px-1 rounded ${fontSize === 'large' ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-slate-900'}`}
             >
               A+
             </button>
             <button
               onClick={() => setFontSize('xl')}
-              className={`text-sm px-1 rounded ${fontSize === 'xl' ? 'text-cyan-400 font-bold' : 'text-gray-400'}`}
+              className={`text-sm px-1 rounded ${fontSize === 'xl' ? 'text-blue-600 font-bold' : 'text-slate-600 hover:text-slate-900'}`}
             >
               A++
             </button>
           </div>
 
           {/* Pacing Cues Toggle */}
-          <label className="flex items-center gap-1.5 cursor-pointer text-xs text-gray-300 hover:text-white">
+          <label className="flex items-center gap-1.5 cursor-pointer text-xs text-slate-700 hover:text-slate-900 font-medium">
             <input
               type="checkbox"
               checked={showPacingCues}
               onChange={(e) => setShowPacingCues(e.target.checked)}
-              className="rounded border-gray-700 bg-gray-950 text-cyan-500 focus:ring-0"
+              className="rounded border-slate-300 text-blue-600 focus:ring-0"
             />
-            <span className="text-[11px]">Dot & Dash Cues</span>
+            <span className="text-[11px]">Show Pause & Tone Cues</span>
           </label>
 
           {/* Copy Script */}
           <button
             onClick={handleCopyScript}
-            className="flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 transition-colors"
+            className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-700 font-semibold transition-colors"
           >
-            {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+            {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
             <span>{copied ? 'Copied!' : 'Copy'}</span>
           </button>
         </div>
       </div>
 
       {/* Live Rhythm Bar & Ticker */}
-      <div className="p-3 rounded-xl bg-gray-950 border border-gray-800/80 flex flex-wrap items-center justify-between gap-3">
+      <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
         {/* Part timing and progress meter */}
         <div className="flex items-center gap-3">
           <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="text-cyan-300">PART {currentPillar.pillarNum}:</span>
+            <Clock className="w-3.5 h-3.5 text-sky-400" />
+            <span className="text-sky-300 font-bold">PART {currentPillar.pillarNum}:</span>
             <span className="text-white text-sm">{formatTimer(currentPartElapsed)}</span>
-            <span className="text-gray-500">/</span>
-            <span className="text-gray-400">{currentPillar.secondsTarget}s</span>
+            <span className="text-slate-500">/</span>
+            <span className="text-slate-400">{currentPillar.secondsTarget}s</span>
           </div>
 
           {/* Progress Bar */}
-          <div className="w-24 sm:w-36 h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div className="w-24 sm:w-36 h-2 bg-slate-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-300"
+              className="h-full bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-300"
               style={{ width: `${Math.min(100, (currentPartElapsed / currentPillar.secondsTarget) * 100)}%` }}
             />
           </div>
@@ -701,17 +701,17 @@ export const InterviewTrainerView: React.FC = () => {
         {/* Live Cue Indicator */}
         <div className="flex items-center gap-2">
           {currentCueState.type === 'dash' ? (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 border border-amber-400/80 text-amber-300 font-mono font-bold text-xs animate-pulse shadow-sm">
-              <span>━━━━ DASH: PAUSE ({currentCueState.remainingSec}s) ━━━━</span>
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 border border-amber-400 text-amber-300 font-mono font-bold text-xs animate-pulse shadow-sm">
+              <span>━━━━ PAUSE ({currentCueState.remainingSec}s) ━━━━</span>
             </span>
           ) : currentCueState.type === 'downtone' ? (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/80 text-emerald-300 font-mono font-bold text-xs animate-pulse">
-              <span>↓ Grounded Down-Tone (Deliver Now)</span>
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-mono font-bold text-xs animate-pulse">
+              <span>↓ Down-Tone Pitch (Deliver Now)</span>
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-900 border border-gray-800 text-cyan-300 font-mono text-xs">
-              <span className="text-cyan-400">● ● ●</span>
-              <span>Spoken Beat (135 WPM)</span>
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-sky-300 font-mono text-xs font-medium">
+              <span className="text-sky-400">● ● ●</span>
+              <span>Speaking Cadence (135 WPM)</span>
             </span>
           )}
         </div>
@@ -721,7 +721,7 @@ export const InterviewTrainerView: React.FC = () => {
           <button
             onClick={handlePrevPhase}
             disabled={activePhaseIndex === 0}
-            className="p-1 rounded bg-gray-900 hover:bg-gray-800 disabled:opacity-30 text-gray-300 border border-gray-800"
+            className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 border border-slate-700 cursor-pointer"
             title="Previous Part"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
@@ -729,10 +729,10 @@ export const InterviewTrainerView: React.FC = () => {
 
           <button
             onClick={togglePacingPlay}
-            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all border ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all border cursor-pointer ${
               isPlayingPacing
-                ? 'bg-amber-950/60 border-amber-500 text-amber-300'
-                : 'bg-gray-900 hover:bg-gray-800 text-emerald-300 border-gray-800'
+                ? 'bg-amber-950/70 border-amber-500 text-amber-300'
+                : 'bg-slate-800 hover:bg-slate-700 text-emerald-400 border-slate-700'
             }`}
             title={isPlayingPacing ? 'Pause Rehearsal Pacing' : 'Play Prompter Timing Pacing'}
           >
@@ -751,7 +751,7 @@ export const InterviewTrainerView: React.FC = () => {
 
           <button
             onClick={resetPacing}
-            className="p-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-white border border-gray-800"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 cursor-pointer"
             title="Reset Timer"
           >
             <RotateCcw className="w-3 h-3" />
@@ -760,7 +760,7 @@ export const InterviewTrainerView: React.FC = () => {
           <button
             onClick={handleNextPhase}
             disabled={activePhaseIndex === CEO_PILLARS.length - 1}
-            className="p-1 rounded bg-gray-900 hover:bg-gray-800 disabled:opacity-30 text-gray-300 border border-gray-800"
+            className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 border border-slate-700 cursor-pointer"
             title="Next Part"
           >
             <ChevronRight className="w-3.5 h-3.5" />
@@ -769,24 +769,24 @@ export const InterviewTrainerView: React.FC = () => {
       </div>
 
       {/* The Prompter Screen (ONE PART AT A TIME) */}
-      <div className="bg-gray-950 p-4 rounded-xl border border-gray-800/80 space-y-2">
+      <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
         {/* Legend Bar */}
-        <div className="flex items-center justify-between text-[10px] text-gray-500 font-mono pb-1 border-b border-gray-900">
+        <div className="flex items-center justify-between text-xs text-slate-400 font-mono pb-2 border-b border-slate-800">
           <span className="flex items-center gap-2">
-            <span>● Dot = 135 WPM Word Beat</span>
+            <span className="text-sky-300 font-semibold">● Dot = 135 WPM Rhythm</span>
             <span>•</span>
-            <span className="text-amber-400/90 font-semibold">━━━━ Dash = Space & Pause</span>
+            <span className="text-amber-400 font-bold">━━━━ Dash = Pause & Breathe</span>
             <span>•</span>
-            <span className="text-emerald-400/90">↓ Down-tone = Authority</span>
+            <span className="text-emerald-400 font-bold">↓ Down-tone = Confident Ending</span>
           </span>
-          <span className="text-cyan-400 font-semibold">
+          <span className="text-sky-400 font-bold">
             {wordCount} words • ~{estimatedSeconds}s Target
           </span>
         </div>
 
         {/* Script Segments */}
         {showPacingCues ? (
-          <div className="space-y-2 pt-1">
+          <div className="space-y-2.5 pt-1">
             {pacedSegments.map((seg) => {
               const isSegmentActive =
                 (isRecording || isPlayingPacing) &&
@@ -798,26 +798,26 @@ export const InterviewTrainerView: React.FC = () => {
                 return (
                   <div
                     key={seg.id}
-                    className={`p-2.5 rounded-xl border transition-all ${
+                    className={`p-3 rounded-xl border transition-all ${
                       isSegmentActive
-                        ? 'bg-amber-500/20 border-amber-400 shadow-lg shadow-amber-500/20 ring-2 ring-amber-400/50 scale-[1.01]'
-                        : 'bg-amber-950/20 border-amber-600/30 text-amber-200/90'
+                        ? 'bg-amber-500/25 border-2 border-amber-400 shadow-lg ring-2 ring-amber-400/50 scale-[1.01]'
+                        : 'bg-amber-950/40 border border-amber-500/60'
                     }`}
                   >
-                    <div className="flex items-center justify-between text-xs font-mono font-bold text-amber-300">
-                      <span className="flex items-center gap-2">
+                    <div className="flex items-center justify-between text-xs font-mono font-bold">
+                      <span className="flex items-center gap-2 text-amber-300 font-bold">
                         <span className="tracking-widest text-amber-400 font-black">━━━━</span>
-                        <span>[DASH: {seg.pauseDuration}s PAUSE]</span>
+                        <span>[PAUSE: {seg.pauseDuration}s]</span>
                         <span className="tracking-widest text-amber-400 font-black">━━━━</span>
                       </span>
-                      <span className="text-[11px] font-sans font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="text-xs font-sans font-bold uppercase tracking-wider flex items-center gap-1.5">
                         {isSegmentActive ? (
-                          <span className="flex items-center gap-1.5 text-amber-300 animate-pulse bg-amber-950/90 px-2.5 py-0.5 rounded border border-amber-400/50">
+                          <span className="flex items-center gap-1.5 text-amber-200 animate-pulse bg-amber-950 px-2.5 py-0.5 rounded border border-amber-400 font-bold">
                             <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
                             <span>HOLD SILENCE ({pauseRemaining}s)</span>
                           </span>
                         ) : (
-                          <span className="text-amber-300/80">Space & Silence • Hold Eye Contact</span>
+                          <span className="text-amber-300 font-bold">Space & Silence • Hold Eye Contact</span>
                         )}
                       </span>
                     </div>
@@ -829,21 +829,21 @@ export const InterviewTrainerView: React.FC = () => {
                 return (
                   <div
                     key={seg.id}
-                    className={`p-2 rounded-xl border transition-all flex items-center justify-between text-xs ${
+                    className={`p-2.5 rounded-xl border transition-all flex items-center justify-between text-xs ${
                       isSegmentActive
-                        ? 'bg-emerald-950/50 border-emerald-400 text-emerald-200 shadow-md ring-1 ring-emerald-400/50'
-                        : 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300/80'
+                        ? 'bg-emerald-900/60 border-2 border-emerald-400 text-white shadow-md ring-1 ring-emerald-400/50'
+                        : 'bg-emerald-950/40 border border-emerald-500/60 text-emerald-300'
                     }`}
                   >
-                    <div className="flex items-center gap-2 font-semibold">
-                      <span className="text-emerald-400 text-base font-bold">↓</span>
-                      <span>[GROUNDED DOWN-TONE]</span>
-                      <span className="text-[11px] font-normal text-emerald-300/70 hidden sm:inline">
-                        End on definitive downward pitch — project executive authority
+                    <div className="flex items-center gap-2 font-bold">
+                      <span className="text-emerald-400 text-base font-black">↓</span>
+                      <span className="text-emerald-400 font-bold">[GROUNDED DOWN-TONE]</span>
+                      <span className="text-xs font-semibold text-emerald-200 hidden sm:inline ml-1">
+                        End on definitive downward pitch — project authority
                       </span>
                     </div>
                     {isSegmentActive && (
-                      <span className="text-[10px] font-mono bg-emerald-900/60 px-2 py-0.5 rounded text-emerald-200 animate-pulse">
+                      <span className="text-[10px] font-mono bg-emerald-900 px-2.5 py-0.5 rounded text-white border border-emerald-400 font-bold animate-pulse">
                         DELIVER NOW
                       </span>
                     )}
@@ -854,30 +854,30 @@ export const InterviewTrainerView: React.FC = () => {
               return (
                 <div
                   key={seg.id}
-                  className={`p-3 rounded-xl border transition-all ${
+                  className={`p-3.5 rounded-xl border transition-all ${
                     isSegmentActive
-                      ? 'bg-cyan-950/40 border-cyan-400 shadow-md shadow-cyan-500/20 ring-1 ring-cyan-400/40'
-                      : 'bg-gray-900/70 border-gray-800/80 text-gray-200'
+                      ? 'bg-slate-800 border-2 border-sky-400 shadow-md ring-1 ring-sky-400/50'
+                      : 'bg-slate-900 border border-slate-800 text-slate-100'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1 text-[10px] font-mono">
-                    <span className="flex items-center gap-1 text-cyan-400/80 font-semibold">
+                  <div className="flex items-center justify-between mb-1.5 text-[11px] font-mono">
+                    <span className="flex items-center gap-1 text-sky-400 font-bold">
                       <span className="text-xs">● ● ●</span>
                       <span className="uppercase tracking-wider">Word Cadence (135 WPM)</span>
                     </span>
                     {isSegmentActive && (
-                      <span className="text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800/60 animate-pulse font-semibold">
+                      <span className="text-sky-300 bg-slate-950 px-2 py-0.5 rounded border border-sky-400 animate-pulse font-bold">
                         ACTIVE SPOKEN BEAT
                       </span>
                     )}
                   </div>
                   <div
-                    className={`leading-relaxed font-sans text-gray-100 ${
+                    className={`leading-relaxed font-sans text-white ${
                       fontSize === 'normal'
-                        ? 'text-xs'
-                        : fontSize === 'large'
                         ? 'text-sm'
-                        : 'text-base font-medium'
+                        : fontSize === 'large'
+                        ? 'text-base'
+                        : 'text-lg font-medium'
                     }`}
                   >
                     {renderHighlightedPhrase(seg.text)}
@@ -888,8 +888,8 @@ export const InterviewTrainerView: React.FC = () => {
           </div>
         ) : (
           <div
-            className={`leading-relaxed font-sans whitespace-pre-line p-3 bg-gray-900/60 rounded-lg border border-gray-800 text-gray-200 ${
-              fontSize === 'normal' ? 'text-xs' : fontSize === 'large' ? 'text-sm' : 'text-base font-medium'
+            className={`leading-relaxed font-sans whitespace-pre-line p-4 bg-slate-900 rounded-xl border border-slate-800 text-white font-medium ${
+              fontSize === 'normal' ? 'text-sm' : fontSize === 'large' ? 'text-base' : 'text-lg font-medium'
             }`}
           >
             {activeScript}
@@ -897,21 +897,21 @@ export const InterviewTrainerView: React.FC = () => {
         )}
       </div>
 
-      {/* Compact CEO Delivery Guidance & Vocal Technique Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1 text-xs">
-        <div className="p-2.5 rounded-xl bg-amber-950/20 border border-amber-600/30 flex items-start gap-2">
-          <Lightbulb className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-          <div className="text-[11px] text-amber-200 leading-relaxed">
-            <strong>Delivery Tip: </strong>
-            {currentPillar.deliveryTip}
+      {/* High-Contrast Delivery Guidance & Vocal Technique Bar */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 text-xs">
+        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 flex items-start gap-2.5 shadow-xs">
+          <Lightbulb className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+          <div className="text-xs text-amber-950 leading-relaxed font-normal">
+            <strong className="text-amber-900 font-bold">Delivery Tip: </strong>
+            <span className="text-amber-950 font-medium">{currentPillar.deliveryTip}</span>
           </div>
         </div>
 
-        <div className="p-2.5 rounded-xl bg-cyan-950/20 border border-cyan-700/30 flex items-start gap-2">
-          <Volume2 className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
-          <div className="text-[11px] text-cyan-200 leading-relaxed">
-            <strong>Vocal Technique: </strong>
-            {currentPillar.vocalTechnique}
+        <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-300 flex items-start gap-2.5 shadow-xs">
+          <Volume2 className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+          <div className="text-xs text-blue-950 leading-relaxed font-normal">
+            <strong className="text-blue-900 font-bold">Vocal Technique: </strong>
+            <span className="text-blue-950 font-medium">{currentPillar.vocalTechnique}</span>
           </div>
         </div>
       </div>
@@ -980,53 +980,53 @@ export const InterviewTrainerView: React.FC = () => {
 
       {/* Studio Backdrop Mode Selector */}
       {isCameraActive && (
-        <div className="p-2.5 rounded-xl bg-gray-950 border border-gray-800 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-xs text-gray-300 font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-slate-800 shadow-xs">
+          <div className="flex items-center gap-1.5 text-xs text-slate-700 font-medium">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
             <span>AI Studio Backdrop:</span>
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setBackgroundMode('blur')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1 border ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 border cursor-pointer ${
                 backgroundMode === 'blur'
-                  ? 'bg-cyan-950 border-cyan-500 text-cyan-300 font-bold shadow-sm'
-                  : 'bg-gray-900 border-gray-800 text-gray-400 hover:text-gray-200'
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                  : 'bg-white border-slate-300 text-slate-700 hover:text-slate-900'
               }`}
-              title="Soft Bokeh Blur (Google Meet / Zoom style)"
+              title="Soft Bokeh Blur"
             >
               <span>Soft Blur</span>
             </button>
             <button
               onClick={() => setBackgroundMode('white')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 border cursor-pointer ${
                 backgroundMode === 'white'
-                  ? 'bg-white border-white text-gray-950 font-bold shadow-sm'
-                  : 'bg-gray-900 border-gray-800 text-gray-400 hover:text-gray-200'
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                  : 'bg-white border-slate-300 text-slate-700 hover:text-slate-900'
               }`}
               title="Replace room with clean white executive studio screen"
             >
-              <span className="w-2 h-2 rounded-full bg-white border border-gray-400"></span>
+              <span className="w-2 h-2 rounded-full bg-white border border-slate-400"></span>
               <span>White Screen</span>
             </button>
             <button
               onClick={() => setBackgroundMode('slate')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 border cursor-pointer ${
                 backgroundMode === 'slate'
-                  ? 'bg-slate-900 border-slate-500 text-slate-200 font-bold shadow-sm'
-                  : 'bg-gray-900 border-gray-800 text-gray-400 hover:text-gray-200'
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                  : 'bg-white border-slate-300 text-slate-700 hover:text-slate-900'
               }`}
-              title="Modern dark executive slate tech studio"
+              title="Dark executive studio"
             >
-              <span className="w-2 h-2 rounded-full bg-slate-950 border border-slate-700"></span>
+              <span className="w-2 h-2 rounded-full bg-slate-900"></span>
               <span>Dark Slate</span>
             </button>
             <button
               onClick={() => setBackgroundMode('none')}
-              className={`px-2 py-1 rounded-lg text-xs font-medium transition-all border ${
+              className={`px-2 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer ${
                 backgroundMode === 'none'
-                  ? 'bg-gray-800 border-gray-600 text-white font-bold shadow-sm'
-                  : 'bg-gray-900 border-gray-800 text-gray-400 hover:text-gray-200'
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                  : 'bg-white border-slate-300 text-slate-700 hover:text-slate-900'
               }`}
               title="Raw webcam background"
             >
@@ -1043,7 +1043,7 @@ export const InterviewTrainerView: React.FC = () => {
             <button
               onClick={handleStartRecording}
               disabled={!isCameraActive}
-              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-md shadow-red-900 disabled:opacity-40"
+              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm disabled:opacity-40 cursor-pointer"
             >
               <Play className="w-3.5 h-3.5" />
               <span>{isFullRun ? 'Start Full 90s Run' : `Record Part ${currentPillar.pillarNum} Take`}</span>
@@ -1051,7 +1051,7 @@ export const InterviewTrainerView: React.FC = () => {
           ) : (
             <button
               onClick={handleStopRecording}
-              className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-red-400 text-xs font-semibold transition-colors flex items-center gap-2 border border-red-500/40"
+              className="px-4 py-2 rounded-lg bg-white hover:bg-slate-100 text-red-600 text-xs font-semibold transition-colors flex items-center gap-2 border border-red-300 shadow-sm cursor-pointer"
             >
               <Square className="w-3.5 h-3.5" />
               <span>Stop & Review Take</span>
@@ -1062,7 +1062,7 @@ export const InterviewTrainerView: React.FC = () => {
         {isCameraActive && (
           <button
             onClick={stopCamera}
-            className="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-gray-800"
+            className="text-xs text-slate-500 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors"
           >
             Turn Camera Off
           </button>
@@ -1071,10 +1071,10 @@ export const InterviewTrainerView: React.FC = () => {
 
       {/* Recorded Take Playback */}
       {recordedVideoUrl && (
-        <div className="mt-4 p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-2">
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Recorded Take Ready for Review
+        <div className="mt-4 p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-700">
+            <span className="font-semibold text-emerald-700 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Recorded Take Ready for Review
             </span>
             <a
               href={recordedVideoUrl}
@@ -1173,10 +1173,10 @@ export const InterviewTrainerView: React.FC = () => {
                 <button
                   key={key}
                   onClick={() => setSelectedTrack(key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 border cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 border cursor-pointer ${
                     selectedTrack === key
-                      ? 'bg-cyan-600 text-white border-cyan-500 shadow-sm'
-                      : 'bg-gray-950 text-gray-400 hover:text-gray-200 border-gray-800'
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                      : 'bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-300'
                   }`}
                 >
                   {TRACK_INFO[key].label.split('(')[0].trim()}
@@ -1186,7 +1186,7 @@ export const InterviewTrainerView: React.FC = () => {
           </div>
 
           {/* Phase Navigation Bar & Layout Controls */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-2.5 rounded-2xl bg-gray-900 border border-gray-800">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-slate-200 shadow-xs">
             {/* Pillar Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
               {CEO_PILLARS.map((p, idx) => (
@@ -1197,14 +1197,14 @@ export const InterviewTrainerView: React.FC = () => {
                     setIsFullRun(false);
                     resetPacing();
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 shrink-0 border ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 border cursor-pointer ${
                     activePhaseIndex === idx && !isFullRun
-                      ? 'bg-cyan-950/60 border-cyan-500 text-cyan-300 font-semibold shadow-sm'
-                      : 'bg-gray-950 border-gray-800 text-gray-400 hover:text-gray-200'
+                      ? 'bg-blue-50 border-2 border-blue-500 text-blue-900 font-bold shadow-xs'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:text-slate-900'
                   }`}
                 >
                   <span>{p.pillarTitle}</span>
-                  <span className="text-[10px] font-mono bg-gray-800 px-1.5 py-0.5 rounded text-gray-300">
+                  <span className="text-[10px] font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-600">
                     {p.timeRange}
                   </span>
                 </button>
@@ -1216,26 +1216,26 @@ export const InterviewTrainerView: React.FC = () => {
                   setActivePhaseIndex(0);
                   resetPacing();
                 }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 shrink-0 border ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 border cursor-pointer ${
                   isFullRun
-                    ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300 font-semibold shadow-sm'
-                    : 'bg-gray-950 border-gray-800 text-gray-400 hover:text-gray-200'
+                    ? 'bg-emerald-50 border-2 border-emerald-500 text-emerald-900 font-bold shadow-xs'
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:text-slate-900'
                 }`}
               >
-                <Play className="w-3 h-3 text-emerald-400" />
+                <Play className="w-3 h-3 text-emerald-600" />
                 <span>Full 90-Second Run</span>
               </button>
             </div>
 
             {/* Layout Mode Controls */}
             <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
-              <div className="flex items-center bg-gray-950 p-1 rounded-xl border border-gray-800 text-xs">
+              <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
                 <button
                   onClick={() => setLayoutMode('top')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                     layoutMode === 'top'
-                      ? 'bg-cyan-600 text-white font-semibold shadow-sm'
-                      : 'text-gray-400 hover:text-gray-200'
+                      ? 'bg-white text-slate-900 font-bold shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                   title="Prompter at top aligned with camera lens for eye contact"
                 >
@@ -1244,10 +1244,10 @@ export const InterviewTrainerView: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setLayoutMode('split')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                     layoutMode === 'split'
-                      ? 'bg-cyan-600 text-white font-semibold shadow-sm'
-                      : 'text-gray-400 hover:text-gray-200'
+                      ? 'bg-white text-slate-900 font-bold shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                   title="Prompter and camera side-by-side"
                 >
@@ -1274,45 +1274,45 @@ export const InterviewTrainerView: React.FC = () => {
           )}
 
           {/* Reference Card: Model-A Framework Principles */}
-          <div className="p-5 rounded-2xl bg-gradient-to-r from-gray-900 via-gray-900/90 to-cyan-950/30 border border-cyan-800/40 space-y-3">
+          <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-slate-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-cyan-400" />
-                <h4 className="text-sm font-bold text-white">
-                  Why the 4-Part Model-A Structure Wins in Top-Tier Interviews
+                <BookOpen className="w-4 h-4 text-blue-600" />
+                <h4 className="text-sm font-bold text-slate-900">
+                  Why the 4-Part Structure Wins in Professional Interviews
                 </h4>
               </div>
-              <span className="text-xs font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800/50">
-                AURA Model-A
+              <span className="text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-semibold">
+                4-Part Method
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1">
-              <div className="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
-                <div className="text-xs font-bold text-cyan-300">1. What You Do</div>
-                <p className="text-[11px] text-gray-400 leading-relaxed">
-                  Eliminates chronological resume reciting. Claims executive authority, functional ownership, and industry scope in seconds.
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <div className="text-xs font-bold text-slate-900">1. What You Do</div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Start with your clear professional title, functional ownership, and scope in seconds.
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
-                <div className="text-xs font-bold text-cyan-300">2. Who You Help</div>
-                <p className="text-[11px] text-gray-400 leading-relaxed">
-                  Focuses on solving real stakeholder pain. Positions you not as an individual worker, but as an organizational problem eliminator.
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <div className="text-xs font-bold text-slate-900">2. Who You Help</div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Focus on solving team and customer pain. Position yourself as a problem solver.
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
-                <div className="text-xs font-bold text-cyan-300">3. How You Help (ROI)</div>
-                <p className="text-[11px] text-gray-400 leading-relaxed">
-                  Provides proof via exact mechanisms: 130+ stored procedures, 80% automated reporting, 60% SLA jump. Hard numbers build instant credibility.
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <div className="text-xs font-bold text-slate-900">3. How You Help</div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Provide proof with real results: process improvements, automated steps, and time saved.
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-gray-950 border border-gray-800 space-y-1">
-                <div className="text-xs font-bold text-cyan-300">4. Why You Are Different</div>
-                <p className="text-[11px] text-gray-400 leading-relaxed">
-                  Your Moat: 8.5 years of enterprise production stability + high-agency systems builder mindset. An inimitable competitive edge.
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                <div className="text-xs font-bold text-slate-900">4. Why You Stand Out</div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Your competitive edge: deep experience, consistency, and a high-ownership mindset.
                 </p>
               </div>
             </div>
