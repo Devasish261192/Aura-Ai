@@ -169,100 +169,108 @@ Respond ONLY with a valid, clean JSON object matching this exact schema:
         return extracted_data
 
     def _fallback_deterministic_parse(self, text: str) -> Dict[str, Any]:
-        """Deterministic parser in case AI extraction is unreachable."""
-        candidate = {
-            "name": "Candidate Name",
-            "headline": "Senior Analytics & Technical Leader with 9+ years experience",
-            "phone": "+1 (555) 000-0000",
-            "email": "candidate@example.com",
-            "location": "City, Country",
-            "linkedin": "linkedin.com/in/candidate",
-            "experience_summary": "Senior technology and data professional with 9+ years in application support, SQL/T-SQL, data analysis, production operations, and system automation."
-        }
+        """
+        Deterministic parser in case AI extraction is unreachable.
+        Dynamically extracts candidate details and timeline from raw text using heuristics.
+        """
+        import re
 
-        timeline_phases = [
-            {
-                "company": "Self-employed / Independent Technical Lead",
-                "role": "Lead Systems Architect & Quantitative Systems Builder",
-                "period": "May 2025 - Present",
-                "location": "Remote / India",
-                "is_gap_phase": True,
-                "summary": "Full-time independent engineering of streaming data architectures, quantitative execution engines, and autonomous Agentic AI platforms.",
-                "responsibilities": [
-                    "Engineered a Python-based quantitative research and real-time streaming platform with WebSockets, Polars, and Kafka.",
-                    "Built Aura AI autonomous career operating system using FastAPI, Gemini function calling, and Windows COM automation.",
-                    "Delivered Sovereign Ledger GRC statutory compliance platform achieving 100% audit readiness and 40% reporting reduction."
-                ]
-            },
-            {
-                "company": "Evolent Health",
-                "role": "Senior Analyst - Application Support & Analytics",
-                "period": "Mar 2022 - May 2025",
-                "location": "Pune, India",
-                "is_gap_phase": False,
-                "summary": "Led enterprise L2/L3 application operations, SQL architecture, and Jira workflow governance.",
-                "responsibilities": [
-                    "Managed 100-150 production incident tickets per month across healthcare claims and payment flows under tight SLAs.",
-                    "Built and maintained 130+ production-grade T-SQL stored procedures and analytical exception queries.",
-                    "Remediated company-wide Jira resolver group sprawl from 200+ down to 60 structured groups, cutting routing friction and increasing SLA completion by 60%.",
-                    "Mentored and upskilled 4 junior analysts in SQL querying techniques and claims schemas."
-                ]
-            },
-            {
-                "company": "Evolent Health",
-                "role": "Analyst - Application Support and Operations",
-                "period": "Mar 2020 - Mar 2022",
-                "location": "Pune, India",
-                "is_gap_phase": False,
-                "summary": "Progressed from support into operational data analysis, investigating claims processing discrepancies.",
-                "responsibilities": [
-                    "Performed data validation and reconciliation across healthcare workflows and database schemas.",
-                    "Collaborated with cross-functional business and technical teams to resolve recurring production issues.",
-                    "Monitored scheduled production batch jobs, ensuring on-time completion of daily claims data syncs."
-                ]
-            },
-            {
-                "company": "Evolent Health",
-                "role": "Associate Analyst - Application Support",
-                "period": "Dec 2017 - Mar 2020",
-                "location": "Pune, India",
-                "is_gap_phase": False,
-                "summary": "Supported healthcare enterprise applications, gaining hands-on mastery of SQL, MSSQL, APIs, and production troubleshooting.",
-                "responsibilities": [
-                    "Investigated application and data issues by tracing problems through business processes and database records.",
-                    "Supported 24/7 rotational shifts for critical healthcare payer client deliverables."
-                ]
-            },
-            {
-                "company": "Valence Health (acquired by Evolent)",
-                "role": "Claims and Data Processing Associate",
-                "period": "Sep 2016 - Dec 2017",
-                "location": "Pune, India",
-                "is_gap_phase": False,
-                "summary": "Built foundational domain expertise in US healthcare claims processing and downstream data-quality checks.",
-                "responsibilities": [
-                    "Processed and audited complex US healthcare claims workflows against payer billing guidelines.",
-                    "Conducted data-quality checks ensuring zero discrepancy between ingested files and processing tables."
-                ]
-            }
-        ]
+        clean_text = text or ""
+        lines = [line.strip() for line in clean_text.splitlines() if line.strip()]
 
-        education = [
-            {"degree": "MS / M.Sc | Financial Engineering", "institution": "WorldQuant University", "period": "Expected 2029"},
-            {"degree": "B.E. | Mechanical Engineering", "institution": "Genba Sopanrao Moze Trust's College of Engineering (SPPU)", "period": "2017"},
-            {"degree": "12th Grade (Senior Secondary)", "institution": "CBSE", "period": "2011"}
+        # 1. Extract contact details via regex
+        email_match = re.search(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', clean_text)
+        email = email_match.group(0) if email_match else "candidate@example.com"
+
+        phone_match = re.search(r'(\+?\d[\d\s\-\(\)]{8,}\d)', clean_text)
+        phone = phone_match.group(0).strip() if phone_match else "+91 00000 00000"
+
+        # 2. Extract Candidate Name from first few clean lines
+        name = "Candidate Name"
+        for l in lines[:4]:
+            if "@" not in l and "http" not in l and not re.search(r'\d{4}', l) and len(l) < 40:
+                name = l.strip()
+                break
+
+        # 3. Detect Headline / Title
+        headline = "Experienced Professional"
+        for l in lines[:10]:
+            if any(k in l.lower() for k in ["manager", "lead", "analyst", "director", "specialist", "partner", "officer", "engineer", "consultant"]):
+                if len(l) < 70:
+                    headline = l.strip()
+                    break
+
+        # 4. Extract work history blocks based on dates/years
+        timeline_phases = []
+        year_pattern = re.compile(r'(20\d\d|19\d\d)\s*(?:-|–|to)\s*(20\d\d|present|current)', re.IGNORECASE)
+
+        for i, l in enumerate(lines):
+            date_match = year_pattern.search(l)
+            if date_match and len(timeline_phases) < 5:
+                period_str = date_match.group(0)
+                # Surrounding line often has role and company
+                role_cand = lines[i - 1] if i > 0 and len(lines[i - 1]) < 80 else headline
+                comp_cand = l.replace(period_str, "").strip(" -–,|") or "Enterprise Organization"
+                timeline_phases.append({
+                    "company": comp_cand or "Organization",
+                    "role": role_cand,
+                    "period": period_str,
+                    "location": "India",
+                    "is_gap_phase": "present" in period_str.lower() and i == 0,
+                    "summary": f"Professional leadership and execution as {role_cand}.",
+                    "responsibilities": [
+                        f"Drove core operational and functional initiatives as {role_cand}.",
+                        "Maintained stakeholder delivery, process rigor, and performance SLAs."
+                    ]
+                })
+
+        # If no dates matched, create a clean default role from headline
+        if not timeline_phases:
+            timeline_phases = [
+                {
+                    "company": "Professional Organization",
+                    "role": headline,
+                    "period": "Recent",
+                    "location": "India",
+                    "is_gap_phase": False,
+                    "summary": f"Core execution and stakeholder delivery as {headline}.",
+                    "responsibilities": [
+                        f"Led key cross-functional initiatives as {headline}.",
+                        "Maintained high SLA adherence and operational excellence."
+                    ]
+                }
+            ]
+
+        # 5. Extract skills from text
+        common_skills_pool = [
+            "Operations", "Process Optimization", "Stakeholder Management", "Project Management",
+            "Data Analysis", "Reporting", "Governance", "Leadership", "Team Mentorship", "SOP Development",
+            "Budgeting", "Risk Management", "Vendor Management", "Strategic Planning", "Workflow Automation"
         ]
+        detected_skills = [s for s in common_skills_pool if s.lower() in clean_text.lower()]
+        if not detected_skills:
+            detected_skills = ["Operations", "Process Optimization", "Leadership", "Stakeholder Management"]
 
         return {
-            "candidate": candidate,
+            "candidate": {
+                "name": name,
+                "headline": headline,
+                "phone": phone,
+                "email": email,
+                "location": "India",
+                "linkedin": f"linkedin.com/in/{name.lower().replace(' ', '-')}",
+                "experience_summary": f"Accomplished {headline} with demonstrated expertise in operational delivery, cross-functional leadership, and organizational performance."
+            },
             "timeline_phases": timeline_phases,
-            "education": education,
-            "skills": ["Python", "SQL / T-SQL", "Kafka", "Polars", "Pandas", "FastAPI", "React", "TypeScript", "Jira", "ITIL"],
+            "education": [
+                {"degree": "Bachelor's Degree", "institution": "University", "period": "Graduate"}
+            ],
+            "skills": detected_skills,
             "gap_phase_analysis": {
-                "has_gap": True,
-                "gap_period": "May 2025 - Present",
-                "duration": "11 Months",
-                "strategic_recommendation": "Framed as Self-Employed / Independent Technical Lead & Systems Builder. Anchored to 3 production projects (Algorithmic Trading Bot, Aura AI, Sovereign Ledger) to eliminate unaddressed gap."
+                "has_gap": False,
+                "gap_period": "",
+                "duration": "",
+                "strategic_recommendation": "Continuous career progression."
             }
         }
 

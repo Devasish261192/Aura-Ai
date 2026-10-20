@@ -3,25 +3,30 @@ import os
 import re
 import logging
 import tempfile
+import contextvars
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 from ..config import ARTIFACTS_DIR, get_user_artifacts_dir
 from ..database import log_artifact_mutation
 
-_current_active_user: str = "user1"
+# Safe thread-local / async-task-local context for concurrent users
+_user_context: contextvars.ContextVar[str] = contextvars.ContextVar("current_active_user", default="user1")
 
 def set_active_user(user_id: str):
-    """Sets the active user session context for artifact mutations."""
-    global _current_active_user
+    """Sets the isolated active user session context for artifact mutations."""
     if user_id:
         clean = re.sub(r'[^a-zA-Z0-9_-]', '', user_id)
         if clean:
-            _current_active_user = clean
+            _user_context.set(clean)
+
+def get_active_user() -> str:
+    """Returns the current active user id from context."""
+    return _user_context.get()
 
 def get_active_artifacts_dir(user_id: Optional[str] = None) -> Path:
     """Returns the isolated artifact directory for the target or active user."""
-    target_user = user_id or _current_active_user
+    target_user = user_id or _user_context.get()
     return get_user_artifacts_dir(target_user)
 
 def _atomic_write_json(file_path: Path, data: Dict[str, Any]):

@@ -83,6 +83,7 @@ export interface MarketJob {
   company: string;
   location: string;
   job_url: string;
+  maps_url?: string;
   match_score: number;
   why_fit: string;
   key_matching_qualities?: string[];

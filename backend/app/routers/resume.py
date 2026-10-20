@@ -15,6 +15,32 @@ router = APIRouter(prefix="/api/resume", tags=["resume"])
 class GenerateResumeRequest(BaseModel):
     track_slug: str = "technical_business_analyst"
 
+class ATSTailorRequest(BaseModel):
+    job_description: str
+    track_slug: Optional[str] = "operations"
+
+@router.post("/ats-tailor")
+def ats_tailor_endpoint(req: ATSTailorRequest, x_user_id: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """
+    Analyzes a target Job Description (JD), matches required keywords against
+    candidate's Career Vault, scores ATS compliance, and generates a tailored resume.
+    """
+    if not req.job_description.strip():
+        raise HTTPException(status_code=400, detail="Job description cannot be empty.")
+    try:
+        user_id = x_user_id or "user1"
+        result = resume_service.tailor_resume_for_job_description(
+            job_description=req.job_description,
+            track_slug=req.track_slug or "custom",
+            user_id=user_id
+        )
+        slug = result["track_slug"]
+        result["download_pdf_url"] = f"/api/resume/download/{slug}/pdf"
+        result["download_docx_url"] = f"/api/resume/download/{slug}/docx"
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to tailor resume: {str(e)}")
+
 @router.get("/tracks")
 def get_resume_tracks() -> List[Dict[str, Any]]:
     """Returns all qualified target career tracks for resume generation."""

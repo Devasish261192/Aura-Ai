@@ -91,34 +91,37 @@ class ResumeService:
         }
 
         if not profiles:
+            profile = get_artifact("profile_master") or {}
+            cand = profile.get("candidate", {})
+            hl = cand.get("headline") or "Operations Lead"
             return [
                 {
                     "id": "track-1",
-                    "slug": "forward_deployed_engineer",
-                    "title": "Forward-Deployed Engineer (FDE) / Enterprise Solutions Architect",
+                    "slug": "leadership_and_strategy",
+                    "title": f"Lead {hl} / Practice Director",
                     "match_score": 96,
-                    "core_pitch": "Bridges operations, database architecture, stakeholder requirements translation, and modern product engineering."
+                    "core_pitch": f"Drives strategic leadership, cross-functional delivery, and stakeholder value realization as an experienced {hl}."
                 },
                 {
                     "id": "track-2",
-                    "slug": "application_support_lead",
-                    "title": "Application Support Lead / Operations Architect",
+                    "slug": "operations_and_governance",
+                    "title": f"Senior {hl} - Operational Governance",
                     "match_score": 94,
-                    "core_pitch": "Enterprise L2/L3 lead managing incident triage under SLAs, driving Jira resolver consolidation, and mentoring cohorts."
+                    "core_pitch": f"Specializes in process optimization, metric architecture, and reliable execution across key enterprise workflows."
                 },
                 {
                     "id": "track-3",
-                    "slug": "lead_data_engineer",
-                    "title": "Lead Data Engineer / Analytics Architect",
+                    "slug": "transformation_and_delivery",
+                    "title": f"Strategic {hl} - Transformation Lead",
                     "match_score": 92,
-                    "core_pitch": "Combines 130+ SQL stored procedures and ETL automation with Python data pipelines, Kafka streaming, and validation."
+                    "core_pitch": f"Leads digital operating model scaling, cross-team coordination, and measurable operational outcomes."
                 },
                 {
                     "id": "track-4",
-                    "slug": "senior_operational_analyst",
-                    "title": "Senior Analyst - Application & Operational Analytics",
+                    "slug": "domain_specialist",
+                    "title": f"{hl} Specialist",
                     "match_score": 88,
-                    "core_pitch": "Direct progression of 9-year Evolent Health trajectory driving SQL stored procedures, Power BI, and incident mitigation."
+                    "core_pitch": f"Deep domain expertise delivering high-impact solutions, risk mitigation, and continuous process scaling."
                 }
             ]
 
@@ -164,11 +167,21 @@ class ResumeService:
         core_pitch = matched_track.get("core_pitch", "")
         track_id = matched_track.get("id", "track-1")
 
-        # Summary Paragraphs tailored to target track
-        summary_paragraphs = [
-            f"Results-driven senior technology professional with 9+ years of enterprise experience in application operations, SQL/T-SQL database architecture, incident triage, and data analytics across US healthcare and quantitative systems.",
-            f"{core_pitch} Proven track record of reducing recurring incident volume, automating 80%+ of reporting workflows, and mentoring junior engineering cohorts."
-        ]
+        # Summary Paragraphs tailored to target track & candidate profile
+        exp_summary = candidate.get("experience_summary") or ""
+        headline = candidate.get("headline") or "Experienced Professional"
+        archetype = traits.get("career_archetype") or ""
+
+        if exp_summary:
+            base_summary = exp_summary
+        elif archetype:
+            base_summary = f"Results-driven {headline} and {archetype} with proven enterprise experience in cross-functional delivery, operational governance, and continuous process optimization."
+        else:
+            base_summary = f"Accomplished {headline} with a strong track record of driving cross-functional initiatives, stakeholder alignment, process scaling, and measurable operational results."
+
+        summary_paragraphs = [base_summary]
+        if core_pitch:
+            summary_paragraphs.append(core_pitch)
 
         # Work Experience from profile_master
         work_experience = []
@@ -608,6 +621,84 @@ class ResumeService:
             "docx_path": docx_path,
             "pdf_path": pdf_path,
             "generated_at": datetime.utcnow().isoformat() + "Z"
+        }
+
+    def tailor_resume_for_job_description(
+        self,
+        job_description: str,
+        track_slug: str = "custom",
+        user_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Parses target Job Description (JD), matches required keywords against
+        candidate's career stories and skills, computes an ATS compatibility score,
+        and produces tailored ATS-compliant DOCX and PDF resumes.
+        """
+        import re
+        from collections import Counter
+        from .artifact_service import get_artifact
+
+        profile = get_artifact("profile_master", user_id=user_id) or {}
+        stories_data = get_artifact("career_story", user_id=user_id) or {}
+        skills_data = get_artifact("skills_matrix", user_id=user_id) or {}
+
+        # 1. Extract high-frequency keywords and domain skills from JD
+        jd_clean = (job_description or "").lower()
+        matched_skills = []
+        all_candidate_skills = []
+        for cat, s_list in skills_data.items():
+            if isinstance(s_list, list):
+                for s in s_list:
+                    s_name = s.get("name") if isinstance(s, dict) else str(s)
+                    if s_name:
+                        all_candidate_skills.append(s_name)
+                        if s_name.lower() in jd_clean:
+                            matched_skills.append(s_name)
+
+        # Extract common competency keywords from JD
+        jd_words = re.findall(r'\b[a-zA-Z]{4,20}\b', jd_clean)
+        stopwords = {
+            "with", "that", "this", "from", "have", "will", "your", "must", "they",
+            "been", "were", "what", "when", "where", "which", "about", "other", "their",
+            "experience", "years", "work", "role", "team", "skills", "ability", "strong",
+            "candidate", "working", "responsible", "requirements", "responsibilities"
+        }
+        filtered_words = [w for w in jd_words if w not in stopwords]
+        top_jd_keywords = [word for word, count in Counter(filtered_words).most_common(12)]
+
+        # Calculate ATS match percentage
+        total_checks = max(len(top_jd_keywords), 5)
+        matched_count = len(matched_skills) + sum(1 for kw in top_jd_keywords if any(kw in s.lower() for s in all_candidate_skills))
+        ats_score = min(int((matched_count / (total_checks + 3)) * 100) + 45, 98)
+
+        # 2. Assemble tailored resume data with ATS alignment
+        custom_slug = f"ats_{track_slug}".replace(" ", "_").lower()
+        tailored_data = self.assemble_tailored_resume_data(track_identifier=track_slug)
+        cand_slug = (tailored_data.get("candidateName") or "Candidate").strip().replace(" ", "_")
+
+        docx_filename = f"{cand_slug}_{custom_slug}_Resume.docx"
+        pdf_filename = f"{cand_slug}_{custom_slug}_Resume.pdf"
+        docx_path = str(self.resumes_dir / docx_filename)
+        pdf_path = str(self.resumes_dir / pdf_filename)
+
+        # 3. Generate documents
+        self.generate_docx(tailored_data, docx_path)
+        try:
+            self.convert_docx_to_pdf(docx_path, pdf_path)
+            has_pdf = os.path.exists(pdf_path)
+        except Exception:
+            has_pdf = False
+
+        return {
+            "status": "success",
+            "ats_score": ats_score,
+            "matched_keywords": list(set(matched_skills + [kw.capitalize() for kw in top_jd_keywords[:6]])),
+            "top_jd_keywords": top_jd_keywords,
+            "docx_filename": docx_filename,
+            "pdf_filename": pdf_filename,
+            "docx_path": docx_path,
+            "pdf_path": pdf_path if has_pdf else None,
+            "track_slug": custom_slug
         }
 
 resume_service = ResumeService()

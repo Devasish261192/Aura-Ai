@@ -137,7 +137,7 @@ def edit_career_story(
     )
 
 def modify_cv_forge_resume(
-    track_slug: str = "technical_business_analyst",
+    track_slug: str = "custom",
     summary_revision: Optional[str] = None,
     bullet_points_to_add: Optional[List[str]] = None,
     skills_to_highlight: Optional[List[str]] = None,
@@ -145,7 +145,7 @@ def modify_cv_forge_resume(
 ) -> Dict[str, Any]:
     """
     Modifies candidate's profile/resume summary, skills, or bullet points in CV Forge, and triggers clean PDF recompilation.
-    track_slug can be: 'technical_business_analyst', 'application_support_lead', 'lead_data_engineer', or 'senior_operational_analyst'.
+    track_slug can be any target track slug (e.g. 'operations', 'leadership_and_strategy', 'transformation_and_delivery', etc.).
     """
     return modify_cv_forge_resume_in_vault(
         track_slug=track_slug,
@@ -153,6 +153,37 @@ def modify_cv_forge_resume(
         bullet_points_to_add=bullet_points_to_add,
         skills_to_highlight=skills_to_highlight,
         custom_instruction=custom_instruction
+    )
+
+def search_live_jobs_serp(
+    role_or_title: str,
+    location: str = "India"
+) -> Dict[str, Any]:
+    """
+    Searches live open job listings across India or a specific city using SerpAPI (Google Jobs).
+    Each returned job includes the job title, company, location, application link, and a direct Google Maps URL to review the company location.
+    If location is 'India' or empty, searches all over India (pan-India). Otherwise searches the specific city (e.g. 'Bengaluru', 'Mumbai', 'Pune', 'Delhi NCR').
+    """
+    from ..services.jobs_service import jobs_service
+    from ..services.artifact_service import get_active_user
+    uid = get_active_user() or "user1"
+    return jobs_service.fetch_next_job_batch(user_id=uid, search_term=role_or_title, location=location)
+
+def tailor_resume_to_job_description(
+    job_description: str,
+    target_role: Optional[str] = "custom"
+) -> Dict[str, Any]:
+    """
+    Analyzes an arbitrary target Job Description (JD), matches required keywords and skills against the candidate's career vault,
+    computes an ATS compliance score (e.g. 92%), and generates an ATS-compliant resume in DOCX and PDF formats.
+    """
+    from ..services.resume_service import resume_service
+    from ..services.artifact_service import get_active_user
+    uid = get_active_user() or "user1"
+    return resume_service.tailor_resume_for_job_description(
+        job_description=job_description,
+        track_slug=target_role or "custom",
+        user_id=uid
     )
 
 # List of tool functions directly callable by Google GenAI
@@ -163,7 +194,9 @@ AURA_TOOLS = [
     modify_cv_forge_resume,
     update_candidate_traits,
     add_skills,
-    get_current_career_artifacts
+    get_current_career_artifacts,
+    search_live_jobs_serp,
+    tailor_resume_to_job_description
 ]
 
 TOOL_DISPATCH_MAP = {
@@ -173,5 +206,7 @@ TOOL_DISPATCH_MAP = {
     "modify_cv_forge_resume": modify_cv_forge_resume,
     "update_candidate_traits": update_candidate_traits,
     "add_skills": add_skills,
-    "get_current_career_artifacts": get_current_career_artifacts
+    "get_current_career_artifacts": get_current_career_artifacts,
+    "search_live_jobs_serp": search_live_jobs_serp,
+    "tailor_resume_to_job_description": tailor_resume_to_job_description
 }

@@ -282,6 +282,131 @@ DOMAIN_FALLBACK_POOLS: Dict[str, List[Dict[str, Any]]] = {
                 "Telemetry Metrics"
             ]
         }
+    ],
+    "operations": [
+        {
+            "title": "Senior Operations Manager",
+            "company": "Amazon India",
+            "location": "Pan India / Bengaluru",
+            "date_posted": "1 day ago",
+            "match_score": 96,
+            "why_fit": "Exceptional fit for cross-functional operational leadership, process standardization, and SLA delivery.",
+            "key_matching_qualities": [
+                "End-to-End Operational Governance",
+                "Process Kaizen & Lean Six Sigma",
+                "Cross-Site Stakeholder Alignment"
+            ]
+        },
+        {
+            "title": "Operations Strategy & Excellence Lead",
+            "company": "Flipkart",
+            "location": "Bengaluru / Pan India",
+            "date_posted": "2 days ago",
+            "match_score": 94,
+            "why_fit": "Aligns with large-scale fulfillment, metric tracking, and scalable operational playbooks.",
+            "key_matching_qualities": [
+                "Operational Playbooks & Standard Operating Procedures",
+                "Metric Dashboards & Variance RCA",
+                "Capacity & Throughput Planning"
+            ]
+        },
+        {
+            "title": "Business Operations Program Lead",
+            "company": "Uber India",
+            "location": "Hyderabad / Remote India",
+            "date_posted": "Recently",
+            "match_score": 92,
+            "why_fit": "Direct match for digital workflow governance, program execution, and incident triage.",
+            "key_matching_qualities": [
+                "Program Management & Delivery",
+                "Continuous Process Improvement",
+                "Executive Performance Reporting"
+            ]
+        }
+    ],
+    "supply_chain": [
+        {
+            "title": "Supply Chain & Logistics Lead",
+            "company": "Unilever India",
+            "location": "Mumbai, Maharashtra, India",
+            "date_posted": "1 day ago",
+            "match_score": 95,
+            "why_fit": "Direct alignment with end-to-end supply chain planning, vendor SLA governance, and logistics optimization.",
+            "key_matching_qualities": [
+                "Demand & Supply Planning",
+                "Vendor SLA & Contract Governance",
+                "Inventory & Route Optimization"
+            ]
+        },
+        {
+            "title": "Strategic Procurement & Sourcing Specialist",
+            "company": "Schneider Electric",
+            "location": "Bengaluru, India",
+            "date_posted": "2 days ago",
+            "match_score": 93,
+            "why_fit": "Matches global sourcing excellence, cost rationalization, and supplier relationship management.",
+            "key_matching_qualities": [
+                "Strategic Sourcing & Category Management",
+                "Cost Negotiation & Value Analysis",
+                "ERP / SAP Supply Chain Flow"
+            ]
+        }
+    ],
+    "finance": [
+        {
+            "title": "Senior Financial Analyst (FP&A)",
+            "company": "JPMorgan Chase & Co.",
+            "location": "Mumbai / Bengaluru",
+            "date_posted": "1 day ago",
+            "match_score": 95,
+            "why_fit": "Matches financial modeling rigor, variance analysis, executive forecasting, and capital planning.",
+            "key_matching_qualities": [
+                "Financial Planning & Analysis (FP&A)",
+                "Variance & P&L Attribution",
+                "Executive Capital Budgeting"
+            ]
+        },
+        {
+            "title": "Finance Operations & Compliance Lead",
+            "company": "American Express",
+            "location": "Gurugram, Delhi NCR, India",
+            "date_posted": "3 days ago",
+            "match_score": 93,
+            "why_fit": "Direct alignment with statutory audit readiness, internal controls, and financial operations.",
+            "key_matching_qualities": [
+                "Statutory Audit Readiness & GRC",
+                "Internal Financial Controls (SOX)",
+                "Process Automation & Reconciliations"
+            ]
+        }
+    ],
+    "sales_marketing": [
+        {
+            "title": "Enterprise Business Development Lead",
+            "company": "Salesforce India",
+            "location": "Bengaluru / Mumbai / Remote",
+            "date_posted": "1 day ago",
+            "match_score": 96,
+            "why_fit": "High alignment with consultative enterprise selling, quota overachievement, and stakeholder relationship mapping.",
+            "key_matching_qualities": [
+                "Consultative Solution Selling",
+                "Strategic Account Expansion",
+                "C-Suite Pitching & Negotiation"
+            ]
+        },
+        {
+            "title": "Senior Growth & Product Marketing Manager",
+            "company": "Zoho",
+            "location": "Chennai / Remote India",
+            "date_posted": "2 days ago",
+            "match_score": 93,
+            "why_fit": "Matches digital acquisition funnels, positioning strategy, and go-to-market execution.",
+            "key_matching_qualities": [
+                "Go-To-Market (GTM) Architecture",
+                "Conversion Funnel Optimization",
+                "Brand Positioning & Product Messaging"
+            ]
+        }
     ]
 }
 
@@ -317,26 +442,39 @@ class JobsService:
         "user3": "consulting",
         "user4": "app_support",
         "user5": "data",
+        "user6": "operations",
+        "user7": "supply_chain",
+        "user8": "finance",
+        "user9": "sales_marketing",
         "test1": "wfm",
         "test2": "hr",
         "test3": "consulting",
         "test4": "app_support",
         "test5": "data",
+        "test6": "operations",
     }
 
     def _detect_user_domain(self, profile: Dict[str, Any], search_term: str = "", user_id: str = "user1") -> str:
-        """Detects whether user is WFM, HR, Consulting, App Support, or Data."""
+        """Detects candidate's professional domain dynamically across all industries."""
         # 1. Direct explicit search term keywords
         term = (search_term or "").lower()
-        if any(k in term for k in ["wfm", "workforce", "rta", "scheduling"]):
+        if any(k in term for k in ["operation", "ops", "coo", "kaizen", "plant", "facilities"]):
+            return "operations"
+        if any(k in term for k in ["supply chain", "logistics", "procurement", "sourcing", "inventory", "warehouse"]):
+            return "supply_chain"
+        if any(k in term for k in ["finance", "financial", "accounting", "accountant", "audit", "fp&a", "tax", "controller", "treasury"]):
+            return "finance"
+        if any(k in term for k in ["sales", "marketing", "business development", "bdm", "growth", "branding", "commercial"]):
+            return "sales_marketing"
+        if any(k in term for k in ["wfm", "workforce", "rta", "scheduling", "capacity"]):
             return "wfm"
         if any(k in term for k in ["hr", "human resource", "talent", "recruitment", "recruiter", "people ops", "hrbp"]):
             return "hr"
         if any(k in term for k in ["consult", "advisory", "strategy", "transformation", "pmo"]):
             return "consulting"
-        if any(k in term for k in ["app support", "application support", "l2", "l3", "incident"]):
+        if any(k in term for k in ["app support", "application support", "l2", "l3", "incident", "production support"]):
             return "app_support"
-        if any(k in term for k in ["data", "analytics", "sql", "pipeline", "etl"]):
+        if any(k in term for k in ["data", "analytics", "sql", "pipeline", "etl", "bi "]):
             return "data"
 
         # 2. Candidate profile / resume / timeline text
@@ -347,6 +485,14 @@ class JobsService:
         for s in profile.get("skills", []):
             text_corpus += f" {s}".lower()
 
+        if any(k in text_corpus for k in ["operation", "ops manager", "process excellence", "lean six sigma", "plant manager"]):
+            return "operations"
+        if any(k in text_corpus for k in ["supply chain", "logistics", "procurement", "sourcing", "warehouse", "inventory"]):
+            return "supply_chain"
+        if any(k in text_corpus for k in ["finance", "financial", "accounting", "fp&a", "internal audit", "taxation"]):
+            return "finance"
+        if any(k in text_corpus for k in ["sales", "marketing", "business development", "account executive", "growth lead"]):
+            return "sales_marketing"
         if any(k in text_corpus for k in ["wfm", "workforce", "rta", "real-time", "real time", "scheduling", "capacity", "erlang", "iex", "verint"]):
             return "wfm"
         if any(k in text_corpus for k in ["hr", "human resource", "talent", "recruitment", "recruiter", "people ops", "hrbp", "onboarding"]):
@@ -358,12 +504,12 @@ class JobsService:
         if any(k in text_corpus for k in ["data", "analytics", "sql", "analyst", "pipeline", "etl"]):
             return "data"
         
-        # 3. Fallback to preset test account domain (user1: WFM, user2: HR, user3: Consulting, user4: App Support, user5: Data)
+        # 3. Fallback to preset test account domain
         clean_uid = user_id.lower().strip()
         if clean_uid in self.USER_PRESET_DOMAINS:
             return self.USER_PRESET_DOMAINS[clean_uid]
 
-        return "wfm"
+        return "operations"
 
     def get_matched_jobs(self, user_id: str = "user1", page: int = 1, page_size: int = 5, location: str = "") -> Dict[str, Any]:
         """Retrieves paginated market jobs scored against candidate's profile."""
@@ -380,13 +526,15 @@ class JobsService:
 
         # If user has no jobs yet, initialize their first batch automatically
         if not jobs:
-            profile = self._load_profile(user_id)
-            domain = self._detect_user_domain(profile, user_id=user_id)
-            return self.fetch_next_job_batch(user_id=user_id, search_term="", location=location or "Pune, India")
+            return self.fetch_next_job_batch(user_id=user_id, search_term="", location=location or "India")
 
-        # Location filter
-        if location:
-            loc_lower = location.lower().replace(", india", "").strip()
+        # Location filter (if not "all india")
+        clean_loc = (location or "").strip()
+        is_all_india = not clean_loc or clean_loc.lower() in [
+            "all over india", "all india", "india", "pan india", "anywhere in india", "all", ""
+        ]
+        if not is_all_india:
+            loc_lower = clean_loc.lower().replace(", india", "").strip()
             filtered = [j for j in jobs if loc_lower in (j.get("location") or "").lower()]
             if filtered:
                 jobs = filtered
@@ -409,40 +557,70 @@ class JobsService:
         self,
         user_id: str = "user1",
         search_term: str = "",
-        location: str = "Pune, India"
+        location: str = "India"
     ) -> Dict[str, Any]:
         """
-        Fetches fresh, un-seen jobs tailored to candidate's background.
+        Fetches fresh, un-seen jobs tailored to candidate's background across India or specific city.
         Uses SQLite seen_jobs deduplication so repeats NEVER occur!
         """
+        import urllib.parse
         udir = self._get_artifacts_dir(user_id)
         profile = self._load_profile(user_id)
         domain = self._detect_user_domain(profile, search_term, user_id=user_id)
 
-        # Resolve search title based on domain
+        # Dynamically discover candidate's actual job title
+        user_actual_role = ""
+        candidate_info = profile.get("candidate", {})
+        if candidate_info.get("headline"):
+            user_actual_role = candidate_info.get("headline")
+        elif profile.get("work_history") and len(profile["work_history"]) > 0:
+            user_actual_role = profile["work_history"][0].get("role", "")
+        elif profile.get("timeline_phases") and len(profile["timeline_phases"]) > 0:
+            user_actual_role = profile["timeline_phases"][0].get("role", "")
+
         domain_titles = {
+            "operations": "Operations Manager",
+            "supply_chain": "Supply Chain Specialist",
+            "finance": "Senior Financial Analyst",
+            "sales_marketing": "Business Development & Marketing Lead",
             "wfm": "Workforce Management Analyst",
             "hr": "HR Business Partner",
             "consulting": "Management Consultant",
             "app_support": "Application Support Lead",
             "data": "Senior Data Analyst"
         }
-        resolved_title = search_term.strip() or domain_titles.get(domain, "Specialist")
+        resolved_title = search_term.strip() or user_actual_role or domain_titles.get(domain, "Professional")
+
+        # Flexible location handling (All India vs Specific City)
+        clean_loc = (location or "").strip()
+        is_all_india = not clean_loc or clean_loc.lower() in [
+            "all over india", "all india", "india", "pan india", "anywhere in india", "all", ""
+        ]
+
+        if is_all_india:
+            query = f"{resolved_title} in India"
+            display_location = "Pan India / Nationwide"
+        elif "remote" in clean_loc.lower():
+            query = f"remote {resolved_title} jobs India"
+            display_location = "Remote, India"
+        else:
+            query = f"{resolved_title} in {clean_loc}, India"
+            display_location = clean_loc
 
         new_jobs: List[Dict[str, Any]] = []
         serp_key = os.getenv("SERP_API_KEY")
 
-        # 1. Try SerpAPI with deduplication
+        # 1. Try SerpAPI with deduplication & Google Maps integration
         if serp_key:
             try:
                 import requests
-                query = f"{resolved_title} in {location}"
                 params = {
                     "engine": "google_jobs",
                     "q": query,
+                    "gl": "in",
                     "api_key": serp_key
                 }
-                resp = requests.get("https://serpapi.com/search.json", params=params, timeout=10)
+                resp = requests.get("https://serpapi.com/search.json", params=params, timeout=12)
                 if resp.status_code == 200:
                     data = resp.json()
                     jobs_results = data.get("jobs_results", [])
@@ -464,16 +642,22 @@ class JobsService:
                         if not job_url:
                             job_url = j.get("share_link", "") or f"https://www.google.com/search?q={c}+{t}"
 
+                        job_loc = str(j.get("location", "") or display_location).strip()
+                        # Google Maps URL for company location verification
+                        maps_query = urllib.parse.quote(f"{c} {job_loc}")
+                        maps_url = f"https://www.google.com/maps/search/?api=1&query={maps_query}"
+
                         new_jobs.append({
                             "title": t,
                             "company": c,
-                            "location": str(j.get("location", "") or location).strip(),
+                            "location": job_loc,
+                            "maps_url": maps_url,
                             "job_url": job_url,
                             "date_posted": "Recently",
                             "match_score": 94,
                             "why_fit": f"Strong alignment with candidate's proven experience and competencies at {c}.",
                             "key_matching_qualities": [
-                                f"Core {domain.upper()} Mastery",
+                                f"Core {domain.replace('_', ' ').title()} Mastery",
                                 "Stakeholder Delivery & Leadership",
                                 "Operational Reliability"
                             ]
@@ -482,34 +666,39 @@ class JobsService:
                 logger.warning(f"SerpAPI fetch failed: {e}")
 
         # 2. Domain-Specific Fallback Pool (Filtered by seen_jobs)
-        pool = DOMAIN_FALLBACK_POOLS.get(domain, DOMAIN_FALLBACK_POOLS["wfm"])
+        pool = DOMAIN_FALLBACK_POOLS.get(domain, DOMAIN_FALLBACK_POOLS.get("operations", DOMAIN_FALLBACK_POOLS["wfm"]))
         for candidate_job in pool:
             jhash = f"{candidate_job['company'].lower()}::{candidate_job['title'].lower()}"
             if not is_job_seen(user_id, jhash):
                 job_copy = dict(candidate_job)
-                job_copy["job_url"] = f"https://www.linkedin.com/jobs/search/?keywords={resolved_title}&location={location}"
+                loc_val = job_copy.get("location", display_location)
+                job_copy["job_url"] = f"https://www.linkedin.com/jobs/search/?keywords={urllib.parse.quote(resolved_title)}&location={urllib.parse.quote(loc_val)}"
+                job_copy["maps_url"] = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(job_copy['company'] + ' ' + loc_val)}"
                 new_jobs.append(job_copy)
 
         # 3. Dynamic Expansion (If user clicks Discover More multiple times and exhausted base pool)
         if len(new_jobs) < 2:
             expansion_companies = [
-                "Microsoft", "Google India", "IBM", "HCLTech", "Cognizant",
-                "Morgan Stanley", "HSBC", "Oracle India", "Cisco", "Siemens"
+                "Tata Group", "Reliance Industries", "Amazon India", "Microsoft India",
+                "Hindustan Unilever", "Adani Group", "HDFC Bank", "Infosys", "ITC Limited", "Larsen & Toubro"
             ]
             for comp in expansion_companies:
                 t = f"Senior {resolved_title}"
                 jhash = f"{comp.lower()}::{t.lower()}"
                 if not is_job_seen(user_id, jhash):
+                    loc_val = display_location
+                    maps_url = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(comp + ' ' + loc_val)}"
                     new_jobs.append({
                         "title": t,
                         "company": comp,
-                        "location": location,
-                        "job_url": f"https://www.linkedin.com/jobs/search/?keywords={resolved_title}&location={location}",
+                        "location": loc_val,
+                        "maps_url": maps_url,
+                        "job_url": f"https://www.linkedin.com/jobs/search/?keywords={urllib.parse.quote(resolved_title)}&location={urllib.parse.quote(loc_val)}",
                         "date_posted": "1 day ago",
                         "match_score": 92,
-                        "why_fit": f"Matches {comp}'s mission-critical enterprise standard and candidate's core {domain.upper()} execution.",
+                        "why_fit": f"Matches {comp}'s mission-critical enterprise standard and candidate's core execution.",
                         "key_matching_qualities": [
-                            f"Enterprise {domain.upper()} Architecture",
+                            f"Enterprise Execution & Governance",
                             "High-Velocity Delivery",
                             "Process Automation"
                         ]
