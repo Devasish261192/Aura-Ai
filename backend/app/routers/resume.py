@@ -14,13 +14,19 @@ router = APIRouter(prefix="/api/resume", tags=["resume"])
 
 class GenerateResumeRequest(BaseModel):
     track_slug: str = "technical_business_analyst"
+    user_id: Optional[str] = None
 
 class ATSTailorRequest(BaseModel):
     job_description: str
     track_slug: Optional[str] = "operations"
+    user_id: Optional[str] = None
 
 @router.post("/ats-tailor")
-def ats_tailor_endpoint(req: ATSTailorRequest, x_user_id: Optional[str] = Header(None)) -> Dict[str, Any]:
+def ats_tailor_endpoint(
+    req: ATSTailorRequest,
+    x_user_id: Optional[str] = Header(None),
+    user_id: Optional[str] = Query(None)
+) -> Dict[str, Any]:
     """
     Analyzes a target Job Description (JD), matches required keywords against
     candidate's Career Vault, scores ATS compliance, and generates a tailored resume.
@@ -28,11 +34,15 @@ def ats_tailor_endpoint(req: ATSTailorRequest, x_user_id: Optional[str] = Header
     if not req.job_description.strip():
         raise HTTPException(status_code=400, detail="Job description cannot be empty.")
     try:
-        user_id = x_user_id or "user1"
+        target_uid = (req.user_id or x_user_id or user_id or "user1").strip().lower()
         result = resume_service.tailor_resume_for_job_description(
             job_description=req.job_description,
             track_slug=req.track_slug or "custom",
-            user_id=user_id
+            user_id=target_uid
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ATS tailoring failed: {str(e)}")
         )
         slug = result["track_slug"]
         result["download_pdf_url"] = f"/api/resume/download/{slug}/pdf"
@@ -70,7 +80,7 @@ def generate_resume(
     Generates an executive, ATS-compliant Word DOCX and native vector PDF
     tailored to the requested career track.
     """
-    uid = (x_user_id or user_id or "user1").strip().lower()
+    uid = (getattr(req, "user_id", None) or x_user_id or user_id or "user1").strip().lower()
     try:
         result = resume_service.generate_tailored_pdf(req.track_slug, user_id=uid)
         track_slug = req.track_slug
@@ -389,6 +399,7 @@ class CVForgeExportDocxRequest(BaseModel):
     documentName: Optional[str] = "Resume.docx"
     resumeData: Optional[dict] = None
     panes: Optional[list] = None
+    user_id: Optional[str] = None
 
 class CVForgeChatRequest(BaseModel):
     message: str
@@ -654,7 +665,7 @@ def api_cv_forge_export_docx(
 ):
     """Compiles and downloads an executive Word (.docx) document from CV Forge Studio."""
     from ..services.resume_service import get_user_resumes_dir
-    uid = (x_user_id or user_id or "user1").strip().lower()
+    uid = (getattr(req, "user_id", None) or x_user_id or user_id or "user1").strip().lower()
     data = req.resumeData or {}
     cand_name = (data.get("candidateName") or "Candidate").strip().replace(" ", "_")
     output_filename = f"{cand_name}_Resume.docx"
@@ -676,7 +687,7 @@ def api_cv_forge_auto_save_docx(
 ):
     """Auto-saves live resume edits from CV Forge Studio to disk in user-isolated storage."""
     from ..services.resume_service import get_user_resumes_dir
-    uid = (x_user_id or user_id or "user1").strip().lower()
+    uid = (getattr(req, "user_id", None) or x_user_id or user_id or "user1").strip().lower()
     data = req.resumeData or {}
     cand_name = (data.get("candidateName") or "Candidate").strip().replace(" ", "_")
     output_filename = f"{cand_name}_Resume.docx"
@@ -704,7 +715,7 @@ def api_cv_forge_export_word_pdf(
     to native vector PDF using Microsoft Word COM automation.
     """
     from ..services.resume_service import get_user_resumes_dir
-    uid = (x_user_id or user_id or "user1").strip().lower()
+    uid = (getattr(req, "user_id", None) or x_user_id or user_id or "user1").strip().lower()
     data = req.resumeData or {}
     cand_name = (data.get("candidateName") or "Candidate").strip().replace(" ", "_")
     docx_filename = f"{cand_name}_Resume.docx"
