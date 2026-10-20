@@ -14,7 +14,16 @@ from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.oxml import parse_xml, OxmlElement
 from docx.oxml.ns import nsdecls, qn
 
-from .artifact_service import get_artifact, ARTIFACTS_DIR
+from .artifact_service import get_artifact, get_active_user, ARTIFACTS_DIR
+from ..config import get_user_artifacts_dir
+
+def get_user_resumes_dir(user_id: Optional[str] = None) -> Path:
+    """Returns the isolated resumes directory for the target user."""
+    uid = user_id or get_active_user() or "user1"
+    clean_uid = uid.strip().lower()
+    rdir = get_user_artifacts_dir(clean_uid) / "resumes"
+    rdir.mkdir(parents=True, exist_ok=True)
+    return rdir
 
 RESUMES_DIR = ARTIFACTS_DIR / "resumes"
 RESUMES_DIR.mkdir(parents=True, exist_ok=True)
@@ -78,9 +87,9 @@ class ResumeService:
     def __init__(self):
         self.resumes_dir = RESUMES_DIR
 
-    def get_available_tracks(self) -> List[Dict[str, Any]]:
-        """Returns the qualified target pathways from traits.json with clean slugs."""
-        traits = get_artifact("traits") or {}
+    def get_available_tracks(self, user_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Returns the qualified target pathways from traits.json with clean slugs for the target user."""
+        traits = get_artifact("traits", user_id=user_id) or {}
         profiles = traits.get("target_profiles", [])
         
         slug_map = {
@@ -91,7 +100,7 @@ class ResumeService:
         }
 
         if not profiles:
-            profile = get_artifact("profile_master") or {}
+            profile = get_artifact("profile_master", user_id=user_id) or {}
             cand = profile.get("candidate", {})
             hl = cand.get("headline") or "Operations Lead"
             return [
@@ -140,25 +149,25 @@ class ResumeService:
             })
         return result
 
-    def assemble_tailored_resume_data(self, track_identifier: str = "technical_business_analyst") -> Dict[str, Any]:
+    def assemble_tailored_resume_data(self, track_identifier: str = "technical_business_analyst", user_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Assembles tailored resume data from canonical artifacts (profile_master, career_story, skills_matrix, traits)
-        focused on the specific target track.
+        focused on the specific target track for the isolated user.
         """
-        profile = get_artifact("profile_master") or {}
-        stories_data = get_artifact("career_story") or {}
-        skills_data = get_artifact("skills_matrix") or {}
-        traits = get_artifact("traits") or {}
+        profile = get_artifact("profile_master", user_id=user_id) or {}
+        stories_data = get_artifact("career_story", user_id=user_id) or {}
+        skills_data = get_artifact("skills_matrix", user_id=user_id) or {}
+        traits = get_artifact("traits", user_id=user_id) or {}
 
         candidate = profile.get("candidate", {})
         candidate_name = candidate.get("name") or "Candidate Name"
-        phone = candidate.get("phone") or "+1 (555) 000-0000"
+        phone = candidate.get("phone") or "+91 00000 00000"
         email = candidate.get("email") or "candidate@example.com"
-        location = candidate.get("location") or "City, Country"
+        location = candidate.get("location") or "India"
         linkedin = candidate.get("linkedin") or "linkedin.com/in/candidate"
 
         # Determine target title and pitch based on track
-        tracks = self.get_available_tracks()
+        tracks = self.get_available_tracks(user_id=user_id)
         matched_track = next(
             (t for t in tracks if track_identifier in t["slug"] or track_identifier in t["id"] or track_identifier in t["title"].lower()),
             tracks[0]
@@ -244,26 +253,16 @@ class ResumeService:
         key_skills = list(dict.fromkeys(top_skills))[:18]
 
         # Education
-        education = profile.get("education", [
+        education = profile.get("education") or [
             {
-                "degree": "MS / M.Sc | Financial Engineering",
-                "institution": "WorldQuant University",
-                "period": "Expected 2029"
-            },
-            {
-                "degree": "B.E. | Mechanical Engineering",
-                "institution": "SPPU (Pune University)",
-                "period": "2017"
+                "degree": "Bachelor's Degree",
+                "institution": "University / College",
+                "period": "Graduate"
             }
-        ])
-
-        certifications = [
-            {"name": "Data Analysis with Python", "issuer": "Free Code Camp", "year": "2022", "status": "Completed"},
-            {"name": "Scientific Computing Python", "issuer": "Free Code Camp", "year": "2021", "status": "Completed"},
-            {"name": "ITIL Incident & Problem Management", "issuer": "Enterprise Certified", "year": "2020", "status": "Completed"}
         ]
 
-        languages = ["English (Fluent)", "Hindi (Fluent)", "Marathi", "Odia"]
+        certifications = profile.get("certifications") or []
+        languages = profile.get("languages") or ["English (Professional)"]
 
         return {
             "candidateName": candidate_name,
@@ -590,11 +589,11 @@ class ResumeService:
 
         raise RuntimeError("PDF conversion engine unavailable. Please ensure LibreOffice is installed on Linux or Microsoft Word on Windows.")
 
-    def generate_tailored_pdf(self, track_slug: str = "technical_business_analyst") -> Dict[str, Any]:
+    def generate_tailored_pdf(self, track_slug: str = "technical_business_analyst", user_id: Optional[str] = None) -> Dict[str, Any]:
         """
         End-to-end pipeline: Assembles tailored data -> Generates Word .docx -> Converts to native PDF.
         """
-        data = self.assemble_tailored_resume_data(track_slug)
+        data = self.assemble_tailored_resume_data(track_slug, user_id=user_id)
         cand_slug = (data.get("candidateName") or "Candidate").strip().replace(" ", "_")
         track_info = data.get("trackInfo", {})
         clean_track_slug = track_info.get("slug") or track_slug
@@ -602,13 +601,14 @@ class ResumeService:
         docx_filename = f"{cand_slug}_{clean_track_slug}_Resume.docx"
         pdf_filename = f"{cand_slug}_{clean_track_slug}_Resume.pdf"
 
-        docx_path = str(self.resumes_dir / docx_filename)
-        pdf_path = str(self.resumes_dir / pdf_filename)
+        user_resumes_dir = get_user_resumes_dir(user_id)
+        docx_path = str(user_resumes_dir / docx_filename)
+        pdf_path = str(user_resumes_dir / pdf_filename)
 
         # 1. Compile fresh .docx OpenXML document
         self.generate_docx(data, docx_path)
 
-        # 2. Convert to PDF using Microsoft Word COM automation
+        # 2. Convert to PDF using LibreOffice / Word COM
         self.convert_docx_to_pdf(docx_path, pdf_path)
 
         return {
@@ -673,13 +673,14 @@ class ResumeService:
 
         # 2. Assemble tailored resume data with ATS alignment
         custom_slug = f"ats_{track_slug}".replace(" ", "_").lower()
-        tailored_data = self.assemble_tailored_resume_data(track_identifier=track_slug)
+        tailored_data = self.assemble_tailored_resume_data(track_identifier=track_slug, user_id=user_id)
         cand_slug = (tailored_data.get("candidateName") or "Candidate").strip().replace(" ", "_")
 
         docx_filename = f"{cand_slug}_{custom_slug}_Resume.docx"
         pdf_filename = f"{cand_slug}_{custom_slug}_Resume.pdf"
-        docx_path = str(self.resumes_dir / docx_filename)
-        pdf_path = str(self.resumes_dir / pdf_filename)
+        user_resumes_dir = get_user_resumes_dir(user_id)
+        docx_path = str(user_resumes_dir / docx_filename)
+        pdf_path = str(user_resumes_dir / pdf_filename)
 
         # 3. Generate documents
         self.generate_docx(tailored_data, docx_path)

@@ -37,7 +37,8 @@ const TRACK_OPTIONS = [
 ];
 
 export const CVForgeView: React.FC = () => {
-  const { artifacts } = useAppStore();
+  const { currentUser, artifacts } = useAppStore();
+  const currentUserId = (currentUser?.username || 'user1').trim().toLowerCase();
   const dynamicTracks = (artifacts?.traits?.target_profiles || []).map((tp) => ({
     id: tp.id,
     slug: tp.slug || tp.id,
@@ -58,7 +59,7 @@ export const CVForgeView: React.FC = () => {
 
   const handleDownload = (format: 'pdf' | 'docx') => {
     setIsDownloading(format);
-    const url = `${API_BASE}/api/resume/download/${selectedTrack.slug}/${format}`;
+    const url = `${API_BASE}/api/resume/download/${selectedTrack.slug}/${format}?user_id=${encodeURIComponent(currentUserId)}`;
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', '');
@@ -139,7 +140,7 @@ export const CVForgeView: React.FC = () => {
           </button>
 
           <a
-            href={`${API_BASE}/cv-forge/`}
+            href={`${API_BASE}/cv-forge/?user=${encodeURIComponent(currentUserId)}&track=${encodeURIComponent(selectedTrack.slug)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1 p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs transition-colors border border-gray-700"
@@ -153,8 +154,8 @@ export const CVForgeView: React.FC = () => {
       {/* Embedded Live CV Forge Studio */}
       <div className="flex-1 w-full h-full relative bg-gray-950">
         <iframe
-          key={iframeKey}
-          src={`${API_BASE}/cv-forge/`}
+          key={`${iframeKey}-${currentUserId}-${selectedTrack.slug}`}
+          src={`${API_BASE}/cv-forge/?user=${encodeURIComponent(currentUserId)}&track=${encodeURIComponent(selectedTrack.slug)}`}
           className="w-full h-full border-none"
           title="CV Forge Studio"
           allow="fullscreen; clipboard-read; clipboard-write"
