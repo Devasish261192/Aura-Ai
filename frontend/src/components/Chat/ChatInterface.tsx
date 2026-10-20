@@ -196,92 +196,92 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
-  // Module contextual label & pills (Structured in 3 top, 3 bottom)
+  // Module contextual label & friendly action pills
   const getContextMeta = () => {
     switch (activeModule) {
       case 'cvforge':
         return {
-          label: 'CV Forge · Resume Tailoring',
+          label: 'Resume Builder · Live Advice',
           icon: Layers,
-          color: 'text-amber-400',
+          color: 'text-indigo-600',
           pills: [
-            { label: 'Polish Summary', prompt: 'Please review and polish my resume summary in CV Forge to make it punchy, technical, and ATS-optimized.', immediate: true },
-            { label: 'Highlight Skills', prompt: 'In CV Forge, highlight my key strengths in advanced SQL optimization, Python data pipelines, and MLOps.', immediate: true },
-            { label: 'ATS Match Scan', prompt: 'Audit my resume bullets for ATS compliance and quantifiable achievements.', immediate: true },
-            { label: 'Fix Timeline (CV)', prompt: 'I want to fix my career timeline from my resume.', action: 'fix_timeline' },
-            { label: 'Add Achievement', prompt: 'In CV Forge, please add this new achievement to my experience: ', immediate: false },
-            { label: 'Recompile PDF', prompt: 'Recompile my resume PDF with the latest canonical vault updates.', immediate: true }
+            { label: 'Polish Summary', prompt: 'Please review and polish my resume summary to make it simple, clear, and professional.', immediate: true },
+            { label: 'Highlight Skills', prompt: 'In my resume, please highlight my top daily tools and strongest practical skills.', immediate: true },
+            { label: 'Check ATS Match', prompt: 'Check my resume to make sure employers and recruiters can read it easily.', immediate: true },
+            { label: 'Upload CV', prompt: 'I want to upload my CV to fill in my work timeline automatically.', action: 'fix_timeline' },
+            { label: 'Add Achievement', prompt: 'In my resume, please add this new achievement to my experience: ', immediate: false },
+            { label: 'Refresh Resume', prompt: 'Please update my resume with my latest saved profile details.', immediate: true }
           ]
         };
       case 'trainer':
         return {
-          label: 'Interview Trainer · Prep Drill',
+          label: 'Interview Practice · Questions',
           icon: GraduationCap,
-          color: 'text-cyan-400',
+          color: 'text-violet-600',
           pills: [
-            { label: 'Concise PREP', prompt: 'Help me formulate a crisp, impactful PREP framework outline for my introduction.', immediate: true },
-            { label: 'Trap & Gotcha', prompt: 'What are common traps and gotchas interviewers probe for in senior technical roles?', immediate: true },
-            { label: 'Optimize SQL Drill', prompt: 'Give me a challenging technical drill question on SQL query optimization and indexing.', immediate: true },
-            { label: 'Fix Timeline (CV)', prompt: 'I want to fix my career timeline from my resume.', action: 'fix_timeline' },
-            { label: 'Incident Triage', prompt: 'Drill me on high-pressure L2/L3 production incident triage and root cause analysis.', immediate: true },
-            { label: 'Explain Gap Phase', prompt: 'Coach me on answering the recruiter question: What have you been doing since May 2025?', immediate: true }
+            { label: 'Common Questions', prompt: 'Ask me 3 common interview questions for my job role, one by one.', immediate: true },
+            { label: 'Tell Me About Yourself', prompt: 'How should I introduce myself when the interviewer says: Tell me about yourself?', immediate: true },
+            { label: 'Tough Questions', prompt: 'What are tricky questions interviewers ask, and how can I answer them calmly?', immediate: true },
+            { label: 'Upload CV', prompt: 'I want to upload my CV to update my timeline.', action: 'fix_timeline' },
+            { label: 'Salary Discussion', prompt: 'How should I answer when an interviewer asks: What is your salary expectation?', immediate: true },
+            { label: 'Explain Work Gap', prompt: 'How should I politely explain a break or gap between jobs?', immediate: true }
           ]
         };
       case 'interview':
         return {
-          label: 'AI Interview Studio · Analysis',
+          label: 'Pitch Studio · Self Introduction',
           icon: Code2,
-          color: 'text-purple-400',
+          color: 'text-purple-600',
           pills: [
-            { label: 'Evaluate Video Take', prompt: 'Critique my delivery tone, technical depth, and pacing from my recent answer.', immediate: true },
-            { label: 'Roleplay Interviewer', prompt: 'Act as an engineering hiring manager and ask me a follow-up probe on high-stakes incident triage.', immediate: true },
-            { label: 'Explain Gap Phase', prompt: 'How should I present my self-employed quant systems building during a live video interview?', immediate: true },
-            { label: 'Fix Timeline (CV)', prompt: 'I want to fix my career timeline from my resume.', action: 'fix_timeline' },
-            { label: 'RCA Architecture Drill', prompt: 'Give me an architectural RCA challenge for a high-throughput streaming failure.', immediate: true },
-            { label: 'Story Teleprompter', prompt: 'Draft a crisp teleprompter script for my top Evolent Health SLA story.', immediate: true }
+            { label: 'Check My Pitch', prompt: 'Can you critique how I introduce myself and suggest 2 simple ways to make it sound better?', immediate: true },
+            { label: 'Mock Interviewer', prompt: 'Please act as a kind hiring manager and ask me one friendly question.', immediate: true },
+            { label: 'Explain Career Shift', prompt: 'How do I explain moving from my past job to my next target role in simple words?', immediate: true },
+            { label: 'Upload CV', prompt: 'I want to upload my CV.', action: 'fix_timeline' },
+            { label: 'Speaking Tips', prompt: 'Give me 3 quick tips to sound confident and relaxed during an interview.', immediate: true },
+            { label: 'Script for My Win', prompt: 'Write me a 30-second script about my proudest work achievement that I can read out loud.', immediate: true }
           ]
         };
       case 'tracker':
         return {
-          label: '30-Day OS · Day 1 Sprint',
+          label: 'My Goals · Daily Checklist',
           icon: Gamepad2,
-          color: 'text-amber-400',
+          color: 'text-amber-600',
           pills: [
-            { label: "Today's Plan", prompt: 'Review my priority sprint tasks for today in the 30-Day Level-Up OS.', immediate: true },
-            { label: 'Funnel Pace', prompt: 'Evaluate my application funnel pace, response conversion, and daily outreach targets.', immediate: true },
-            { label: 'Daily Scorecard', prompt: 'Let us review my daily accountability scorecard and complete Day 1 verification.', immediate: true },
-            { label: 'Fix Timeline (CV)', prompt: 'I want to fix my career timeline from my resume.', action: 'fix_timeline' },
-            { label: 'Sprint Milestones', prompt: 'What are the core technical milestones for Week 1?', immediate: true },
-            { label: 'Next High Impact', prompt: 'What is the single highest-impact action I should take right now?', immediate: true }
+            { label: "Today's Checklist", prompt: 'What are 3 simple actions I should take today to move my job search forward?', immediate: true },
+            { label: 'Application Pace', prompt: 'How many jobs should I apply to each week to get good interview calls?', immediate: true },
+            { label: 'Daily Review', prompt: 'Help me review the progress I made today.', immediate: true },
+            { label: 'Upload CV', prompt: 'I want to upload my CV.', action: 'fix_timeline' },
+            { label: 'Follow Up Tips', prompt: 'What is a polite message to send a recruiter after applying for a job?', immediate: true },
+            { label: 'Next Best Step', prompt: 'What is the single best thing I should do next right now?', immediate: true }
           ]
         };
       case 'jobs':
         return {
-          label: 'Job Radar · Market & TG',
+          label: 'Find Jobs · Match & Apply',
           icon: Briefcase,
-          color: 'text-sky-400',
+          color: 'text-sky-600',
           pills: [
-            { label: 'Match My CV', prompt: 'Analyze which open market jobs in Pune best align with my technical stories and SQL/Python depth.', immediate: true },
-            { label: 'Draft Referral DM', prompt: 'Draft a customized 1-click referral DM outreach pitch for the Aptiv opening.', immediate: true },
-            { label: 'Fix Timeline (CV)', prompt: 'I want to fix my career timeline from my resume.', action: 'fix_timeline' },
-            { label: 'Salary Radar', prompt: 'What is the benchmark compensation for senior technology leads and data engineers in Pune?', immediate: true },
-            { label: 'Telegram Roles', prompt: 'Filter Telegram supergroup referral opportunities matching senior application and data roles.', immediate: true },
-            { label: 'ATS Keyword Audit', prompt: 'Audit my resume against top market job descriptions for keywords.', immediate: true }
+            { label: 'Search All India', prompt: 'Search top open jobs across India that match my skills and background.', immediate: true },
+            { label: 'Search in My City', prompt: 'Find open jobs matching my role in my city: ', immediate: false },
+            { label: 'Tailor to a Job', prompt: 'Here is a job description. Please tailor my resume for it: ', immediate: false },
+            { label: 'Upload CV', prompt: 'I want to upload my CV.', action: 'fix_timeline' },
+            { label: 'Company Location', prompt: 'How can I check the company office location on Google Maps?', immediate: true },
+            { label: 'Referral Message', prompt: 'Write me a short, friendly message to ask an employee for a job referral.', immediate: true }
           ]
         };
       case 'traits':
       default:
         return {
-          label: 'Canonical Vault · Story Mining',
+          label: 'My Profile · Guided Coach',
           icon: Compass,
-          color: 'text-emerald-400',
+          color: 'text-emerald-600',
           pills: [
-            { label: 'Audit Vault & Gaps', prompt: 'Please audit all stories in my vault: check if any stories are missing, if all 5 STARR points are complete, and what we need clarified or discussed.', immediate: true },
-            { label: 'Fix Timeline (CV)', prompt: 'I want to fix my career timeline from my resume.', action: 'fix_timeline' },
-            { label: 'Add Story Incident', prompt: 'I remembered a new incident for my story: ', immediate: false },
-            { label: 'Update Metrics', prompt: 'Please update the metrics on my project: ', immediate: false },
-            { label: 'Discovered Tracks', prompt: 'Review my discovered career tracks and target profiles based on all stories.', immediate: true },
-            { label: 'Verify Gap Phase', prompt: 'Explain how my independent systems projects cover the gap phase from May 2025 to Present.', immediate: true }
+            { label: 'What is Saved?', prompt: 'What jobs, skills, and work stories do you have saved about me so far?', immediate: true },
+            { label: 'Upload CV', prompt: 'I want to upload my CV to fill in my jobs automatically.', action: 'fix_timeline' },
+            { label: 'Add a Work Story', prompt: 'I want to share a work win or story: ', immediate: false },
+            { label: 'Add Daily Tools', prompt: 'I want to add the tools and software apps I use every day: ', immediate: false },
+            { label: 'My Best Careers', prompt: 'What job roles and career paths fit my background best?', immediate: true },
+            { label: 'Explain Work Break', prompt: 'How can we explain a break or gap in my career in a positive way?', immediate: true }
           ]
         };
     }
@@ -291,23 +291,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const ContextIcon = meta.icon;
 
   return (
-    <div className="flex flex-col h-full bg-gray-950 text-gray-100 selection:bg-blue-500/30 selection:text-white">
-      {/* Top Header Bar (Matching Version 0 Layout) */}
-      <div className="h-13 border-b border-gray-800/90 px-4 flex items-center justify-between shrink-0 bg-gray-900/70 backdrop-blur-md">
+    <div className="flex flex-col h-full bg-white text-slate-800 selection:bg-blue-100 selection:text-blue-900">
+      {/* Top Header Bar */}
+      <div className="h-13 border-b border-slate-200 px-4 flex items-center justify-between shrink-0 bg-slate-50/90">
         {/* Agent Profile & Live Indicator */}
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 ring-1 ring-blue-400/40">
-            <Bot className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-xs text-white">
+            <Bot className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center space-x-1.5 leading-none">
-              <span className="font-bold text-xs text-white tracking-tight">Aura Counselor</span>
-              <span className="flex items-center gap-1 text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Live
+              <span className="font-bold text-xs text-slate-900 tracking-tight">Aura Career Coach</span>
+              <span className="flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Ready
               </span>
             </div>
-            <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-400 font-medium">
+            <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-500 font-medium">
               <ContextIcon className={`w-3 h-3 ${meta.color}`} />
               <span className="truncate max-w-[170px]">{meta.label}</span>
             </div>
@@ -321,34 +321,34 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             onClick={handleCopyFullChat}
             className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
               isAllCopied
-                ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
-                : 'text-gray-400 hover:text-gray-100 hover:bg-gray-800'
+                ? 'text-emerald-700 bg-emerald-50 border border-emerald-200'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
             }`}
-            title="Copy entire chat conversation (prompts & responses)"
+            title="Copy full conversation"
           >
             {isAllCopied ? (
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
             ) : (
               <Copy className="w-3.5 h-3.5" />
             )}
           </button>
 
-          {/* Toggle Width (Half vs Standard) */}
+          {/* Toggle Width */}
           {onToggleWidth && (
             <button
               onClick={onToggleWidth}
-              className="p-1.5 text-gray-400 hover:text-gray-100 hover:bg-gray-800 rounded-lg transition-colors"
-              title={isHalfWidth ? 'Switch to Standard Width (35%)' : 'Switch to 50/50 Split View'}
+              className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-200 rounded-lg transition-colors"
+              title={isHalfWidth ? 'Standard Width' : '50/50 Split View'}
             >
-              <Columns className={`w-3.5 h-3.5 ${isHalfWidth ? 'text-blue-400' : ''}`} />
+              <Columns className={`w-3.5 h-3.5 ${isHalfWidth ? 'text-blue-600' : ''}`} />
             </button>
           )}
 
           {/* Clear Chat */}
           <button
             onClick={clearChat}
-            className="p-1.5 text-gray-400 hover:text-rose-400 hover:bg-gray-800 rounded-lg transition-colors"
-            title="Reset Chat Session"
+            className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-slate-200 rounded-lg transition-colors"
+            title="Reset Chat"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -357,8 +357,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           {onCollapse && (
             <button
               onClick={onCollapse}
-              className="p-1.5 text-gray-400 hover:text-gray-100 hover:bg-gray-800 rounded-lg transition-colors"
-              title="Collapse Aura Counselor (Full Screen for Active Tool)"
+              className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-200 rounded-lg transition-colors"
+              title="Close Chat"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -367,7 +367,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Dynamic Context Action Pills Grid: 3 on top, 3 below */}
-      <div className="px-3 py-2 bg-gray-900/60 border-b border-gray-800/80 shrink-0">
+      <div className="px-3 py-2 bg-slate-50/60 border-b border-slate-200 shrink-0">
         <div className="grid grid-cols-3 gap-1.5">
           {meta.pills.map((pill, idx) => {
             const isTimeline = pill.action === 'fix_timeline';
@@ -378,14 +378,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 title={pill.prompt}
                 className={`px-2 py-1.5 text-[10px] font-medium rounded-lg border transition-all flex items-center justify-center gap-1 text-center cursor-pointer active:scale-95 shadow-2xs ${
                   isTimeline
-                    ? 'bg-amber-950/40 border-amber-500/40 text-amber-200 hover:bg-amber-900/60 hover:text-white font-semibold'
-                    : 'bg-gray-950/80 hover:bg-gray-800 text-gray-300 hover:text-white border-gray-800/90 hover:border-gray-700'
+                    ? 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 font-semibold'
+                    : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-200 hover:border-slate-300'
                 }`}
               >
                 {isTimeline ? (
-                  <Calendar className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+                  <Calendar className="w-2.5 h-2.5 text-amber-600 shrink-0" />
                 ) : (
-                  <Sparkles className="w-2.5 h-2.5 text-amber-400/80 shrink-0" />
+                  <Sparkles className="w-2.5 h-2.5 text-amber-500 shrink-0" />
                 )}
                 <span className="truncate">{pill.label}</span>
               </button>
@@ -395,28 +395,28 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Messages Scroll Feed */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2.5 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-4 space-y-2.5 bg-slate-50/30">
         {messages.map((msg) => (
           <MessageItem key={msg.id} message={msg} />
         ))}
         {isStreaming && (
-          <div className="flex items-center space-x-2 text-xs text-blue-400 p-2 font-mono animate-pulse">
+          <div className="flex items-center space-x-2 text-xs text-blue-600 p-2 font-medium animate-pulse">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            <span>Aura Agent is reasoning and compiling vault tools...</span>
+            <span>Aura is typing your answer...</span>
           </div>
         )}
         {isUploadingResume && (
-          <div className="flex items-center space-x-2 text-xs text-amber-400 p-2 font-mono animate-pulse bg-amber-950/20 border border-amber-500/30 rounded-xl">
+          <div className="flex items-center space-x-2 text-xs text-amber-700 p-2 font-medium animate-pulse bg-amber-50 border border-amber-200 rounded-xl">
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            <span>Extracting career timeline & verifying gap phase from resume...</span>
+            <span>Reading your CV and saving your work history...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input Bar */}
-      <div className="p-3 border-t border-gray-800 bg-gray-900/60 shrink-0">
-        <div className="flex items-end space-x-2 bg-gray-900 border border-gray-800 focus-within:border-blue-500 rounded-2xl p-2 transition-all shadow-lg">
+      <div className="p-3 border-t border-slate-200 bg-white shrink-0">
+        <div className="flex items-end space-x-2 bg-slate-50 border border-slate-300 focus-within:border-blue-500 focus-within:bg-white rounded-2xl p-2 transition-all shadow-xs">
           {/* Hidden File Input for Resume Upload */}
           <input
             type="file"
@@ -431,11 +431,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             type="button"
             onClick={() => resumeFileInputRef.current?.click()}
             disabled={isUploadingResume || isStreaming}
-            title="Upload CV / Resume to extract timeline and gap phase"
-            className="p-2 rounded-xl text-gray-400 hover:text-amber-300 hover:bg-gray-800 transition-all shrink-0 cursor-pointer"
+            title="Upload CV / Resume to fill in your work history automatically"
+            className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-slate-200 transition-all shrink-0 cursor-pointer"
           >
             {isUploadingResume ? (
-              <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+              <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
             ) : (
               <Upload className="w-4 h-4" />
             )}
@@ -446,9 +446,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask Aura anything (CV edits, story updates, code hints, strategy)..."
+            placeholder="Type your message to Aura (or share your job, skills, or questions)..."
             rows={2}
-            className="flex-1 bg-transparent border-0 text-xs text-gray-100 placeholder-gray-500 focus:ring-0 focus:outline-none resize-none px-2 py-1 max-h-28 leading-relaxed font-sans"
+            className="flex-1 bg-transparent border-0 text-xs text-slate-900 placeholder-slate-400 focus:ring-0 focus:outline-none resize-none px-2 py-1 max-h-28 leading-relaxed font-sans"
           />
 
           {/* AI Polish Button */}
@@ -457,13 +457,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               type="button"
               onClick={handlePolish}
               disabled={isPolishing}
-              title="Fix misheard voice words & technical terms using AI"
-              className="px-2 py-1.5 rounded-xl text-[11px] font-semibold flex items-center gap-1 bg-purple-950/60 hover:bg-purple-900/80 text-purple-200 border border-purple-500/30 transition-all shrink-0 cursor-pointer shadow-sm"
+              title="Clean up grammar and spelling using AI"
+              className="px-2 py-1.5 rounded-xl text-[11px] font-semibold flex items-center gap-1 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition-all shrink-0 cursor-pointer shadow-xs"
             >
               {isPolishing ? (
-                <Loader2 className="w-3 h-3 animate-spin text-purple-300" />
+                <Loader2 className="w-3 h-3 animate-spin text-purple-600" />
               ) : (
-                <Sparkles className="w-3 h-3 text-purple-400" />
+                <Sparkles className="w-3 h-3 text-purple-600" />
               )}
               <span className="hidden sm:inline">Polish</span>
             </button>
@@ -476,8 +476,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             disabled={!inputText.trim() || isStreaming || isPolishing || isUploadingResume}
             className={`p-2 rounded-xl transition-all flex items-center justify-center shrink-0 ${
               inputText.trim() && !isStreaming && !isPolishing && !isUploadingResume
-                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30 cursor-pointer'
-                : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
+                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
             title="Send Message (Enter)"
           >
@@ -490,11 +490,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
 
         {/* Keyboard shortcut hint */}
-        <div className="flex items-center justify-between text-[10px] text-gray-500 px-2 mt-1.5">
+        <div className="flex items-center justify-between text-[10px] text-slate-500 px-2 mt-1.5">
           <span className="flex items-center gap-1">
-            <Keyboard className="w-3 h-3 text-gray-400" /> <strong className="text-gray-400">Win + H</strong> for voice dictation
+            <Keyboard className="w-3 h-3 text-slate-400" /> Press <strong className="text-slate-600">Enter</strong> to send
           </span>
-          <span>Enter to send · Shift+Enter for newline</span>
+          <span>Shift+Enter for a new line</span>
         </div>
       </div>
     </div>

@@ -10,7 +10,6 @@ import {
   Briefcase,
   Lightbulb,
   Upload,
-  Calendar,
   ChevronDown,
   ChevronUp,
   Filter,
@@ -110,28 +109,28 @@ export const ArtifactsViewer: React.FC = () => {
   });
 
   return (
-    <div className="flex flex-col h-full bg-gray-950 border-l border-gray-800 text-gray-100 overflow-hidden">
+    <div className="flex flex-col h-full bg-slate-50 border-l border-slate-200 text-slate-800 overflow-hidden">
       {/* Sleek Single-Bar Header: Title + Subtabs + Refresh */}
-      <div className="min-h-13 border-b border-gray-800 px-3 sm:px-5 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0 bg-gray-900/80 backdrop-blur-md">
-        {/* Left: Vault Brand & Live State */}
+      <div className="min-h-13 border-b border-slate-200 px-3 sm:px-5 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0 bg-white shadow-2xs">
+        {/* Left: Profile Brand & Live State */}
         <div className="flex items-center space-x-2.5 shrink-0">
-          <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
             <Database className="w-3.5 h-3.5" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-white tracking-wide">
-                Career Vault
+              <span className="text-xs font-bold text-slate-900 tracking-wide">
+                My Profile
               </span>
-              <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.2 rounded-full border border-emerald-500/20 font-mono">
-                {stories.length} Stories · {workHistory.length} Roles
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 font-medium">
+                {stories.length} Stories · {workHistory.length} Jobs
               </span>
             </div>
           </div>
         </div>
 
-        {/* Center: Consolidated 4 Main Tabs (Scrollable on small/laptop screens) */}
-        <div className="flex items-center bg-gray-950/80 p-1 rounded-xl border border-gray-800/80 space-x-1 overflow-x-auto no-scrollbar max-w-full shrink">
+        {/* Center: Consolidated 4 Main Tabs */}
+        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 space-x-1 overflow-x-auto no-scrollbar max-w-full shrink">
           <button
             onClick={() => {
               setActiveTab('timeline');
@@ -139,13 +138,13 @@ export const ArtifactsViewer: React.FC = () => {
             }}
             className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               activeTab === 'timeline' && !showRawJson
-                ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-900'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Briefcase className="w-3 h-3" />
-            <span>Timeline</span>
-            <span className="text-[10px] font-mono opacity-80">({workHistory.length})</span>
+            <span>Work History</span>
+            <span className="text-[10px] font-medium opacity-80">({workHistory.length})</span>
           </button>
 
           <button
@@ -155,13 +154,13 @@ export const ArtifactsViewer: React.FC = () => {
             }}
             className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               activeTab === 'stories' && !showRawJson
-                ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-900'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <FileText className="w-3 h-3" />
-            <span>Story Vault</span>
-            <span className="text-[10px] font-mono opacity-80">({stories.length})</span>
+            <span>Work Stories</span>
+            <span className="text-[10px] font-medium opacity-80">({stories.length})</span>
           </button>
 
           <button
@@ -171,12 +170,12 @@ export const ArtifactsViewer: React.FC = () => {
             }}
             className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               activeTab === 'traits' && !showRawJson
-                ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-900'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Award className="w-3 h-3" />
-            <span>Traits</span>
+            <span>Strengths</span>
           </button>
 
           <button
@@ -186,102 +185,94 @@ export const ArtifactsViewer: React.FC = () => {
             }}
             className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
               activeTab === 'skills' && !showRawJson
-                ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-900'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Cpu className="w-3 h-3" />
-            <span>Skills Matrix</span>
+            <span>Skills</span>
           </button>
         </div>
 
-        {/* Right: Quick Actions & JSON Toggle */}
+        {/* Right: Quick Actions & Refresh */}
         <div className="flex items-center space-x-2 shrink-0">
           <button
             onClick={() => setShowRawJson((prev) => !prev)}
-            className={`text-xs px-2.5 py-1 rounded-lg border transition-colors flex items-center gap-1 font-mono ${
+            className={`text-xs px-2.5 py-1 rounded-lg border transition-colors flex items-center gap-1 ${
               showRawJson
-                ? 'bg-purple-950/60 border-purple-500/40 text-purple-300'
-                : 'bg-gray-900 border-gray-800 text-gray-400 hover:text-gray-200'
+                ? 'bg-purple-50 border-purple-300 text-purple-700'
+                : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900'
             }`}
-            title="Toggle Raw JSON View"
+            title="Toggle Raw Details"
           >
             <Code2 className="w-3 h-3" />
-            <span className="hidden sm:inline">JSON</span>
+            <span className="hidden sm:inline">Details</span>
           </button>
 
           <button
             onClick={handleRefresh}
-            className="text-gray-400 hover:text-white p-1.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-700 transition-colors"
-            title="Sync Vault from Server"
+            className="text-slate-600 hover:text-slate-900 p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Refresh Profile"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-blue-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-blue-600' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* Main Content Viewport */}
-      <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/60">
         {showRawJson ? (
-          <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 font-mono text-xs overflow-x-auto text-emerald-400">
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 font-mono text-xs overflow-x-auto text-emerald-400">
             <pre>{JSON.stringify(artifacts, null, 2)}</pre>
           </div>
         ) : (
           <>
             {/* TAB 1: TIMELINE & ROLES */}
             {activeTab === 'timeline' && (
-              <div className="space-y-5 max-w-5xl mx-auto">
-                {/* Unified Executive Identity & Extractor Hero */}
-                <div className="p-5 rounded-2xl bg-gradient-to-r from-gray-900 via-gray-900/90 to-blue-950/30 border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-4 max-w-5xl mx-auto">
+                {/* Profile Identity Card */}
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
                   <div className="space-y-1.5 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
-                        Executive Identity
+                      <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        Profile Overview
                       </span>
-                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                        9+ Years Experience
+                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        {(candidate as any)?.experience_years ? `${(candidate as any).experience_years} Experience` : 'Experienced Professional'}
                       </span>
                     </div>
 
-                    <h2 className="text-lg font-bold text-white tracking-tight">
-                      {candidate?.name || 'Aura Candidate'}
+                    <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                      {candidate?.name || currentUser?.name || 'Your Profile'}
                     </h2>
 
-                    <p className="text-xs text-blue-300 font-medium">
-                      {candidate?.headline || 'Senior Technology & Data Lead | Systems Builder'}
+                    <p className="text-xs text-blue-700 font-semibold">
+                      {candidate?.headline || currentUser?.latest_role || 'Professional'}
                     </p>
 
                     {candidate?.experience_summary && (
-                      <p className="text-xs text-gray-300 leading-relaxed pt-1 max-w-3xl">
+                      <p className="text-xs text-slate-600 leading-relaxed pt-1 max-w-3xl">
                         {candidate.experience_summary}
                       </p>
                     )}
                   </div>
 
                   {/* Actions Right */}
-                  <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0 md:min-w-[190px]">
+                  <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0 md:min-w-[180px]">
                     <button
                       onClick={openRoleModal}
-                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-950 cursor-pointer"
+                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
-                      <span>{currentUser?.is_assigned ? 'Calibrate Role' : 'Assign My Role'}</span>
+                      <span>Edit My Role & Info</span>
                     </button>
 
                     <button
                       onClick={() => setIsTimelineModalOpen(true)}
-                      className="px-3.5 py-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-xs font-medium flex items-center justify-center gap-1.5 border border-gray-700 transition-colors"
+                      className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 border border-slate-300 transition-colors cursor-pointer shadow-2xs"
                     >
-                      <Upload className="w-3.5 h-3.5 text-blue-400" />
-                      <span>Upload & Extract CV</span>
-                    </button>
-
-                    <button
-                      onClick={() => setIsTimelineModalOpen(true)}
-                      className="px-3.5 py-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 text-xs font-medium flex items-center justify-center gap-1.5 border border-gray-700 transition-colors"
-                    >
-                      <Calendar className="w-3 h-3 text-cyan-400" />
-                      <span>Calibrate Timeline</span>
+                      <Upload className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Upload CV File</span>
                     </button>
                   </div>
                 </div>
@@ -289,17 +280,17 @@ export const ArtifactsViewer: React.FC = () => {
                 {/* Chronological Work History & Milestones */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Briefcase className="w-3.5 h-3.5 text-blue-400" />
-                      <span>Chronological Career Milestones ({workHistory.length})</span>
+                    <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                      <Briefcase className="w-3.5 h-3.5 text-blue-600" />
+                      <span>My Work Experience ({workHistory.length})</span>
                     </h3>
-                    <span className="text-[11px] text-gray-500 font-mono">
-                      Anchored to Career Vault
+                    <span className="text-[11px] text-slate-500">
+                      Saved in your profile
                     </span>
                   </div>
 
                   {workHistory.length > 0 ? (
-                    <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-gray-800">
+                    <div className="relative pl-6 space-y-3.5 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
                       {workHistory.map((wh, idx) => {
                         const isGap = Boolean(
                           wh.is_gap_phase ||
@@ -313,8 +304,8 @@ export const ArtifactsViewer: React.FC = () => {
                             <div
                               className={`absolute -left-6 top-4 w-3 h-3 rounded-full border-2 ${
                                 isGap
-                                  ? 'bg-amber-400 border-amber-300 ring-4 ring-amber-400/20'
-                                  : 'bg-blue-500 border-blue-400 ring-4 ring-blue-500/20'
+                                  ? 'bg-amber-400 border-amber-300 ring-4 ring-amber-100'
+                                  : 'bg-blue-600 border-blue-400 ring-4 ring-blue-100'
                               }`}
                             ></div>
 
@@ -322,41 +313,41 @@ export const ArtifactsViewer: React.FC = () => {
                             <div
                               className={`p-4 rounded-xl border transition-all ${
                                 isGap
-                                  ? 'bg-gradient-to-r from-amber-950/20 to-gray-900 border-amber-500/40 shadow-sm'
-                                  : 'bg-gray-900/90 border-gray-800 hover:border-gray-700'
+                                  ? 'bg-amber-50/50 border-amber-300 shadow-2xs'
+                                  : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
                               }`}
                             >
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <h4 className="text-sm font-bold text-white">{wh.role}</h4>
+                                  <h4 className="text-sm font-bold text-slate-900">{wh.role}</h4>
                                   {isGap ? (
-                                    <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-mono font-medium">
-                                      Systems Builder & Quant R&D (Gap Phase)
+                                    <span className="text-[10px] bg-amber-100 text-amber-800 border border-amber-200 px-2 py-0.5 rounded font-medium">
+                                      Independent Work / Career Transition
                                     </span>
                                   ) : (
-                                    <span className="text-xs font-semibold text-blue-400">
-                                      @ {wh.company}
+                                    <span className="text-xs font-semibold text-blue-700">
+                                      at {wh.company}
                                     </span>
                                   )}
                                 </div>
 
-                                <span className="text-[11px] font-mono text-gray-400 bg-gray-950 px-2.5 py-0.5 rounded border border-gray-800 self-start sm:self-auto">
+                                <span className="text-[11px] text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200 self-start sm:self-auto font-medium">
                                   {wh.period || 'Recent'}
                                 </span>
                               </div>
 
                               {wh.summary && (
-                                <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                                <p className="text-xs text-slate-600 leading-relaxed mb-3">
                                   {wh.summary}
                                 </p>
                               )}
 
                               {wh.responsibilities && wh.responsibilities.length > 0 && (
-                                <div className="space-y-1.5 pt-1 border-t border-gray-800/60">
-                                  <span className="text-[11px] font-semibold text-gray-400 block">
-                                    Core Engineering Scope:
+                                <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                                  <span className="text-[11px] font-semibold text-slate-500 block">
+                                    Main Responsibilities:
                                   </span>
-                                  <ul className="space-y-1 text-xs text-gray-300 pl-4 list-disc marker:text-blue-500">
+                                  <ul className="space-y-1 text-xs text-slate-600 pl-4 list-disc marker:text-blue-600">
                                     {wh.responsibilities.map((r, rIdx) => (
                                       <li key={rIdx}>{r}</li>
                                     ))}
@@ -369,15 +360,15 @@ export const ArtifactsViewer: React.FC = () => {
                       })}
                     </div>
                   ) : (
-                    <div className="p-8 rounded-2xl bg-gray-900/40 border border-dashed border-gray-800 text-center space-y-2">
-                      <Briefcase className="w-8 h-8 text-gray-600 mx-auto" />
-                      <p className="text-xs font-medium text-gray-400">No organizations recorded yet</p>
+                    <div className="p-8 rounded-2xl bg-white border border-dashed border-slate-300 text-center space-y-2 shadow-xs">
+                      <Briefcase className="w-8 h-8 text-slate-400 mx-auto" />
+                      <p className="text-xs font-medium text-slate-600">No jobs recorded yet</p>
                       <button
                         onClick={() => setIsTimelineModalOpen(true)}
-                        className="px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold inline-flex items-center gap-1.5 mt-2"
+                        className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold inline-flex items-center gap-1.5 mt-2 cursor-pointer shadow-xs"
                       >
                         <Upload className="w-3.5 h-3.5" />
-                        <span>Upload CV to Populate Timeline</span>
+                        <span>Upload CV File</span>
                       </button>
                     </div>
                   )}
@@ -385,28 +376,28 @@ export const ArtifactsViewer: React.FC = () => {
               </div>
             )}
 
-            {/* TAB 2: STORY VAULT (INTERACTIVE ACCORDION & FILTER) */}
+            {/* TAB 2: STORY VAULT */}
             {activeTab === 'stories' && (
               <div className="space-y-4 max-w-5xl mx-auto">
                 {/* Story Controls Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-gray-900 border border-gray-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
                   {/* Category Filter Pills */}
                   <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                    <Filter className="w-3.5 h-3.5 text-gray-500 shrink-0 ml-1" />
+                    <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1" />
                     {[
-                      { id: 'all', label: `All (${stories.length})` },
-                      { id: 'incident', label: 'Triage & Outages' },
-                      { id: 'architecture', label: 'SQL & Database' },
-                      { id: 'automation', label: 'Automation & SLAs' },
-                      { id: 'ai', label: 'Quant & Agentic AI' }
+                      { id: 'all', label: `All Stories (${stories.length})` },
+                      { id: 'incident', label: 'Problem Solving' },
+                      { id: 'architecture', label: 'Tools & Systems' },
+                      { id: 'automation', label: 'Process & Efficiency' },
+                      { id: 'ai', label: 'Projects & Innovation' }
                     ].map((f) => (
                       <button
                         key={f.id}
                         onClick={() => setStoryFilter(f.id as any)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 ${
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer ${
                           storyFilter === f.id
-                            ? 'bg-blue-600 text-white font-semibold'
-                            : 'bg-gray-950 text-gray-400 hover:text-gray-200 border border-gray-800'
+                            ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                            : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                         }`}
                       >
                         {f.label}
@@ -418,14 +409,14 @@ export const ArtifactsViewer: React.FC = () => {
                   <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
                     <button
                       onClick={() => toggleAllStories(true)}
-                      className="text-[11px] text-gray-400 hover:text-white px-2 py-1 rounded hover:bg-gray-800"
+                      className="text-[11px] text-slate-600 hover:text-slate-900 px-2 py-1 rounded hover:bg-slate-100 cursor-pointer"
                     >
                       Expand All
                     </button>
-                    <span className="text-gray-700">|</span>
+                    <span className="text-slate-300">|</span>
                     <button
                       onClick={() => toggleAllStories(false)}
-                      className="text-[11px] text-gray-400 hover:text-white px-2 py-1 rounded hover:bg-gray-800"
+                      className="text-[11px] text-slate-600 hover:text-slate-900 px-2 py-1 rounded hover:bg-slate-100 cursor-pointer"
                     >
                       Collapse All
                     </button>
@@ -435,26 +426,19 @@ export const ArtifactsViewer: React.FC = () => {
                 {/* Filtered Stories List */}
                 <div className="space-y-3">
                   {filteredStories.length === 0 ? (
-                    <div className="p-8 rounded-2xl bg-gray-900/40 border border-dashed border-gray-800 text-center space-y-2">
-                      <FileText className="w-8 h-8 text-gray-600 mx-auto" />
-                      <p className="text-xs text-gray-400">No stories match this filter</p>
+                    <div className="p-8 rounded-2xl bg-white border border-dashed border-slate-300 text-center space-y-2 shadow-xs">
+                      <FileText className="w-8 h-8 text-slate-400 mx-auto" />
+                      <p className="text-xs text-slate-600 font-medium">No work stories in this filter yet</p>
+                      <p className="text-[11px] text-slate-500">Tell Aura in the chat: "I want to share a work win" to add one!</p>
                     </div>
                   ) : (
                     filteredStories.map((s: any) => {
                       const isExpanded = Boolean(expandedStoryIds[s.id]);
-                      const isRelevantToActiveTrack =
-                        activeProfileTab &&
-                        s.applicable_profiles &&
-                        s.applicable_profiles.includes(activeProfileTab);
 
                       return (
                         <div
                           key={s.id}
-                          className={`rounded-xl border transition-all ${
-                            isRelevantToActiveTrack
-                              ? 'bg-gray-900 border-blue-500/40 shadow-sm'
-                              : 'bg-gray-900/80 border-gray-800 hover:border-gray-700'
-                          }`}
+                          className="rounded-xl border border-slate-200 bg-white hover:border-slate-300 shadow-xs transition-all"
                         >
                           {/* Story Accordion Header */}
                           <div
@@ -463,17 +447,12 @@ export const ArtifactsViewer: React.FC = () => {
                           >
                             <div className="space-y-1 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-800/40">
+                                <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
                                   {s.id.toUpperCase()}
                                 </span>
-                                <h4 className="text-sm font-bold text-white leading-snug">{s.title}</h4>
-                                {isRelevantToActiveTrack && (
-                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.2 rounded font-mono">
-                                    Track Match
-                                  </span>
-                                )}
+                                <h4 className="text-sm font-bold text-slate-900 leading-snug">{s.title}</h4>
                               </div>
-                              <p className="text-xs text-gray-400">
+                              <p className="text-xs text-slate-500">
                                 {s.company} · {s.role} ({s.period || 'Recent'})
                               </p>
                             </div>
@@ -481,50 +460,49 @@ export const ArtifactsViewer: React.FC = () => {
                             <div className="flex items-center gap-2 shrink-0 pt-0.5">
                               {/* Quick Metrics preview */}
                               {s.metrics && s.metrics.length > 0 && (
-                                <span className="hidden sm:inline-block text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                <span className="hidden sm:inline-block text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-medium">
                                   {s.metrics[0]}
                                 </span>
                               )}
-                              <div className="w-6 h-6 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400">
+                              <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
                                 {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                               </div>
                             </div>
                           </div>
 
-                          {/* Expanded Full STARR Content */}
+                          {/* Expanded Story Content */}
                           {isExpanded && (
-                            <div className="px-3.5 pb-4 space-y-3 border-t border-gray-800/80 pt-3">
-                              {/* 4 STARR Matrix Points */}
+                            <div className="px-3.5 pb-4 space-y-3 border-t border-slate-100 pt-3">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-                                <div className="p-2.5 rounded-lg bg-gray-950/60 border border-gray-800/80 space-y-1">
-                                  <strong className="text-amber-400 font-semibold block">1. Situation:</strong>
-                                  <span className="text-gray-300 leading-relaxed">{s.situation}</span>
+                                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                                  <strong className="text-amber-800 font-semibold block">1. The Problem / Situation:</strong>
+                                  <span className="text-slate-700 leading-relaxed">{s.situation}</span>
                                 </div>
 
-                                <div className="p-2.5 rounded-lg bg-gray-950/60 border border-gray-800/80 space-y-1">
-                                  <strong className="text-sky-400 font-semibold block">2. Plan / Goal:</strong>
-                                  <span className="text-gray-300 leading-relaxed">{s.task}</span>
+                                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                                  <strong className="text-blue-800 font-semibold block">2. Plan & Goal:</strong>
+                                  <span className="text-slate-700 leading-relaxed">{s.task}</span>
                                 </div>
 
-                                <div className="p-2.5 rounded-lg bg-gray-950/60 border border-gray-800/80 space-y-1">
-                                  <strong className="text-emerald-400 font-semibold block">3. Execution:</strong>
-                                  <span className="text-gray-300 leading-relaxed">{s.action}</span>
+                                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                                  <strong className="text-emerald-800 font-semibold block">3. What You Did:</strong>
+                                  <span className="text-slate-700 leading-relaxed">{s.action}</span>
                                 </div>
 
-                                <div className="p-2.5 rounded-lg bg-gray-950/60 border border-gray-800/80 space-y-1">
-                                  <strong className="text-purple-400 font-semibold block">4. Result & Metrics:</strong>
-                                  <span className="text-gray-300 leading-relaxed">{s.result}</span>
+                                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                                  <strong className="text-purple-800 font-semibold block">4. The Good Result:</strong>
+                                  <span className="text-slate-700 leading-relaxed">{s.result}</span>
                                 </div>
                               </div>
 
-                              {/* Point 5: Learnings & Preventative Governance */}
+                              {/* Point 5: Learnings */}
                               {s.learnings && s.learnings.length > 0 && (
-                                <div className="p-2.5 rounded-lg bg-amber-950/20 border border-amber-600/30 space-y-1">
-                                  <div className="flex items-center gap-1.5 text-amber-300 font-semibold text-xs">
-                                    <Lightbulb className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                                    <span>5. Retrospective Learnings & Preventative Safeguards:</span>
+                                <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200 space-y-1">
+                                  <div className="flex items-center gap-1.5 text-amber-900 font-semibold text-xs">
+                                    <Lightbulb className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                    <span>5. Key Learnings & Takeaways:</span>
                                   </div>
-                                  <ul className="space-y-0.5 pl-4 list-disc marker:text-amber-400 text-xs text-gray-300">
+                                  <ul className="space-y-0.5 pl-4 list-disc marker:text-amber-600 text-xs text-slate-700">
                                     {s.learnings.map((lrn: string, lIdx: number) => (
                                       <li key={lIdx}>{lrn}</li>
                                     ))}
@@ -538,9 +516,9 @@ export const ArtifactsViewer: React.FC = () => {
                                   {s.metrics.map((m: string, idx: number) => (
                                     <span
                                       key={idx}
-                                      className="text-[11px] bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md flex items-center gap-1 font-mono"
+                                      className="text-[11px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1 font-medium"
                                     >
-                                      <CheckCircle2 className="w-3 h-3 text-emerald-400" /> {m}
+                                      <CheckCircle2 className="w-3 h-3 text-emerald-600" /> {m}
                                     </span>
                                   ))}
                                 </div>
@@ -557,124 +535,85 @@ export const ArtifactsViewer: React.FC = () => {
 
             {/* TAB 3: ARCHETYPES & TRAITS */}
             {activeTab === 'traits' && (
-              <div className="space-y-5 max-w-5xl mx-auto">
-                {!traits?.career_archetype && (!traits?.target_profiles || traits.target_profiles.length === 0) ? (
-                  <div className="p-8 sm:p-12 rounded-2xl bg-gray-900/60 border border-gray-800 text-center space-y-4">
-                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto">
-                      <Award className="w-6 h-6" />
+              <div className="space-y-4 max-w-5xl mx-auto">
+                {/* Target Role Match Cards Grid */}
+                {traits?.target_profiles && traits.target_profiles.length > 0 ? (
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                      Recommended Career Directions & Match Scores
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {traits.target_profiles.map((tp) => (
+                        <div
+                          key={tp.id}
+                          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 transition-all space-y-2.5 shadow-xs"
+                        >
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-bold text-slate-900">{tp.title}</h4>
+                            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                              {tp.match_score}% Match
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-600 leading-relaxed">{tp.core_pitch}</p>
+                          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                            <span className="text-slate-400">Track: {tp.id}</span>
+                            <button
+                              onClick={() => setActiveModule('cvforge')}
+                              className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 cursor-pointer"
+                            >
+                              <span>Open in Resume Builder</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="space-y-1.5 max-w-md mx-auto">
-                      <h3 className="text-base font-bold text-white">Traits Awaiting Calibration</h3>
-                      <p className="text-xs text-gray-400 leading-relaxed">
-                        Upload your CV in the chat or from the Timeline tab. Aura will automatically synthesize your calibrated Career Archetype, Target Role match scores, and Evaluated Competencies.
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setIsTimelineModalOpen(true)}
-                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer shadow-lg shadow-blue-900/20"
-                    >
-                      <Upload className="w-3.5 h-3.5" />
-                      <span>Upload CV / Timeline</span>
-                    </button>
                   </div>
                 ) : (
-                  <>
-                    {/* Archetype banner */}
-                    {traits?.career_archetype && (
-                      <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-950/50 via-gray-900 to-indigo-950/40 border border-blue-800/40 flex items-center justify-between">
-                        <div>
-                          <span className="text-[11px] uppercase tracking-wider text-blue-400 font-semibold block mb-0.5">
-                            Calibrated Career Archetype
-                          </span>
-                          <h3 className="text-base font-bold text-white">{traits.career_archetype}</h3>
-                          <p className="text-xs text-gray-400 mt-1">
-                            High-assurance enterprise reliability paired with autonomous engineering capability.
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => setActiveModule('cvforge')}
-                          className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
-                        >
-                          <span>Tailor in CV Forge</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Target Role Match Cards Grid */}
-                    {traits?.target_profiles && traits.target_profiles.length > 0 && (
-                      <div className="space-y-3">
-                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                          Qualified Role Pathways & Match Scores
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {traits.target_profiles.map((tp) => (
-                            <div
-                              key={tp.id}
-                              className="p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 transition-all space-y-2.5"
-                            >
-                              <div className="flex items-center justify-between">
-                                <h4 className="text-sm font-bold text-white">{tp.title}</h4>
-                                <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                                  {tp.match_score}% Match
-                                </span>
-                              </div>
-                              <p className="text-xs text-gray-400 leading-relaxed">{tp.core_pitch}</p>
-                              <div className="pt-2 border-t border-gray-800 flex items-center justify-between text-[11px]">
-                                <span className="text-gray-500 font-mono">Track: {tp.id}</span>
-                                <button
-                                  onClick={() => setActiveModule('cvforge')}
-                                  className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1"
-                                >
-                                  <span>Inspect in CV Forge</span>
-                                  <ArrowRight className="w-3 h-3" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Core Competencies & Evaluated Traits */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Competencies */}
-                      {traits?.core_competencies && traits.core_competencies.length > 0 && (
-                        <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
-                          <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                            Core Competencies
-                          </h4>
-                          <div className="flex flex-wrap gap-1.5">
-                            {traits.core_competencies.map((cc, i) => (
-                              <span
-                                key={i}
-                                className="text-xs bg-gray-950 border border-gray-800 text-gray-200 px-2.5 py-1 rounded-lg"
-                              >
-                                {cc}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Personality Traits */}
-                      {traits?.personality_traits && traits.personality_traits.length > 0 && (
-                        <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
-                          <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-                            Evaluated Traits & Mindset
-                          </h4>
-                          <div className="space-y-1.5 text-xs text-gray-300">
-                            {traits.personality_traits.map((pt, i) => (
-                              <div key={i} className="p-2 rounded-lg bg-gray-950/60 border border-gray-800/80">
-                                {pt}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </>
+                  <div className="p-8 rounded-2xl bg-white border border-dashed border-slate-300 text-center space-y-2 shadow-xs">
+                    <Award className="w-8 h-8 text-slate-400 mx-auto" />
+                    <p className="text-xs font-semibold text-slate-700">Career directions will appear as you chat with Aura</p>
+                    <p className="text-[11px] text-slate-500">Share your jobs and skills to see matching career paths!</p>
+                  </div>
                 )}
+
+                {/* Core Competencies & Evaluated Traits */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Competencies */}
+                  {traits?.core_competencies && traits.core_competencies.length > 0 && (
+                    <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3 shadow-xs">
+                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Core Competencies & Strengths
+                      </h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {traits.core_competencies.map((cc, i) => (
+                          <span
+                            key={i}
+                            className="text-xs bg-slate-50 border border-slate-200 text-slate-700 px-2.5 py-1 rounded-lg font-medium"
+                          >
+                            {cc}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Personality Traits */}
+                  {traits?.personality_traits && traits.personality_traits.length > 0 && (
+                    <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3 shadow-xs">
+                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Workplace Style & Mindset
+                      </h4>
+                      <div className="space-y-1.5 text-xs text-slate-700">
+                        {traits.personality_traits.map((pt, i) => (
+                          <div key={i} className="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                            {pt}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -682,34 +621,35 @@ export const ArtifactsViewer: React.FC = () => {
             {activeTab === 'skills' && (
               <div className="space-y-4 max-w-5xl mx-auto">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Verified Competency Matrix
+                  <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                    My Registered Skills
                   </h3>
-                  <span className="text-[11px] text-gray-500 font-mono">
-                    Extracted from STARR Milestones
+                  <span className="text-[11px] text-slate-500">
+                    Saved in your profile
                   </span>
                 </div>
 
                 {Object.keys(skillsMatrix).length === 0 || Object.values(skillsMatrix).every((arr: any) => arr.length === 0) ? (
-                  <div className="p-8 rounded-2xl bg-gray-900/40 border border-dashed border-gray-800 text-center space-y-2">
-                    <Cpu className="w-8 h-8 text-gray-600 mx-auto" />
-                    <p className="text-xs text-gray-400">Skills Matrix will populate as stories are saved.</p>
+                  <div className="p-8 rounded-2xl bg-white border border-dashed border-slate-300 text-center space-y-2 shadow-xs">
+                    <Cpu className="w-8 h-8 text-slate-400 mx-auto" />
+                    <p className="text-xs text-slate-600 font-medium">No skills added yet</p>
+                    <p className="text-[11px] text-slate-500">Tell Aura in the chat what tools and apps you use daily!</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(skillsMatrix).map(([catKey, skills]: [string, any]) => (
-                      <div key={catKey} className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-2.5">
-                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-wider border-b border-gray-800 pb-1.5">
+                      <div key={catKey} className="p-4 rounded-xl bg-white border border-slate-200 space-y-2.5 shadow-xs">
+                        <h4 className="text-xs font-bold text-blue-700 uppercase tracking-wider border-b border-slate-100 pb-1.5">
                           {catKey.replace(/_/g, ' ')}
                         </h4>
                         <div className="flex flex-wrap gap-1.5">
                           {skills.map((sk: any, idx: number) => (
                             <span
                               key={idx}
-                              className="text-xs bg-gray-950 border border-gray-800 text-gray-200 px-2.5 py-1 rounded-lg flex items-center gap-1.5"
+                              className="text-xs bg-slate-50 border border-slate-200 text-slate-700 px-2.5 py-1 rounded-lg flex items-center gap-1.5"
                             >
-                              <span>{sk.name}</span>
-                              <span className="text-[10px] text-gray-500 font-mono">({sk.level})</span>
+                              <span className="font-medium">{sk.name}</span>
+                              <span className="text-[10px] text-slate-400">({sk.level})</span>
                             </span>
                           ))}
                         </div>

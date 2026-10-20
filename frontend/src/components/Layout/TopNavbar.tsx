@@ -46,52 +46,52 @@ export const TopNavbar: React.FC = () => {
   }> = [
     {
       id: 'landing',
-      label: 'Career Tree',
+      label: 'Career Path',
       icon: GitFork,
-      color: 'text-cyan-400',
-      desc: 'Predictive 4-tier trajectory & forks'
-    },
-    {
-      id: 'tracker',
-      label: 'Level-Up',
-      icon: Gamepad2,
-      color: 'text-amber-400',
-      desc: '30-Day sprint accountability'
-    },
-    {
-      id: 'trainer',
-      label: 'Trainer',
-      icon: GraduationCap,
-      color: 'text-cyan-400',
-      desc: 'Behavioral & technical mock prep'
-    },
-    {
-      id: 'interview',
-      label: 'AI Studio',
-      icon: Video,
-      color: 'text-purple-400',
-      desc: 'Executive video pitch & speech telemetry'
-    },
-    {
-      id: 'cvforge',
-      label: 'CV Forge',
-      icon: Layers,
-      color: 'text-amber-300',
-      desc: 'Multi-track ATS resume compiler'
+      color: 'text-blue-600',
+      desc: 'See your career growth options'
     },
     {
       id: 'traits',
-      label: 'Vault',
+      label: 'My Profile',
       icon: Dna,
-      color: 'text-emerald-400',
-      desc: 'Permanent story & competency vault'
+      color: 'text-emerald-600',
+      desc: 'Your jobs, skills, and work wins'
+    },
+    {
+      id: 'cvforge',
+      label: 'Resume Builder',
+      icon: Layers,
+      color: 'text-indigo-600',
+      desc: 'Create clean, ready-to-use resumes'
     },
     {
       id: 'jobs',
-      label: 'Job Radar',
+      label: 'Find Jobs',
       icon: Briefcase,
-      color: 'text-sky-400',
-      desc: 'Dynamic job matcher & referrals'
+      color: 'text-sky-600',
+      desc: 'Search jobs and view company locations'
+    },
+    {
+      id: 'trainer',
+      label: 'Practice Questions',
+      icon: GraduationCap,
+      color: 'text-violet-600',
+      desc: 'Practice common interview questions'
+    },
+    {
+      id: 'interview',
+      label: 'Pitch Studio',
+      icon: Video,
+      color: 'text-purple-600',
+      desc: 'Practice speaking your introduction'
+    },
+    {
+      id: 'tracker',
+      label: 'My Goals',
+      icon: Gamepad2,
+      color: 'text-amber-600',
+      desc: 'Daily checklist and next steps'
     }
   ];
 
@@ -104,21 +104,21 @@ export const TopNavbar: React.FC = () => {
 
   return (
     <>
-      <header className="h-14 border-b border-gray-800 bg-gray-950 px-3 sm:px-4 flex items-center justify-between z-20 shrink-0 w-full overflow-hidden">
+      <header className="h-14 border-b border-slate-200 bg-white px-3 sm:px-4 flex items-center justify-between z-20 shrink-0 w-full overflow-hidden shadow-xs">
         {/* Left: Brand */}
         <div className="flex items-center space-x-2.5 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-sm shadow-blue-500/20 shrink-0">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div className="flex items-center space-x-1.5 leading-none">
-            <span className="font-bold text-sm text-white tracking-tight">Aura AI</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-400 font-mono font-medium border border-blue-500/20">
-              v1.0
+            <span className="font-bold text-sm text-slate-900 tracking-tight">Aura Career</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-medium border border-blue-200">
+              Personal Coach
             </span>
           </div>
         </div>
 
-        {/* Center: Module Navigation Tabs - Part of the top ribbon (no floating box!) */}
+        {/* Center: Module Navigation Tabs */}
         <nav className="hidden md:flex items-center space-x-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mx-2 lg:mx-4 h-full">
           {navItems.map((item) => {
             const isActive = activeModule === item.id;
@@ -130,8 +130,8 @@ export const TopNavbar: React.FC = () => {
                 onClick={() => setActiveModule(item.id)}
                 className={`h-9 px-2.5 lg:px-3 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                   isActive
-                    ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
-                    : 'text-gray-400 hover:text-gray-100 hover:bg-gray-900/80'
+                    ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
                 title={item.desc}
               >
@@ -142,19 +142,19 @@ export const TopNavbar: React.FC = () => {
           })}
         </nav>
 
-        {/* Right Action Cluster: ALWAYS Pinned & Visible with Prominent Sign Out */}
+        {/* Right Action Cluster */}
         <div className="flex items-center space-x-2 shrink-0 z-30">
           {/* Currency Quick Toggle */}
           <button
             onClick={() => setCurrency(currency === 'INR' ? 'USD' : 'INR')}
-            className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold bg-gray-900 hover:bg-gray-800 border border-gray-800 transition-colors cursor-pointer shrink-0"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition-colors cursor-pointer shrink-0"
             title={`Active currency: ${currency}. Click to switch between INR (₹) and USD ($).`}
           >
-            <span className={currency === 'INR' ? 'text-amber-400 font-bold' : 'text-gray-500'}>
+            <span className={currency === 'INR' ? 'text-amber-700 font-bold' : 'text-slate-400'}>
               ₹
             </span>
-            <span className="text-gray-600 font-mono">/</span>
-            <span className={currency === 'USD' ? 'text-cyan-400 font-bold' : 'text-gray-500'}>
+            <span className="text-slate-400 font-mono">/</span>
+            <span className={currency === 'USD' ? 'text-blue-700 font-bold' : 'text-slate-400'}>
               $
             </span>
           </button>
@@ -164,32 +164,32 @@ export const TopNavbar: React.FC = () => {
             onClick={toggleChatCollapse}
             className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer shrink-0 ${
               !isChatCollapsed
-                ? 'bg-blue-600/20 text-blue-300 border-blue-500/40 shadow-sm'
-                : 'bg-gray-900 text-gray-400 hover:text-white border-gray-800'
+                ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 border-slate-200'
             }`}
-            title={isChatCollapsed ? 'Open Aura Counselor AI' : 'Collapse Chat to Fullscreen Tool'}
+            title={isChatCollapsed ? 'Open Aura Career Coach' : 'Collapse Chat to View Full Page'}
           >
-            <Sparkles className={`w-3.5 h-3.5 ${!isChatCollapsed ? 'text-amber-300 animate-pulse' : 'text-gray-400'}`} />
-            <span className="hidden lg:inline">Counselor</span>
-            <span className={`w-1.5 h-1.5 rounded-full ${!isChatCollapsed ? 'bg-emerald-400' : 'bg-gray-600'}`}></span>
+            <Sparkles className={`w-3.5 h-3.5 ${!isChatCollapsed ? 'text-amber-500 animate-pulse' : 'text-slate-500'}`} />
+            <span className="hidden lg:inline">Coach Chat</span>
+            <span className={`w-1.5 h-1.5 rounded-full ${!isChatCollapsed ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
           </button>
 
-          {/* User Account Tag (Compact so it never eats screen width) */}
+          {/* User Account Tag */}
           {currentUser && (
-            <div className="flex items-center space-x-1.5 text-xs bg-gray-900 px-2 sm:px-2.5 py-1.5 rounded-lg border border-gray-800 text-gray-200 shrink-0">
-              <User className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-              <span className="text-xs font-mono font-bold text-blue-400">
+            <div className="flex items-center space-x-1.5 text-xs bg-slate-100 px-2 sm:px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 shrink-0">
+              <User className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span className="text-xs font-bold text-slate-800">
                 {currentUser.username}
               </span>
             </div>
           )}
 
-          {/* Prominent Red Sign Out Button: ALWAYS VISIBLE AND UNCLIPPED */}
+          {/* Sign Out Button */}
           {currentUser && (
             <button
               onClick={logout}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-sm shadow-rose-950 transition-all cursor-pointer shrink-0"
-              title="Sign Out / Switch Beta Tester Account"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 shadow-xs transition-all cursor-pointer shrink-0"
+              title="Sign Out / Switch Profile"
             >
               <LogOut className="w-3.5 h-3.5 shrink-0" />
               <span>Sign Out</span>
@@ -199,33 +199,33 @@ export const TopNavbar: React.FC = () => {
           {/* Mobile Hamburger Menu Toggle Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-300 hover:text-white transition-colors cursor-pointer shrink-0"
+            className="md:hidden p-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition-colors cursor-pointer shrink-0"
             aria-label="Toggle Navigation Menu"
           >
-            {isMobileMenuOpen ? <X className="w-4 h-4 text-rose-400" /> : <Menu className="w-4 h-4 text-gray-300" />}
+            {isMobileMenuOpen ? <X className="w-4 h-4 text-rose-600" /> : <Menu className="w-4 h-4 text-slate-700" />}
           </button>
         </div>
       </header>
 
       {/* ----------------- MOBILE SLIDE-OVER NAVIGATION DRAWER ----------------- */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-14 z-50 bg-gray-950/98 backdrop-blur-2xl p-4 flex flex-col justify-between overflow-y-auto animate-in fade-in duration-150">
+        <div className="md:hidden fixed inset-0 top-14 z-50 bg-white p-4 flex flex-col justify-between overflow-y-auto animate-in fade-in duration-150 border-t border-slate-200">
           <div className="space-y-4">
             {/* User Details Header Card */}
-            <div className="p-3.5 rounded-2xl bg-[#111726] border border-gray-800 flex items-center justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">
+                <div className="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 font-bold">
                   {currentUser?.username?.slice(0, 2).toUpperCase() || 'AU'}
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-sm text-white">{candidateName}</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold">
+                    <span className="font-bold text-sm text-slate-900">{candidateName}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold">
                       {currentUser?.username}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-400 block mt-0.5">
-                    {currentUser?.role_track || 'Beta Tester Workspace'}
+                  <span className="text-xs text-slate-500 block mt-0.5">
+                    {currentUser?.role_track || 'Professional Profile'}
                   </span>
                 </div>
               </div>
@@ -233,7 +233,7 @@ export const TopNavbar: React.FC = () => {
               {/* Currency Button */}
               <button
                 onClick={() => setCurrency(currency === 'INR' ? 'USD' : 'INR')}
-                className="px-2.5 py-1.5 rounded-xl bg-gray-900 border border-gray-700 text-xs font-semibold text-amber-300"
+                className="px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 text-xs font-semibold text-slate-800 shadow-xs"
               >
                 {currency === 'INR' ? '₹ INR' : '$ USD'}
               </button>
@@ -245,24 +245,24 @@ export const TopNavbar: React.FC = () => {
                 setChatCollapsed(false);
                 setIsMobileMenuOpen(false);
               }}
-              className="w-full p-3 rounded-2xl bg-gradient-to-r from-blue-900/40 via-indigo-900/40 to-blue-900/40 border border-blue-500/40 text-blue-200 text-xs font-semibold flex items-center justify-between shadow-lg shadow-blue-950"
+              className="w-full p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold flex items-center justify-between shadow-xs"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-blue-600/30 flex items-center justify-center text-amber-300">
+                <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white">
                   <Sparkles className="w-4 h-4 animate-pulse" />
                 </div>
                 <div className="text-left">
-                  <span className="block text-white font-bold text-xs">Open Aura Counselor AI</span>
-                  <span className="block text-[11px] text-gray-400">Interactive voice & chat guidance</span>
+                  <span className="block text-slate-900 font-bold text-xs">Open Aura Career Coach</span>
+                  <span className="block text-[11px] text-slate-500">Friendly chat & voice help</span>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-blue-400" />
+              <ChevronRight className="w-4 h-4 text-blue-600" />
             </button>
 
             {/* Modules List */}
             <div className="space-y-1.5">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-gray-500 px-1 font-semibold">
-                Workspace Modules
+              <span className="text-[11px] uppercase tracking-wider text-slate-500 px-1 font-semibold">
+                Main Features
               </span>
               <div className="space-y-1">
                 {navItems.map((item) => {
@@ -275,26 +275,26 @@ export const TopNavbar: React.FC = () => {
                       onClick={() => handleMobileNavClick(item.id)}
                       className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-blue-600/20 border-blue-500/50 text-white shadow-md'
-                          : 'bg-gray-900/60 border-gray-800/80 text-gray-300 hover:bg-gray-900 hover:text-white'
+                          ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs'
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                            isActive ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400'
+                            isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
                           }`}
                         >
                           <Icon className={`w-4 h-4 ${isActive ? 'text-white' : item.color}`} />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-xs text-white">{item.label}</span>
+                            <span className="font-bold text-xs text-slate-900">{item.label}</span>
                           </div>
-                          <span className="text-[11px] text-gray-400 block mt-0.5">{item.desc}</span>
+                          <span className="text-[11px] text-slate-500 block mt-0.5">{item.desc}</span>
                         </div>
                       </div>
-                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-gray-600'}`} />
+                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
                     </button>
                   );
                 })}
@@ -302,22 +302,22 @@ export const TopNavbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Actions: Big Red Sign Out */}
-          <div className="pt-4 border-t border-gray-800 space-y-2 mt-4">
+          {/* Bottom Actions: Sign Out */}
+          <div className="pt-4 border-t border-slate-200 space-y-2 mt-4">
             <button
               onClick={() => {
                 logout();
                 setIsMobileMenuOpen(false);
               }}
-              className="w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
             >
               <LogOut className="w-4 h-4 text-white" />
               <span>Sign Out ({currentUser?.username})</span>
             </button>
 
             <div className="text-center">
-              <span className="text-[10px] text-gray-500 font-mono">
-                Aura AI Career OS · Multi-Tenant Isolated Session
+              <span className="text-[10px] text-slate-400">
+                Aura Career Coach · Simple, Easy & Safe
               </span>
             </div>
           </div>

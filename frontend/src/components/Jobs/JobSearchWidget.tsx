@@ -36,7 +36,7 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
   // Use isCompact if passed to adapt padding
   const paddingClass = isCompact ? 'p-2 space-y-2' : 'p-4 space-y-3.5';
   const [activeSubTab, setActiveSubTab] = useState<'market' | 'telegram'>('market');
-  const [locationInput, setLocationInput] = useState('Pune, India');
+  const [locationInput, setLocationInput] = useState('All India');
   
   // Market Jobs State
   const [marketJobs, setMarketJobs] = useState<MarketJob[]>([]);
@@ -287,34 +287,34 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
   };
 
   return (
-    <div className={`flex flex-col bg-[#0b101b] border border-gray-800 rounded-2xl shadow-2xl overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden ${className}`}>
       {/* Top Header & Dual Subtabs */}
-      <div className="px-4 py-3 border-b border-gray-800/80 bg-gray-900/60 flex items-center justify-between gap-3 shrink-0">
+      <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/90 flex items-center justify-between gap-3 shrink-0">
         {/* Subtabs Switcher */}
-        <div className="flex items-center gap-1.5 bg-gray-950/80 p-1 rounded-xl border border-gray-800/90">
+        <div className="flex items-center gap-1.5 bg-slate-200/80 p-1 rounded-xl">
           <button
             onClick={() => setActiveSubTab('market')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeSubTab === 'market'
-                ? 'bg-blue-600/90 text-white shadow-sm shadow-blue-500/20'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Briefcase className="w-3.5 h-3.5 text-white" />
-            <span>Market</span>
+            <Briefcase className="w-3.5 h-3.5 text-blue-600" />
+            <span>Open Jobs</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('telegram')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeSubTab === 'telegram'
-                ? 'bg-sky-600/90 text-white shadow-sm shadow-sky-500/20'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Send className="w-3.5 h-3.5 text-sky-400" />
-            <span>Telegram</span>
-            <span className="text-[10px] bg-sky-500/20 text-sky-300 font-mono px-1.5 py-0.2 rounded-full border border-sky-500/30">
+            <Send className="w-3.5 h-3.5 text-sky-600" />
+            <span>Telegram Channel</span>
+            <span className="text-[10px] bg-sky-50 text-sky-700 font-mono px-1.5 py-0.2 rounded-full border border-sky-200 font-bold">
               {telegramReferrals.length}
             </span>
           </button>
@@ -330,14 +330,14 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                   value={locationInput}
                   onChange={(e) => setLocationInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && fetchMarketJobs(1, locationInput)}
-                  placeholder="Location"
-                  className="w-32 sm:w-36 px-2.5 py-1 text-xs bg-gray-950/90 border border-gray-700/80 text-gray-100 rounded-lg focus:outline-none focus:border-blue-500 placeholder-gray-500"
+                  placeholder="City or All India"
+                  className="w-32 sm:w-40 px-2.5 py-1 text-xs bg-white border border-slate-300 text-slate-800 rounded-lg focus:outline-none focus:border-blue-500 placeholder-slate-400"
                 />
               </div>
               <button
                 onClick={() => fetchMarketJobs(1, locationInput)}
                 title="Search Location"
-                className="p-1.5 text-gray-300 hover:text-white bg-gray-800/80 hover:bg-gray-700 rounded-lg border border-gray-700/80 transition-colors"
+                className="p-1.5 text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 transition-colors cursor-pointer"
               >
                 <Search className="w-3.5 h-3.5" />
               </button>
@@ -345,20 +345,20 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                 onClick={handleDiscoverLiveRoles}
                 title="Discover Fresh Roles"
                 disabled={isLoadingMarket}
-                className="p-1.5 text-gray-300 hover:text-white bg-gray-800/80 hover:bg-gray-700 rounded-lg border border-gray-700/80 transition-colors disabled:opacity-50"
+                className="p-1.5 text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingMarket ? 'animate-spin text-blue-400' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingMarket ? 'animate-spin text-blue-600' : ''}`} />
               </button>
             </>
           ) : (
             <button
               onClick={() => fetchTelegramReferrals(true)}
               disabled={isLoadingTelegram}
-              title="Re-check Telegram Group"
-              className="px-2.5 py-1 text-xs font-medium text-sky-300 hover:text-white bg-sky-950/40 hover:bg-sky-900/60 rounded-lg border border-sky-800/60 transition-colors flex items-center gap-1.5"
+              title="Check Telegram Group"
+              className="px-2.5 py-1 text-xs font-medium text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 rounded-lg border border-sky-200 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoadingTelegram ? 'animate-spin text-sky-400' : ''}`} />
-              <span className="hidden sm:inline">Re-check Group</span>
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoadingTelegram ? 'animate-spin text-sky-600' : ''}`} />
+              <span className="hidden sm:inline">Refresh Channel</span>
             </button>
           )}
         </div>
@@ -366,10 +366,10 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
 
       {/* Quick Location Scope Chips for All India & Cities */}
       {activeSubTab === 'market' && (
-        <div className="px-4 py-2 bg-gray-950/70 border-b border-gray-800/60 flex items-center gap-1.5 overflow-x-auto text-[11px] shrink-0">
-          <span className="text-gray-500 font-medium shrink-0 flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-gray-400" />
-            Scope:
+        <div className="px-4 py-2 bg-slate-50 border-b border-slate-200 flex items-center gap-1.5 overflow-x-auto text-[11px] shrink-0">
+          <span className="text-slate-500 font-medium shrink-0 flex items-center gap-1">
+            <MapPin className="w-3 h-3 text-slate-400" />
+            Location:
           </span>
           {[
             { label: '🇮🇳 All India', query: 'All India' },
@@ -391,8 +391,8 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                 }}
                 className={`px-2.5 py-0.5 rounded-full whitespace-nowrap transition-all font-medium border cursor-pointer ${
                   isSelected
-                    ? 'bg-blue-600/30 text-blue-300 border-blue-500/60 shadow-sm'
-                    : 'bg-gray-900/80 text-gray-400 border-gray-800 hover:text-gray-200 hover:border-gray-700'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-semibold'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
                 }`}
               >
                 {chip.label}
@@ -403,26 +403,26 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
       )}
 
       {/* Main Content Area */}
-      <div className={`flex-1 overflow-y-auto ${paddingClass} custom-scrollbar`}>
+      <div className={`flex-1 overflow-y-auto ${paddingClass} custom-scrollbar bg-slate-50/50`}>
         {/* ----------------- MARKET JOBS TAB ----------------- */}
         {activeSubTab === 'market' && (
           <>
             {isLoadingMarket && marketJobs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-                <RefreshCw className="w-6 h-6 animate-spin text-blue-400 mb-2" />
-                <p className="text-xs">Searching verified market roles in {locationInput}...</p>
+              <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+                <RefreshCw className="w-6 h-6 animate-spin text-blue-600 mb-2" />
+                <p className="text-xs text-slate-600">Finding open jobs in {locationInput}...</p>
               </div>
             ) : marketJobs.length === 0 ? (
-              <div className="text-center py-12 px-4 bg-gray-900/40 rounded-xl border border-gray-800/80">
-                <Briefcase className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                <p className="text-xs text-gray-300 font-medium">No open positions found in this page.</p>
-                <p className="text-[11px] text-gray-500 mt-1 mb-3">Try searching a different location or discover fresh listings.</p>
+              <div className="text-center py-12 px-4 bg-white rounded-xl border border-slate-200 shadow-xs">
+                <Briefcase className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                <p className="text-xs text-slate-700 font-semibold">No open jobs found for this search.</p>
+                <p className="text-[11px] text-slate-500 mt-1 mb-3">Try choosing "All India" or a major city above.</p>
                 <button
                   onClick={handleDiscoverLiveRoles}
-                  className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors inline-flex items-center gap-1.5"
+                  className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors inline-flex items-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <Search className="w-3.5 h-3.5" />
-                  <span>Discover Live Open Roles</span>
+                  <span>Discover Open Jobs</span>
                 </button>
               </div>
             ) : (
@@ -434,24 +434,24 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                     key={`${job.company}-${job.title}-${idx}`}
                     className={`p-4 rounded-xl border transition-all ${
                       isApplied
-                        ? 'bg-gray-900/90 border-emerald-500/40 shadow-sm shadow-emerald-500/10'
-                        : 'bg-[#111726]/90 border-gray-800/90 hover:border-gray-700/90 shadow-md'
+                        ? 'bg-emerald-50/40 border-emerald-300 shadow-2xs'
+                        : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-sm'
                     }`}
                   >
                     {/* Header: Title, Company, Location & Score */}
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h4 className="text-sm font-bold text-gray-100 tracking-tight leading-snug">
+                        <h4 className="text-sm font-bold text-slate-900 tracking-tight leading-snug">
                           {job.title}
                         </h4>
-                        <div className="flex items-center flex-wrap gap-1.5 text-xs text-gray-400 mt-0.5">
-                          <span className="text-gray-300 font-medium">{job.company}</span>
+                        <div className="flex items-center flex-wrap gap-1.5 text-xs text-slate-500 mt-0.5">
+                          <span className="text-slate-800 font-semibold">{job.company}</span>
                           <span>•</span>
                           <span>{job.location}</span>
                           {job.salary && (
                             <>
                               <span>•</span>
-                              <span className="text-emerald-400 font-mono font-medium text-xs">
+                              <span className="text-emerald-700 font-semibold text-xs">
                                 {formatCompensation(job.salary, currency)}
                               </span>
                             </>
@@ -459,7 +459,7 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                           {job.date_posted && (
                             <>
                               <span>•</span>
-                              <span className="text-amber-400/90 flex items-center gap-1 text-[11px]">
+                              <span className="text-slate-500 flex items-center gap-1 text-[11px]">
                                 <Clock className="w-3 h-3" />
                                 {job.date_posted}
                               </span>
@@ -472,13 +472,13 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                       <span
                         className={`text-xs px-2.5 py-1 rounded-lg font-semibold shrink-0 text-center leading-none ${
                           isApplied
-                            ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 flex items-center gap-1'
-                            : 'bg-amber-950/70 text-amber-300 border border-amber-600/40'
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1'
+                            : 'bg-blue-50 text-blue-700 border border-blue-200'
                         }`}
                       >
                         {isApplied ? (
                           <>
-                            <Check className="w-3 h-3 text-emerald-400" />
+                            <Check className="w-3 h-3 text-emerald-600" />
                             <span>Applied</span>
                           </>
                         ) : (
@@ -488,17 +488,17 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                     </div>
 
                     {/* Fit Rationale */}
-                    <p className="text-xs text-gray-300/90 mt-2.5 leading-relaxed line-clamp-3">
+                    <p className="text-xs text-slate-600 mt-2.5 leading-relaxed line-clamp-3">
                       {job.why_fit}
                     </p>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center flex-wrap gap-2 mt-3.5 pt-3 border-t border-gray-800/60">
-                      {/* View / Review Post Button (Only opens link without marking applied) */}
+                    <div className="flex items-center flex-wrap gap-2 mt-3.5 pt-3 border-t border-slate-200">
+                      {/* View / Review Post Button */}
                       <button
                         onClick={() => handleViewJobPost(job)}
-                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-sky-500 hover:bg-sky-400 active:bg-sky-600 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm shadow-sky-500/20 cursor-pointer"
-                        title="Open original job posting in external tab"
+                        className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                        title="Open original job posting in new tab"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>View Job Post</span>
@@ -509,10 +509,10 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                         href={job.maps_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.company + ' ' + (job.location || 'India'))}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 text-xs font-medium text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-700/60 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+                        className="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
                         title="Review company office location on Google Maps"
                       >
-                        <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                        <MapPin className="w-3.5 h-3.5 text-emerald-600" />
                         <span>Company Map</span>
                       </a>
 
@@ -521,8 +521,8 @@ export const JobSearchWidget: React.FC<JobSearchWidgetProps> = ({ className = ''
                         onClick={(e) => handleToggleApplied(job, e)}
                         className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 border cursor-pointer ${
                           isApplied
-                            ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50 hover:bg-emerald-900/80 shadow-sm'
-                            : 'bg-gray-800/90 text-gray-300 border-gray-700 hover:border-emerald-500/40 hover:text-white'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                            : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
                         }`}
                         title={isApplied ? 'Click to unmark as applied' : 'Click to mark as applied'}
                       >

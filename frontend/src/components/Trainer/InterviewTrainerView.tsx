@@ -608,26 +608,26 @@ export const InterviewTrainerView: React.FC = () => {
   };
 
   const renderTeleprompter = () => (
-    <div className="p-5 rounded-2xl bg-gray-900 border border-cyan-800/40 shadow-xl space-y-4">
+    <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4 text-slate-800">
       {/* Prompter Top Bar: Header, Part Title, Word count, Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-800 gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-200 gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <Eye className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <Eye className="w-4 h-4 text-blue-600" />
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <span>{currentPillar.pillarTitle}</span>
-              <span className="text-xs text-cyan-400 font-mono font-normal">
+              <span className="text-xs text-blue-600 font-normal">
                 ({currentPillar.subtitle.split('(')[0].trim()})
               </span>
             </h3>
             {isFullRun && (
-              <span className="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">
                 Full Run Auto-Advance (Part {activePhaseIndex + 1} of 4)
               </span>
             )}
           </div>
-          <p className="text-[11px] text-gray-400 mt-0.5">
-            Cadence: 130–140 WPM • Dot = Spoken Beat • Dash = Space & Strategic Pause
+          <p className="text-[11px] text-slate-500 mt-0.5">
+            Pace: 130–140 WPM • Natural conversational rhythm with pauses
           </p>
         </div>
 
@@ -919,11 +919,11 @@ export const InterviewTrainerView: React.FC = () => {
   );
 
   const renderVideoRecorder = () => (
-    <div className="p-5 rounded-2xl bg-gray-900 border border-gray-800 space-y-4">
-      <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+    <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4 text-slate-800">
+      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
         <div className="flex items-center gap-2">
-          <Camera className="w-4 h-4 text-cyan-400" />
-          <span className="text-sm font-bold text-white">Live Practice Recorder</span>
+          <Camera className="w-4 h-4 text-blue-600" />
+          <span className="text-sm font-bold text-slate-900">Live Practice Recorder</span>
         </div>
         {isRecording && (
           <div className="flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-mono">
@@ -1091,36 +1091,36 @@ export const InterviewTrainerView: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-gray-950 text-gray-100 overflow-y-auto p-6 space-y-5">
+    <div className="flex flex-col h-full bg-slate-50 text-slate-800 overflow-y-auto p-4 sm:p-6 space-y-5">
       {/* Top Banner: Local Recording Destination & Framework Attribution */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between p-3.5 rounded-xl bg-gray-900 border border-gray-800 shrink-0 gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between p-3.5 rounded-xl bg-white border border-slate-200 shrink-0 gap-3 shadow-sm">
         <div className="flex items-center space-x-3">
-          <FolderOpen className="w-4 h-4 text-cyan-400" />
-          <span className="text-xs text-gray-400 font-medium">Recordings Destination:</span>
-          <span className="text-xs font-mono text-cyan-300 bg-gray-950 px-3 py-1 rounded-lg border border-gray-800">
+          <FolderOpen className="w-4 h-4 text-blue-600" />
+          <span className="text-xs text-slate-500 font-medium">Recordings Destination:</span>
+          <span className="text-xs font-mono text-slate-700 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
             D:\job search\recordings
           </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 text-xs font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>AURA Model-A: Executive Pitch Framework</span>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <span>Practice Studio: 4-Step Introduction</span>
           </div>
-          <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Video Ready
+          <span className="text-[11px] text-emerald-700 font-medium flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Video Ready
           </span>
         </div>
       </div>
 
-      {/* Mode Selector Tabs (Scrollable on small/laptop screens) */}
-      <div className="flex items-center gap-2 border-b border-gray-800 pb-3 overflow-x-auto no-scrollbar shrink-0">
+      {/* Mode Selector Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto no-scrollbar shrink-0">
         <button
           onClick={() => setActiveTrainerMode('intro')}
           className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
             activeTrainerMode === 'intro'
-              ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20'
-              : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
           }`}
         >
           <Video className="w-3.5 h-3.5 shrink-0" />
@@ -1131,40 +1131,40 @@ export const InterviewTrainerView: React.FC = () => {
           onClick={() => setActiveTrainerMode('communication')}
           className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
             activeTrainerMode === 'communication'
-              ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20'
-              : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5 shrink-0" />
-          <span>2. Communication Masterclass</span>
+          <span>2. Communication Guide</span>
         </button>
 
         <button
           onClick={() => setActiveTrainerMode('technical')}
           className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
             activeTrainerMode === 'technical'
-              ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20'
-              : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
           }`}
         >
           <Database className="w-3.5 h-3.5 shrink-0" />
-          <span>3. Technical Delivery Trainer</span>
+          <span>3. Job Questions Trainer</span>
         </button>
       </div>
 
-      {/* MODE 1: INTRODUCTION VIDEO TRAINER (CEO MODEL) */}
+      {/* MODE 1: INTRODUCTION VIDEO TRAINER */}
       {activeTrainerMode === 'intro' && (
         <div className="space-y-5">
           {/* Track Selector Bar & Speed Guidance */}
-          <div className="p-4 rounded-2xl bg-gray-900 border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Target Track:</span>
-                <span className="text-xs font-semibold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Target Track:</span>
+                <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                   {TRACK_INFO[selectedTrack].badge}
                 </span>
               </div>
-              <p className="text-xs text-gray-400">{TRACK_INFO[selectedTrack].description}</p>
+              <p className="text-xs text-slate-500">{TRACK_INFO[selectedTrack].description}</p>
             </div>
 
             {/* Track Switcher Pills */}

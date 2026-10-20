@@ -9,29 +9,29 @@ import {
 import { useAppStore } from '../../store/useAppStore';
 import { API_BASE } from '../../config';
 
-const TRACK_OPTIONS = [
+const UNIVERSAL_TRACK_OPTIONS = [
   {
     id: 'track-1',
-    slug: 'forward_deployed_engineer',
-    title: 'Forward-Deployed Engineer (FDE) / Solutions Architect',
-    score: 96
+    slug: 'operations_team_lead',
+    title: 'Operations & Team Lead / Manager',
+    score: 95
   },
   {
     id: 'track-2',
-    slug: 'application_support_lead',
-    title: 'Application Support Lead / Operations Architect',
-    score: 94
-  },
-  {
-    id: 'track-3',
-    slug: 'lead_data_engineer',
-    title: 'Lead Data Engineer / Analytics Architect',
+    slug: 'business_specialist',
+    title: 'Business Specialist & Project Coordinator',
     score: 92
   },
   {
+    id: 'track-3',
+    slug: 'customer_success_lead',
+    title: 'Client Relationships & Account Lead',
+    score: 90
+  },
+  {
     id: 'track-4',
-    slug: 'senior_operational_analyst',
-    title: 'Senior Analyst - Application & Operational Analytics',
+    slug: 'functional_analyst',
+    title: 'Process & Workflow Specialist',
     score: 88
   }
 ];
@@ -39,13 +39,14 @@ const TRACK_OPTIONS = [
 export const CVForgeView: React.FC = () => {
   const { currentUser, artifacts } = useAppStore();
   const currentUserId = (currentUser?.username || 'user1').trim().toLowerCase();
+  
   const dynamicTracks = (artifacts?.traits?.target_profiles || []).map((tp) => ({
     id: tp.id,
     slug: tp.slug || tp.id,
     title: tp.title,
     score: tp.match_score || 90
   }));
-  const trackOptions = dynamicTracks.length > 0 ? dynamicTracks : TRACK_OPTIONS;
+  const trackOptions = dynamicTracks.length > 0 ? dynamicTracks : UNIVERSAL_TRACK_OPTIONS;
 
   const [selectedTrack, setSelectedTrack] = useState(trackOptions[0]);
   const [isDownloading, setIsDownloading] = useState<'pdf' | 'docx' | null>(null);
@@ -72,45 +73,44 @@ export const CVForgeView: React.FC = () => {
   const handleTrackChange = (trackSlug: string) => {
     const track = trackOptions.find((t) => t.slug === trackSlug) || trackOptions[0];
     setSelectedTrack(track);
-    // Reload iframe to ensure fresh track context
     setIframeKey((prev) => prev + 1);
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-950 text-gray-100 overflow-hidden">
+    <div className="flex flex-col h-full bg-slate-50 text-slate-800 overflow-hidden">
       {/* CV Forge Top Action Bar */}
-      <div className="min-h-14 py-2 px-3 sm:px-6 border-b border-gray-800 bg-gray-900/90 flex flex-wrap items-center justify-between gap-2.5 shrink-0 z-10">
+      <div className="min-h-14 py-2 px-3 sm:px-6 border-b border-slate-200 bg-white flex flex-wrap items-center justify-between gap-2.5 shrink-0 z-10 shadow-sm">
         <div className="flex items-center space-x-2.5 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
             <Layers className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-sm font-bold text-white tracking-tight">CV Forge Studio</h2>
-              <span className="text-[10px] bg-amber-400/10 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/20 font-mono">
-                ATS Engine
+              <h2 className="text-sm font-bold text-slate-900 tracking-tight">Ready Resume Builder</h2>
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 font-medium">
+                ATS Friendly
               </span>
             </div>
-            <p className="hidden md:block text-[11px] text-gray-400">Precision A4 Sheet Tailoring & Vector Word/PDF Generation</p>
+            <p className="hidden md:block text-[11px] text-slate-500">Clean 1-Page Layout with Downloadable Word & PDF</p>
           </div>
         </div>
 
         {/* Center Track Selector */}
-        <div className="flex items-center space-x-2 bg-gray-950 px-2.5 py-1.5 rounded-xl border border-gray-800 shrink max-w-full">
-          <Bookmark className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-          <span className="hidden sm:inline text-xs text-gray-400 font-medium">Track:</span>
+        <div className="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 shrink max-w-full">
+          <Bookmark className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+          <span className="hidden sm:inline text-xs text-slate-500 font-medium">Target Role:</span>
           <select
             value={selectedTrack.slug}
             onChange={(e) => handleTrackChange(e.target.value)}
-            className="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer pr-1 truncate max-w-[180px] sm:max-w-[260px]"
+            className="bg-transparent text-xs font-semibold text-slate-900 focus:outline-none cursor-pointer pr-1 truncate max-w-[180px] sm:max-w-[260px]"
           >
             {trackOptions.map((t) => (
-              <option key={t.id} value={t.slug} className="bg-gray-900 text-gray-200">
+              <option key={t.id} value={t.slug} className="bg-white text-slate-800">
                 {t.title} ({t.score}% Match)
               </option>
             ))}
           </select>
-          <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30 shrink-0">
+          <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">
             {selectedTrack.score}%
           </span>
         </div>
@@ -120,21 +120,21 @@ export const CVForgeView: React.FC = () => {
           <button
             onClick={() => handleDownload('pdf')}
             disabled={Boolean(isDownloading)}
-            className="flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-sm shadow-emerald-900 disabled:opacity-50 cursor-pointer"
-            title="Download Vector PDF compiled via native Microsoft Word COM"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+            title="Download clean PDF resume"
           >
             <Download className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden sm:inline">Word PDF</span>
+            <span className="hidden sm:inline">Download PDF</span>
             <span className="sm:hidden">PDF</span>
           </button>
 
           <button
             onClick={() => handleDownload('docx')}
             disabled={Boolean(isDownloading)}
-            className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-medium transition-colors border border-gray-700 disabled:opacity-50 cursor-pointer"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium transition-colors border border-slate-300 disabled:opacity-50 cursor-pointer shadow-sm"
             title="Download editable Word Document (.docx)"
           >
-            <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+            <FileText className="w-3.5 h-3.5 text-blue-600 shrink-0" />
             <span className="hidden sm:inline">Export Word</span>
             <span className="sm:hidden">DOCX</span>
           </button>
@@ -143,8 +143,8 @@ export const CVForgeView: React.FC = () => {
             href={`${API_BASE}/cv-forge/?user=${encodeURIComponent(currentUserId)}&track=${encodeURIComponent(selectedTrack.slug)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center space-x-1 p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs transition-colors border border-gray-700"
-            title="Open Studio in Full Dedicated Tab"
+            className="flex items-center space-x-1 p-2 rounded-lg bg-white hover:bg-slate-100 text-slate-600 text-xs transition-colors border border-slate-300 shadow-sm"
+            title="Open in full screen tab"
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
@@ -152,12 +152,12 @@ export const CVForgeView: React.FC = () => {
       </div>
 
       {/* Embedded Live CV Forge Studio */}
-      <div className="flex-1 w-full h-full relative bg-gray-950">
+      <div className="flex-1 w-full h-full relative bg-slate-100">
         <iframe
           key={`${iframeKey}-${currentUserId}-${selectedTrack.slug}`}
           src={`${API_BASE}/cv-forge/?user=${encodeURIComponent(currentUserId)}&track=${encodeURIComponent(selectedTrack.slug)}`}
           className="w-full h-full border-none"
-          title="CV Forge Studio"
+          title="Resume Builder"
           allow="fullscreen; clipboard-read; clipboard-write"
         />
       </div>

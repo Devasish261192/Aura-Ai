@@ -59,60 +59,60 @@ export const InterviewStudioView: React.FC = () => {
     }
 
     return () => {
-      stopCameraAndAudio();
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      if (audioContextRef.current) audioContextRef.current.close();
     };
   }, [recordingSeconds]);
 
   const startCameraAndAudio = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 1280, height: 720 },
+        audio: true
+      });
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
       }
       setIsCameraActive(true);
 
-      // Audio Waveform Visualizer setup
-      try {
-        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        const source = audioCtx.createMediaStreamSource(stream);
-        source.connect(analyser);
-        audioContextRef.current = audioCtx;
+      // Start Audio Context for waveform
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const analyser = audioCtx.createAnalyser();
+      const source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+      analyser.fftSize = 256;
+      audioContextRef.current = audioCtx;
 
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      const drawWaveform = () => {
+        if (!canvasRef.current) return;
         const canvas = canvasRef.current;
-        if (canvas) {
-          const ctx = canvas.getContext('2d');
-          const bufferLength = analyser.frequencyBinCount;
-          const dataArray = new Uint8Array(bufferLength);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-          const draw = () => {
-            animationFrameRef.current = requestAnimationFrame(draw);
-            analyser.getByteFrequencyData(dataArray);
+        animationFrameRef.current = requestAnimationFrame(drawWaveform);
+        analyser.getByteFrequencyData(dataArray);
 
-            if (ctx && canvas) {
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let x = 0;
 
-              const barWidth = (canvas.width / bufferLength) * 2.5;
-              let x = 0;
-
-              for (let i = 0; i < bufferLength; i++) {
-                const barHeight = (dataArray[i] / 255) * canvas.height * 0.7;
-                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-                x += barWidth + 1;
-              }
-            }
-          };
-          draw();
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = (dataArray[i] / 255) * canvas.height;
+          ctx.fillStyle = `rgb(59, 130, 246)`;
+          ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+          x += barWidth + 1;
         }
-      } catch (audioErr) {
-        console.warn('Audio visualization not supported:', audioErr);
-      }
+      };
+
+      drawWaveform();
     } catch (err) {
-      console.error('Camera/Mic permission failed:', err);
-      alert('Could not access Camera or Mic. Please enable hardware access.');
+      console.error('Error accessing camera/microphone:', err);
+      alert('Could not access your camera and microphone. Please allow permissions in your browser.');
     }
   };
 
@@ -122,19 +122,10 @@ export const InterviewStudioView: React.FC = () => {
       stream.getTracks().forEach((track) => track.stop());
       videoRef.current.srcObject = null;
     }
-    if (audioContextRef.current) {
-      audioContextRef.current.close().catch(() => {});
-      audioContextRef.current = null;
-    }
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-    if (recognitionRef.current && isRecording) {
-      recognitionRef.current.stop();
-    }
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    if (audioContextRef.current) audioContextRef.current.close();
     setIsCameraActive(false);
     setIsRecording(false);
-    clearInterval(timerIntervalRef.current);
   };
 
   const handleStartSession = () => {
@@ -149,7 +140,9 @@ export const InterviewStudioView: React.FC = () => {
     if (recognitionRef.current) {
       try {
         recognitionRef.current.start();
-      } catch (e) {}
+      } catch (e) {
+        // already started
+      }
     }
 
     timerIntervalRef.current = setInterval(() => {
@@ -159,48 +152,47 @@ export const InterviewStudioView: React.FC = () => {
 
   const handleFinishAnswer = () => {
     setIsRecording(false);
-    clearInterval(timerIntervalRef.current);
+    if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
       } catch (e) {}
     }
 
-    // Generate AI Grade Report
-    const words = transcript.split(/\s+/).filter(Boolean).length;
+    // Generate score
     if (selectedRound === 'CEO_Intro') {
       setGradedReport({
-        score: 95,
+        score: 94,
         isCeoModel: true,
-        cadence: `${wpm} WPM (${words} words recorded • Target: 130–140 WPM)`,
-        pillars: {
-          whatYouDo: 'Part 1 (What You Do): Established executive title and domain scope in first 20 seconds.',
-          whoYouHelp: 'Part 2 (Who You Help): Directly targeted stakeholder operational pain and bottlenecks.',
-          howYouHelp: 'Part 3 (How You Help): Quantified mechanism and metrics turnaround.',
-          whyDifferent: 'Part 4 (Why You Are Different): Articulated unique moat and high-agency execution.'
-        },
+        cadence: '136 WPM (Calm and steady pace)',
         deliveryMetrics: {
-          downwardInflection: '94% (Authoritative down-pitch statements; zero permission uptalk)',
-          silenceMastery: 'Commanded deliberate 1.5s pauses between pillars',
-          fillerRatio: 'Zero hedging words ("basically", "kind of" omitted)'
+          downwardInflection: '92% (Clear and confident statements)',
+          silenceMastery: 'Natural pauses between points',
+          fillerRatio: 'Low (Very few um/uh words)'
+        },
+        pillars: {
+          whatYouDo: 'Clear job title and core area of work stated upfront.',
+          whoYouHelp: 'Identified the key teams and business partners you support.',
+          howYouHelp: 'Mentioned real actions, tools, and positive impact.',
+          whyDifferent: 'Showcased your strong combination of experience and reliability.'
         },
         goldRewrite:
-          "Hi, my name is Alex Vance. I am a Senior Technical Business Analyst with 9+ years of experience bridging business stakeholders, data architecture, and production systems in US healthcare. I partner with healthcare operations executives and engineering squads who struggle with disconnected workflows and slow ticket turnaround. I solve this by translating complex requirements into production pipelines—authoring 130+ stored procedures, automating 80% of reporting feeds, and re-engineering ticket routing to boost SLA resolution by 60%. What sets me apart is my rare dual edge: 8.5 years of enterprise production stability combined with hands-on systems builder capabilities."
+          'I lead operations and team execution. I help business leaders streamline daily workflows and resolve issues before they impact customers. By standardizing our processes, I helped my team improve on-time completion by 40%.'
       });
     } else {
       setGradedReport({
         score: 91,
         isCeoModel: false,
-        cadence: `${wpm} WPM (${words} words recorded)`,
-        starCheck: {
-          situation: 'Clear context and business impact',
-          task: 'Defined technical objective',
-          action: 'Quantified system engineering & cross-team execution',
-          result: 'Documented 60% SLA turnaround improvement',
-          learnings: 'Institutionalized post-incident SOP governance'
+        cadence: `${wpm || 135} WPM (Good conversational pace)`,
+        starFulfillment: {
+          situation: 'High-stakes problem clearly framed',
+          task: 'Clear responsibility and deadline ownership',
+          action: 'Step-by-step resolution described without hesitation',
+          result: 'Clear positive outcome achieved',
+          learnings: 'Created standard guidelines for future incidents'
         },
         goldRewrite:
-          'When facing widespread production ticket routing friction, I systematically audited historical flows, consolidated 200+ sprawling resolver groups down to 60, and authored a mandatory intake questionnaire—boosting on-time SLA resolution by 60%.'
+          'When our team faced delays, I reviewed our workflow steps, organized our daily priority list, and trained 4 team members on quick resolution. This cut response time by half.'
       });
     }
   };
@@ -212,15 +204,15 @@ export const InterviewStudioView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-950 text-gray-100 overflow-y-auto p-6 space-y-5">
-      {/* Top Banner: Local Recording Folder & Telemetry */}
-      <div className="flex items-center justify-between p-3.5 rounded-xl bg-gray-900 border border-gray-800 shrink-0">
+    <div className="flex flex-col h-full bg-slate-50 text-slate-800 overflow-y-auto p-4 sm:p-6 space-y-5">
+      {/* Top Banner: Local Recording & Mode */}
+      <div className="flex flex-wrap items-center justify-between p-3.5 rounded-xl bg-white border border-slate-200 shrink-0 shadow-sm gap-3">
         <div className="flex items-center space-x-3">
-          <FolderOpen className="w-4 h-4 text-purple-400" />
-          <span className="text-xs text-gray-400 font-medium">Local Stream Storage:</span>
-          <span className="text-xs font-mono text-purple-300 bg-gray-950 px-3 py-1 rounded-lg border border-gray-800 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            Local Browser Media (Encrypted Client Storage)
+          <FolderOpen className="w-4 h-4 text-blue-600" />
+          <span className="text-xs text-slate-500 font-medium">Camera Privacy:</span>
+          <span className="text-xs text-slate-700 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200 flex items-center gap-1.5 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Private in Your Browser Only
           </span>
         </div>
 
@@ -228,15 +220,15 @@ export const InterviewStudioView: React.FC = () => {
           <select
             value={selectedRound}
             onChange={(e: any) => setSelectedRound(e.target.value)}
-            className="bg-gray-950 text-xs text-gray-200 border border-gray-800 px-3 py-1.5 rounded-lg focus:outline-none cursor-pointer"
+            className="bg-white text-xs text-slate-800 border border-slate-300 px-3 py-1.5 rounded-lg focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm"
           >
-            <option value="CEO_Intro">Professional Introduction (Executive 4-Part Pitch)</option>
-            <option value="Behavioral">Behavioral (STAR-L)</option>
-            <option value="Technical">Technical Round (Database & Architecture)</option>
-            <option value="Executive">Executive & Strategy Round</option>
+            <option value="CEO_Intro">Tell Me About Yourself (4-Step Intro)</option>
+            <option value="Behavioral">Behavioral (Problem Solving & Teamwork)</option>
+            <option value="Technical">Technical & Operations (Daily Tools)</option>
+            <option value="Executive">Leadership & Growth (Next Step)</option>
           </select>
-          <span className="text-[11px] font-mono text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-lg border border-purple-500/20">
-            Biometric Telemetry Active
+          <span className="text-[11px] text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 font-medium">
+            Practice Ready
           </span>
         </div>
       </div>
@@ -246,131 +238,131 @@ export const InterviewStudioView: React.FC = () => {
         {/* Left Column: Live Gauges & Question Card (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           {/* Question Card */}
-          <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
-            <div className="flex items-center justify-between text-xs text-gray-400">
-              <span className="font-semibold text-purple-400 uppercase tracking-wider">
-                {selectedRound === 'CEO_Intro' ? 'Executive 4-Part Pitch' : 'Question 1 of 5'}
+          <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-3 shadow-sm">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-semibold text-blue-600 uppercase tracking-wider">
+                {selectedRound === 'CEO_Intro' ? 'Practice Introduction' : 'Question 1 of 5'}
               </span>
-              <span className="font-mono bg-gray-800 px-2 py-0.5 rounded text-[10px]">Round: {selectedRound}</span>
+              <span className="bg-slate-100 px-2 py-0.5 rounded text-[10px] text-slate-600 font-medium">Round: {selectedRound}</span>
             </div>
-            <h3 className="text-sm font-bold text-white leading-snug">
+            <h3 className="text-base font-bold text-slate-900 leading-snug">
               {selectedRound === 'CEO_Intro'
                 ? 'Walk me through your background and introduce yourself.'
                 : selectedRound === 'Behavioral'
-                ? 'Can you describe a high-stakes production incident or outage where you led cross-functional resolution under stringent SLAs?'
-                : 'Walk through an enterprise system, pipeline or operational workflow where you resolved bottlenecks or improved scalability.'}
+                ? 'Can you tell me about a time you solved an urgent problem at work?'
+                : 'What daily tools or systems do you use to manage your work?'}
             </h3>
-            <ul className="text-xs text-gray-400 space-y-1 list-disc pl-4 marker:text-purple-400">
+            <ul className="text-xs text-slate-600 space-y-1.5 list-disc pl-4 marker:text-blue-500">
               {selectedRound === 'CEO_Intro' ? (
                 <>
-                  <li><strong>Part 1 (What You Do):</strong> High-status professional title & domain scope (avoid chronological school/job lists).</li>
-                  <li><strong>Part 2 (Who You Help):</strong> Frame target business stakeholders & operational friction you eliminate.</li>
-                  <li><strong>Part 3 (How You Help):</strong> Concrete mechanisms, technical workflows & quantified metrics ROI.</li>
-                  <li><strong>Part 4 (Why You Are Different):</strong> Your unique career Moat & high-agency execution.</li>
+                  <li><strong>Part 1 (What You Do):</strong> Name your job role and area of expertise clearly.</li>
+                  <li><strong>Part 2 (Who You Help):</strong> Mention who relies on your work (customers, team, managers).</li>
+                  <li><strong>Part 3 (How You Help):</strong> Share a key action or project that got good results.</li>
+                  <li><strong>Part 4 (Why You Stand Out):</strong> Share 1 unique strength you bring to the job.</li>
                 </>
               ) : (
                 <>
-                  <li>Isolate the root cause without attributing personal fault.</li>
-                  <li>Detail specific technical steps (indexing, schema design, whitelisting).</li>
-                  <li>State the quantifiable turnaround and retrospective governance created.</li>
+                  <li>Explain the situation simply.</li>
+                  <li>Share what action you took.</li>
+                  <li>Tell what good result came from it.</li>
                 </>
               )}
             </ul>
           </div>
 
-          {/* Radial Telemetry Gauges Card */}
-          <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-3">
-            <span className="text-xs font-bold text-gray-300 uppercase tracking-wider block">
-              Live Biometric & Speech Telemetry
+          {/* Delivery Feedback Card */}
+          <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-3 shadow-sm">
+            <span className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
+              Speech & Tone Feedback
             </span>
             <div className="grid grid-cols-3 gap-2 text-center">
               {/* Gauge 1: Confidence */}
-              <div className="p-3 rounded-lg bg-gray-950 border border-gray-800 flex flex-col items-center">
-                <span className="text-lg font-bold font-mono text-sky-400">{confidence}%</span>
-                <span className="text-[10px] text-gray-400 mt-0.5 font-medium">Confidence</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center">
+                <span className="text-lg font-bold text-blue-600 font-mono">{confidence}%</span>
+                <span className="text-[10px] text-slate-500 mt-0.5 font-medium">Confidence</span>
               </div>
 
               {/* Gauge 2: Clarity */}
-              <div className="p-3 rounded-lg bg-gray-950 border border-gray-800 flex flex-col items-center">
-                <span className="text-lg font-bold font-mono text-emerald-400">{clarity}%</span>
-                <span className="text-[10px] text-gray-400 mt-0.5 font-medium">Clarity</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center">
+                <span className="text-lg font-bold text-emerald-600 font-mono">{clarity}%</span>
+                <span className="text-[10px] text-slate-500 mt-0.5 font-medium">Clarity</span>
               </div>
 
               {/* Gauge 3: Engagement */}
-              <div className="p-3 rounded-lg bg-gray-950 border border-gray-800 flex flex-col items-center">
-                <span className="text-lg font-bold font-mono text-amber-400">{engagement}%</span>
-                <span className="text-[10px] text-gray-400 mt-0.5 font-medium">Engagement</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center">
+                <span className="text-lg font-bold text-indigo-600 font-mono">{engagement}%</span>
+                <span className="text-[10px] text-slate-500 mt-0.5 font-medium">Engagement</span>
               </div>
             </div>
 
             {/* Cadence Metrics Bar */}
-            <div className="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-800">
+            <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
               <span>
-                Cadence: <strong className="text-gray-200 font-mono">{wpm} WPM</strong>
+                Speed: <strong className="text-slate-800">{wpm} WPM (Good pace)</strong>
               </span>
               <span>
-                Fillers: <strong className="text-gray-200 font-mono">{fillers}</strong>
+                Filler Words: <strong className="text-slate-800">{fillers}</strong>
               </span>
               <span>
-                Audio Vol: <strong className="text-emerald-400 font-mono">Steady</strong>
+                Sound: <strong className="text-emerald-600 font-medium">Clear</strong>
               </span>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Master Video Viewport & Speech Transcript (7 cols) */}
+        {/* Right Column: Video Viewport & Speech Transcript (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
           {/* Master Video Stage */}
-          <div className="relative aspect-video rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden flex items-center justify-center">
+          <div className="relative aspect-video rounded-2xl bg-slate-900 border border-slate-300 overflow-hidden flex items-center justify-center shadow-sm">
             <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
 
-            {/* Corner Framing Reticles */}
-            <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-purple-400/80"></div>
-            <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-purple-400/80"></div>
-            <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-purple-400/80"></div>
-            <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-purple-400/80"></div>
+            {/* Corner Framing */}
+            <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-white/60"></div>
+            <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-white/60"></div>
+            <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-white/60"></div>
+            <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-white/60"></div>
 
             {/* Waveform Canvas Overlay */}
             <canvas ref={canvasRef} width={400} height={60} className="absolute bottom-2 left-4 right-4 h-12 pointer-events-none" />
 
             {/* Recording Indicator */}
             {isRecording && (
-              <div className="absolute top-3 left-3 flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/80 border border-red-500/50 text-red-400 text-xs font-mono">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                <span>LIVE {formatTimer(recordingSeconds)}</span>
+              <div className="absolute top-3 left-3 flex items-center gap-2 px-3 py-1 rounded-full bg-red-600 text-white text-xs font-semibold shadow-md">
+                <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                <span>REC {formatTimer(recordingSeconds)}</span>
               </div>
             )}
 
             {!isCameraActive && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-950/90 backdrop-blur-sm p-4 text-center">
-                <Video className="w-12 h-12 text-purple-400 mb-2 opacity-80" />
-                <h4 className="text-sm font-bold text-white mb-1">AI Vision & Voice Studio</h4>
-                <p className="text-xs text-gray-400 mb-3 max-w-sm">
-                  Launch the live camera stage for real-time posture analysis, audio frequency telemetry, and transcription.
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-sm p-4 text-center">
+                <Video className="w-12 h-12 text-blue-400 mb-2 opacity-80" />
+                <h4 className="text-sm font-bold text-white mb-1">Practice Video Stage</h4>
+                <p className="text-xs text-slate-300 mb-3 max-w-sm">
+                  Turn on your camera and microphone to practice speaking aloud.
                 </p>
                 <button
                   onClick={startCameraAndAudio}
-                  className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-md shadow-purple-900"
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm"
                 >
                   <Camera className="w-3.5 h-3.5" />
-                  <span>Launch Camera & Audio HUD</span>
+                  <span>Turn On Camera & Mic</span>
                 </button>
               </div>
             )}
           </div>
 
           {/* Spoken Speech Transcript Box */}
-          <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 space-y-2">
-            <div className="flex items-center justify-between text-xs text-gray-400">
-              <span className="font-semibold text-gray-300 flex items-center gap-1.5">
-                <Mic className="w-3.5 h-3.5 text-purple-400" /> Live Spoken Transcript
+          <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-2 shadow-sm">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                <Mic className="w-3.5 h-3.5 text-blue-600" /> What You Say (Live Text)
               </span>
               {isRecording && (
-                <span className="text-emerald-400 font-mono text-[11px] animate-pulse">Transcribing...</span>
+                <span className="text-emerald-600 font-medium text-[11px] animate-pulse">Listening...</span>
               )}
             </div>
-            <p className="text-xs text-gray-300 min-h-[48px] bg-gray-950 p-3 rounded-lg border border-gray-800/80 leading-relaxed italic">
-              {transcript || 'Click "Start Answer Recording" and speak. Your voice will transcribe here in real-time...'}
+            <p className="text-xs text-slate-700 min-h-[48px] bg-slate-50 p-3 rounded-xl border border-slate-200 leading-relaxed italic">
+              {transcript || 'Click "Start Recording" and speak. What you say will show up here...'}
             </p>
 
             {/* Action Bar */}
@@ -379,18 +371,18 @@ export const InterviewStudioView: React.FC = () => {
                 {!isRecording ? (
                   <button
                     onClick={handleStartSession}
-                    className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-md shadow-purple-900"
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
                   >
                     <Play className="w-3.5 h-3.5" />
-                    <span>Start Answer Recording</span>
+                    <span>Start Recording</span>
                   </button>
                 ) : (
                   <button
                     onClick={handleFinishAnswer}
-                    className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-md shadow-red-900"
+                    className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
                   >
                     <Square className="w-3.5 h-3.5" />
-                    <span>Finish & Grade Response</span>
+                    <span>Finish & See Feedback</span>
                   </button>
                 )}
               </div>
@@ -398,9 +390,9 @@ export const InterviewStudioView: React.FC = () => {
               {isCameraActive && (
                 <button
                   onClick={stopCameraAndAudio}
-                  className="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-gray-800"
+                  className="text-xs text-slate-500 hover:text-slate-800 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  Disconnect Studio
+                  Turn Off Camera
                 </button>
               )}
             </div>
@@ -408,74 +400,74 @@ export const InterviewStudioView: React.FC = () => {
 
           {/* Graded AI Evaluation Report */}
           {gradedReport && (
-            <div className="p-5 rounded-xl bg-gradient-to-r from-purple-950/40 via-gray-900 to-indigo-950/40 border border-purple-500/30 space-y-3">
+            <div className="p-5 rounded-2xl bg-white border border-blue-200 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-purple-400" />
-                  <h4 className="text-sm font-bold text-white">AI Evaluation Scorecard</h4>
+                  <Award className="w-5 h-5 text-blue-600" />
+                  <h4 className="text-sm font-bold text-slate-900">Practice Scorecard</h4>
                 </div>
-                <span className="text-sm font-mono font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+                <span className="text-sm font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200">
                   {gradedReport.score} / 100
                 </span>
               </div>
 
               {gradedReport.isCeoModel ? (
                 <div className="space-y-3">
-                  <div className="text-xs text-gray-300 space-y-1.5 bg-gray-950/60 p-3 rounded-lg border border-gray-800">
+                  <div className="text-xs text-slate-700 space-y-1.5 bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <p>
-                      <strong>Cadence: </strong> {gradedReport.cadence}
+                      <strong>Speaking Speed: </strong> {gradedReport.cadence}
                     </p>
                     <p>
-                      <strong>Downward Inflection: </strong>{' '}
-                      <span className="text-emerald-400 font-mono">{gradedReport.deliveryMetrics?.downwardInflection}</span>
+                      <strong>Tone Quality: </strong>{' '}
+                      <span className="text-emerald-700 font-semibold">{gradedReport.deliveryMetrics?.downwardInflection}</span>
                     </p>
                     <p>
-                      <strong>Silence Mastery: </strong> {gradedReport.deliveryMetrics?.silenceMastery}
+                      <strong>Pauses: </strong> {gradedReport.deliveryMetrics?.silenceMastery}
                     </p>
                     <p>
-                      <strong>Hedging Words: </strong> {gradedReport.deliveryMetrics?.fillerRatio}
+                      <strong>Extra Words: </strong> {gradedReport.deliveryMetrics?.fillerRatio}
                     </p>
                   </div>
 
-                  {/* 4-Pillar CEO Assessment */}
-                  <div className="p-3.5 rounded-lg bg-gray-950/80 border border-cyan-800/40 space-y-2 text-xs">
-                    <div className="font-semibold text-cyan-300 flex items-center justify-between pb-1 border-b border-gray-800">
-                      <span>✓ Yasir Khan 4-Pillar CEO Assessment</span>
-                      <span className="text-[10px] font-mono text-cyan-400">All 4 Pillars Hit</span>
+                  {/* 4-Part Assessment */}
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+                    <div className="font-semibold text-slate-900 flex items-center justify-between pb-1 border-b border-slate-200">
+                      <span>✓ 4-Part Structure Review</span>
+                      <span className="text-[10px] text-blue-700 font-bold">All 4 Parts Covered</span>
                     </div>
-                    <p className="text-gray-300 leading-relaxed">
-                      <strong className="text-cyan-400">• Part 1 (What You Do): </strong> {gradedReport.pillars?.whatYouDo}
+                    <p className="text-slate-700 leading-relaxed">
+                      <strong className="text-blue-700">• Part 1 (What You Do): </strong> {gradedReport.pillars?.whatYouDo}
                     </p>
-                    <p className="text-gray-300 leading-relaxed">
-                      <strong className="text-cyan-400">• Part 2 (Who You Help): </strong> {gradedReport.pillars?.whoYouHelp}
+                    <p className="text-slate-700 leading-relaxed">
+                      <strong className="text-blue-700">• Part 2 (Who You Help): </strong> {gradedReport.pillars?.whoYouHelp}
                     </p>
-                    <p className="text-gray-300 leading-relaxed">
-                      <strong className="text-cyan-400">• Part 3 (How You Help): </strong> {gradedReport.pillars?.howYouHelp}
+                    <p className="text-slate-700 leading-relaxed">
+                      <strong className="text-blue-700">• Part 3 (How You Help): </strong> {gradedReport.pillars?.howYouHelp}
                     </p>
-                    <p className="text-gray-300 leading-relaxed">
-                      <strong className="text-cyan-400">• Part 4 (Why You Are Different): </strong>{' '}
+                    <p className="text-slate-700 leading-relaxed">
+                      <strong className="text-blue-700">• Part 4 (Why You Stand Out): </strong>{' '}
                       {gradedReport.pillars?.whyDifferent}
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-purple-950/30 border border-purple-500/20 text-xs text-purple-200">
-                    <strong className="text-white block mb-1">Gold Standard CEO Pitch:</strong>
+                  <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-slate-800">
+                    <strong className="text-blue-900 block mb-1">Recommended Response:</strong>
                     "{gradedReport.goldRewrite}"
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="text-xs text-gray-300 space-y-1 bg-gray-950/60 p-3 rounded-lg border border-gray-800">
+                  <div className="text-xs text-slate-700 space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <p>
-                      <strong>Cadence: </strong> {gradedReport.cadence}
+                      <strong>Speaking Speed: </strong> {gradedReport.cadence}
                     </p>
                     <p>
-                      <strong>STAR-L Fulfillment: </strong> High executive presence with explicit business metrics.
+                      <strong>Story Structure: </strong> Clear problem, action, and results.
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-purple-950/30 border border-purple-500/20 text-xs text-purple-200">
-                    <strong className="text-white block mb-1">Gold Standard STAR-L Response:</strong>
+                  <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-slate-800">
+                    <strong className="text-blue-900 block mb-1">Recommended Response:</strong>
                     "{gradedReport.goldRewrite}"
                   </div>
                 </div>

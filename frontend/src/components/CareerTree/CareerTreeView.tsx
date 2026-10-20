@@ -827,31 +827,31 @@ export const CareerTreeView: React.FC = () => {
   const activeTrack = availableTracks.find((t) => t.id === activeTrackId) || availableTracks[0];
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0d14] text-gray-100 overflow-y-auto">
+    <div className="flex flex-col h-full bg-slate-50 text-slate-800 overflow-y-auto">
       {/* Integrated Workspace Header Bar */}
-      <div className="border-b border-gray-800 bg-[#0f121d]/90 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-20">
+      <div className="border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-20 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <GitFork className="w-4 h-4 text-cyan-400" />
-            <h1 className="text-base font-bold text-white tracking-tight">Predictive Career Trajectory Tree</h1>
+            <GitFork className="w-4 h-4 text-blue-600" />
+            <h1 className="text-base font-bold text-slate-900 tracking-tight">Career Path & Next Steps</h1>
             <span
-              className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full border ${
+              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                 hasData
-                  ? 'bg-emerald-400/10 border-emerald-400/30 text-emerald-400'
-                  : 'bg-amber-400/10 border-amber-400/30 text-amber-300'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  : 'bg-amber-50 border-amber-200 text-amber-700'
               }`}
             >
-              {hasData ? `${stories.length} Stories · Dynamic Vault Tree` : 'Genesis State (Empty Canvas)'}
+              {hasData ? `${stories.length} Work Stories Saved` : 'Waiting for Your Work Info'}
             </span>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Simulate career forks, quantify skill compounding, and inspect high-leverage canopy destinations.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Explore your next job options, skills to learn, and expected salary ranges.
           </p>
         </div>
 
         {/* Track Switcher */}
         {hasData ? (
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-900 border border-gray-800 overflow-x-auto no-scrollbar max-w-full shrink">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200 overflow-x-auto no-scrollbar max-w-full shrink">
             {availableTracks.map((t) => {
               const Icon = t.icon;
               const isSelected = t.id === activeTrack.id;
@@ -866,16 +866,16 @@ export const CareerTreeView: React.FC = () => {
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     isSelected
                       ? isVaultTrack
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                        : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/60'
+                        ? 'bg-white text-blue-700 border border-blue-200 shadow-sm'
+                        : 'bg-white text-slate-900 border border-slate-300 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isSelected ? (isVaultTrack ? 'text-emerald-400' : 'text-cyan-400') : 'text-gray-500'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isSelected ? (isVaultTrack ? 'text-blue-600' : 'text-slate-800') : 'text-slate-400'}`} />
                   <span>{t.name}</span>
                   {isVaultTrack && (
-                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300 font-bold">
-                      Personal Vault
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 font-bold">
+                      Your Path
                     </span>
                   )}
                 </button>
@@ -887,15 +887,15 @@ export const CareerTreeView: React.FC = () => {
             {showSamplePreview ? (
               <button
                 onClick={() => setShowSamplePreview(false)}
-                className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold hover:bg-amber-500/30 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-300 text-xs font-bold hover:bg-amber-100 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <EyeOff className="w-3.5 h-3.5" />
-                <span>Return to Blank Personal Canvas</span>
+                <span>Return to My Path</span>
               </button>
             ) : (
-              <div className="flex items-center gap-2 text-gray-400 bg-gray-900 px-3 py-1.5 rounded-xl border border-gray-800">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                <span>Awaiting Story / Profile in Vault</span>
+              <div className="flex items-center gap-2 text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                <span>Tell Aura about your jobs to build your path</span>
               </div>
             )}
           </div>
@@ -906,66 +906,63 @@ export const CareerTreeView: React.FC = () => {
       <div className="flex-1 p-3 sm:p-6 max-w-6xl mx-auto w-full space-y-6 sm:space-y-8">
         {!hasData && !showSamplePreview ? (
           /* BLANK / GENESIS STATE WHEN NO STORIES OR TIMELINE EXIST */
-          <div className="relative rounded-3xl bg-[#0c0f18] border border-gray-800 p-8 sm:p-12 overflow-hidden shadow-2xl text-center">
-            {/* Subtle Ambient Radial Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] pointer-events-none rounded-full"></div>
-
+          <div className="relative rounded-3xl bg-white border border-slate-200 p-8 sm:p-12 overflow-hidden shadow-sm text-center">
             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-950 via-blue-950 to-indigo-950 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400 shadow-xl shadow-cyan-950">
-                <GitFork className="w-8 h-8 animate-pulse" />
+              <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto text-blue-600 shadow-sm">
+                <GitFork className="w-8 h-8" />
               </div>
 
               <div className="space-y-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400 bg-cyan-400/10 px-3 py-1 rounded-full border border-cyan-400/20 font-bold">
-                  Genesis State • Awaiting Stories in Vault
+                <span className="text-[10px] uppercase tracking-wider text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200 font-semibold">
+                  Step 1 • Tell Aura About Your Work
                 </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                  Your Career Trajectory Tree Has Not Sprouted Yet
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                  Your Career Path Will Appear Here
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-xl mx-auto">
-                  The Career Tree is built dynamically from your verified career stories, recent organization role, and demonstrated skill set in your Career Vault. Currently, your account (<span className="text-cyan-300 font-bold">{currentUser?.name || currentUser?.username}</span> · <span className="text-gray-300">{currentUser?.role_track}</span>) has 0 stories and 0 timeline roles recorded.
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-xl mx-auto">
+                  Your career path is created from your past jobs, daily tasks, and best work accomplishments. Right now, your profile (<span className="text-blue-600 font-bold">{currentUser?.name || currentUser?.username}</span>) has no saved jobs yet.
                 </p>
               </div>
 
-              {/* Architectural Blueprint Flow */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-[#141724]/80 border border-white/5 text-left text-xs">
-                <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
-                  <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs">
-                    <span className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center font-mono text-[10px]">1</span>
-                    <span>Role & Skills</span>
+              {/* Simple 4-Step Guide */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left text-xs">
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 text-blue-600 font-bold text-xs">
+                    <span className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center font-mono text-[10px]">1</span>
+                    <span>Recent Job</span>
                   </div>
-                  <p className="text-[11px] text-gray-400 leading-relaxed">
-                    Anchor your recent role, tools used, and daily operational workflow.
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Name your current or most recent job title and company.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
-                  <div className="flex items-center gap-2 text-blue-400 font-bold text-xs">
-                    <span className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center font-mono text-[10px]">2</span>
-                    <span>Timeline & Prior Titles</span>
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs">
+                    <span className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center font-mono text-[10px]">2</span>
+                    <span>Tools & Skills</span>
                   </div>
-                  <p className="text-[11px] text-gray-400 leading-relaxed">
-                    Plot past roles from career start (list in chat or 1-click CV upload).
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Add the software, daily tools, or skills you use at work.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
-                  <div className="flex items-center gap-2 text-purple-400 font-bold text-xs">
-                    <span className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center font-mono text-[10px]">3</span>
-                    <span>Mine STARR Stories</span>
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 text-purple-600 font-bold text-xs">
+                    <span className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center font-mono text-[10px]">3</span>
+                    <span>Best Work Wins</span>
                   </div>
-                  <p className="text-[11px] text-gray-400 leading-relaxed">
-                    Aura mines verified metrics, incident recoveries, and retrospective learnings.
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Answer 3 quick questions about a problem you solved at work.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1.5">
-                  <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center font-mono text-[10px]">4</span>
-                    <span>Pivots & Canopy Sprout</span>
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 text-emerald-600 font-bold text-xs">
+                    <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center font-mono text-[10px]">4</span>
+                    <span>Career Path</span>
                   </div>
-                  <p className="text-[11px] text-gray-400 leading-relaxed">
-                    Predictive forks (L2) and executive canopy targets (L4) emerge dynamically.
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    See matching senior roles, salary boosts, and next job steps.
                   </p>
                 </div>
               </div>
@@ -976,37 +973,37 @@ export const CareerTreeView: React.FC = () => {
                   onClick={() => {
                     setChatCollapsed(false);
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-lg shadow-blue-950 flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>Start Story Mining with Aura</span>
+                  <span>Talk with Aura Coach</span>
                 </button>
 
                 <button
                   onClick={openRoleModal}
-                  className="px-4 py-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <Edit3 className="w-4 h-4 text-indigo-300" />
-                  <span>Calibrate Recent Role</span>
+                  <Edit3 className="w-4 h-4 text-blue-600" />
+                  <span>Set Current Job Title</span>
                 </button>
 
                 <button
                   onClick={() => setIsTimelineModalOpen(true)}
-                  className="px-4 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700 text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <Upload className="w-4 h-4 text-cyan-400" />
-                  <span>Upload CV / Timeline</span>
+                  <Upload className="w-4 h-4 text-blue-600" />
+                  <span>Upload Resume</span>
                 </button>
               </div>
 
               {/* Optional Sample Preview Toggle */}
-              <div className="pt-4 border-t border-white/5">
+              <div className="pt-4 border-t border-slate-200">
                 <button
                   onClick={() => setShowSamplePreview(true)}
-                  className="text-xs text-gray-500 hover:text-gray-300 font-mono transition-colors flex items-center gap-1.5 mx-auto cursor-pointer"
+                  className="text-xs text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1.5 mx-auto cursor-pointer"
                 >
-                  <Eye className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Preview Interactive Sample Architecture</span>
+                  <Eye className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Show Example Career Path</span>
                 </button>
               </div>
             </div>
@@ -1062,27 +1059,24 @@ export const CareerTreeView: React.FC = () => {
         </div>
 
         {/* 4-TIER CAREER TREE CANVAS */}
-        <div className="relative rounded-3xl bg-[#0c0f18] border border-gray-800 p-8 overflow-hidden shadow-2xl">
-          {/* Subtle Ambient Radial Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 blur-[120px] pointer-events-none rounded-full"></div>
-
-          <div className="flex flex-col-reverse gap-10 relative z-10">
+        <div className="relative rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 overflow-hidden shadow-sm">
+          <div className="flex flex-col-reverse gap-8 sm:gap-10 relative z-10">
             {/* 1. ROOT LEVEL (Foundation & Timeline) */}
             <div className="flex flex-col items-center">
               {/* Plotted Career Origins & Progression Timeline (from startup to current) */}
               {workHistory.length > 1 ? (
-                <div className="w-full max-w-xl mb-4 p-4 rounded-2xl bg-[#141724]/90 border border-cyan-500/30 shadow-lg">
-                  <div className="flex items-center justify-between text-[11px] font-mono text-gray-400 mb-2">
-                    <span className="flex items-center gap-1.5 text-cyan-400 font-bold uppercase tracking-wider">
+                <div className="w-full max-w-xl mb-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
+                    <span className="flex items-center gap-1.5 text-blue-700 font-bold uppercase tracking-wider">
                       <Clock className="w-3.5 h-3.5" />
-                      <span>Plotted Career Progression ({workHistory.length} Titles from Career Start)</span>
+                      <span>Career History ({workHistory.length} Past Jobs)</span>
                     </span>
                     <button
                       onClick={() => setIsTimelineModalOpen(true)}
-                      className="text-[10px] text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer underline flex items-center gap-1"
+                      className="text-[10px] text-blue-600 hover:text-blue-700 font-semibold cursor-pointer underline flex items-center gap-1"
                     >
                       <Upload className="w-3 h-3" />
-                      <span>Update Timeline</span>
+                      <span>Update Jobs</span>
                     </button>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -1091,17 +1085,17 @@ export const CareerTreeView: React.FC = () => {
                       return (
                         <div key={idx} className="flex items-center gap-2">
                           <div
-                            className={`px-3 py-1.5 rounded-xl text-xs font-mono border transition-all ${
+                            className={`px-3 py-1.5 rounded-xl text-xs border transition-all ${
                               isCurrent
-                                ? 'bg-cyan-500/15 border-cyan-400 text-cyan-200 font-bold shadow-[0_0_12px_rgba(0,242,254,0.15)]'
-                                : 'bg-gray-900/80 border-gray-800 text-gray-400'
+                                ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold shadow-sm'
+                                : 'bg-white border-slate-200 text-slate-600'
                             }`}
                           >
-                            <span className={isCurrent ? 'text-white' : 'text-gray-300'}>{wh.role}</span>
-                            {wh.company && <span className="text-gray-500 ml-1 text-[11px]">@ {wh.company}</span>}
-                            {wh.period && <span className="text-[10px] text-gray-500 block">{wh.period}</span>}
+                            <span className={isCurrent ? 'text-blue-900' : 'text-slate-800 font-medium'}>{wh.role}</span>
+                            {wh.company && <span className="text-slate-500 ml-1 text-[11px]">@ {wh.company}</span>}
+                            {wh.period && <span className="text-[10px] text-slate-400 block">{wh.period}</span>}
                           </div>
-                          {!isCurrent && <ChevronRight className="w-3.5 h-3.5 text-gray-600 shrink-0" />}
+                          {!isCurrent && <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />}
                         </div>
                       );
                     })}
@@ -1110,42 +1104,42 @@ export const CareerTreeView: React.FC = () => {
               ) : (
                 <button
                   onClick={() => setIsTimelineModalOpen(true)}
-                  className="mb-3 px-3 py-1.5 rounded-xl bg-gray-900/60 hover:bg-gray-800/80 border border-dashed border-gray-700 hover:border-cyan-500/40 text-gray-400 hover:text-cyan-300 text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="mb-3 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-dashed border-slate-300 text-slate-600 hover:text-blue-600 text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
-                  <Upload className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>+ Plot Earlier Career Titles / Upload CV</span>
+                  <Upload className="w-3.5 h-3.5 text-blue-600" />
+                  <span>+ Add Earlier Jobs / Upload CV</span>
                 </button>
               )}
 
-              <div className="flex items-center gap-2 font-mono text-[11px] text-gray-400 uppercase tracking-widest mb-3">
-                <Shield className="w-3.5 h-3.5 text-cyan-400" />
-                <span>{activeTrack.rootNode.level}</span>
+              <div className="flex items-center gap-2 text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-3">
+                <Shield className="w-3.5 h-3.5 text-blue-600" />
+                <span>Level 01 • Foundation (Current Role)</span>
               </div>
 
               <div
                 onClick={() => setSelectedNode(activeTrack.rootNode)}
-                className="w-full max-w-xl p-5 rounded-2xl bg-[#141724] border border-cyan-500/30 hover:border-cyan-400 transition-all cursor-pointer group shadow-lg hover:shadow-cyan-500/10 relative"
+                className="w-full max-w-xl p-5 rounded-2xl bg-white border-2 border-blue-500 hover:border-blue-600 transition-all cursor-pointer group shadow-sm relative"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h4 className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors">
+                    <h4 className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors">
                       {activeTrack.rootNode.title}
                     </h4>
-                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                       {activeTrack.rootNode.description}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="font-mono text-xs font-bold text-cyan-400 block">
+                    <span className="text-xs font-bold text-blue-700 block">
                       {formatCompensation(activeTrack.rootNode.compRange, currency)}
                     </span>
-                    <span className="text-[10px] text-gray-500">CV Baseline</span>
+                    <span className="text-[10px] text-slate-400">Current Level</span>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-white/5">
+                <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-100">
                   {activeTrack.rootNode.skills.map((s) => (
-                    <span key={s} className="px-2 py-0.5 rounded text-[10px] bg-white/5 text-gray-300 font-mono">
+                    <span key={s} className="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-700 font-medium">
                       {s}
                     </span>
                   ))}
@@ -1153,13 +1147,13 @@ export const CareerTreeView: React.FC = () => {
               </div>
 
               {/* Connecting Vertical Trunk Stem */}
-              <div className="w-0.5 h-10 bg-gradient-to-t from-cyan-400 to-transparent mt-2"></div>
+              <div className="w-0.5 h-8 bg-slate-300 mt-2"></div>
             </div>
 
             {/* 2. FORK LEVEL (Decision Crossroads) */}
             <div className="flex flex-col items-center">
-              <div className="font-mono text-[11px] text-gray-400 uppercase tracking-widest mb-4">
-                Level 02 • Decision Crossroads (Upward Radial)
+              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-4">
+                Level 02 • Possible Directions
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
@@ -1171,40 +1165,40 @@ export const CareerTreeView: React.FC = () => {
                       onClick={() => setSelectedNode(fork)}
                       className={`p-4 rounded-2xl transition-all cursor-pointer relative flex flex-col justify-between ${
                         isChosen
-                          ? 'bg-[#151a2d] border-2 border-cyan-400 shadow-[0_0_25px_rgba(0,242,254,0.2)]'
-                          : 'bg-[#12141f]/70 border border-gray-800 opacity-60 hover:opacity-100 hover:border-gray-700'
+                          ? 'bg-blue-50/50 border-2 border-blue-500 shadow-sm'
+                          : 'bg-slate-50 border border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       {isChosen && (
-                        <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-cyan-400 text-black font-mono text-[9px] font-bold tracking-wider">
-                          OPTIMAL FORK
+                        <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[9px] font-bold tracking-wider">
+                          RECOMMENDED
                         </div>
                       )}
 
                       <div>
-                        <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 mb-1.5">
+                        <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5 font-medium">
                           <span>{fork.level}</span>
-                          <span className={isChosen ? 'text-emerald-400 font-bold' : ''}>
-                            CV Score: {fork.evScore}
+                          <span className={isChosen ? 'text-emerald-700 font-bold' : ''}>
+                            Match: {fork.evScore}%
                           </span>
                         </div>
-                        <h5 className={`font-bold text-xs mb-1.5 ${isChosen ? 'text-white' : 'text-gray-300'}`}>
+                        <h5 className={`font-bold text-xs mb-1.5 ${isChosen ? 'text-slate-900' : 'text-slate-800'}`}>
                           {fork.title}
                         </h5>
-                        <p className="text-[11px] text-gray-400 leading-relaxed mb-3">
+                        <p className="text-[11px] text-slate-600 leading-relaxed mb-3">
                           {fork.description}
                         </p>
                       </div>
 
-                      <div className="pt-2 border-t border-white/5 space-y-2">
-                        <div className="flex items-center justify-between text-[11px] font-mono">
-                          <span className="text-gray-400">Comp Band:</span>
-                          <span className={isChosen ? 'text-cyan-300 font-bold' : 'text-gray-400'}>
+                      <div className="pt-2 border-t border-slate-200/60 space-y-2">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-500">Pay Range:</span>
+                          <span className={isChosen ? 'text-blue-700 font-bold' : 'text-slate-700'}>
                             {formatCompensation(fork.compRange, currency)}
                           </span>
                         </div>
                         {fork.metricsDelta && (
-                          <div className="text-[10px] font-mono text-emerald-400 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded text-center border border-emerald-500/20">
+                          <div className="text-[10px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded text-center border border-emerald-200">
                             {fork.metricsDelta}
                           </div>
                         )}
@@ -1215,43 +1209,43 @@ export const CareerTreeView: React.FC = () => {
               </div>
 
               {/* Connecting Trunk to Incline */}
-              <div className="w-0.5 h-10 bg-cyan-400 mt-2 shadow-[0_0_10px_#22d3ee]"></div>
+              <div className="w-0.5 h-8 bg-blue-400 mt-2"></div>
             </div>
 
             {/* 3. INCLINE LEVEL (Promoted Milestone) */}
             <div className="flex flex-col items-center">
-              <div className="font-mono text-[11px] text-gray-400 uppercase tracking-widest mb-3">
-                Level 03 • Incline Milestone (Promoted Mid-Point)
+              <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-3">
+                Level 03 • Next Senior Promotion
               </div>
 
               <div
                 onClick={() => setSelectedNode(activeTrack.inclineNode)}
-                className="w-full max-w-xl p-5 rounded-2xl bg-gradient-to-r from-[#182038] to-[#121626] border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,242,254,0.18)] hover:scale-[1.01] transition-all cursor-pointer relative"
+                className="w-full max-w-xl p-5 rounded-2xl bg-indigo-50/50 border-2 border-indigo-400 shadow-sm hover:scale-[1.01] transition-all cursor-pointer relative"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-cyan-400/20 text-cyan-300 text-[10px] font-mono font-bold mb-1.5">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 text-[10px] font-bold mb-1.5">
                       <TrendingUp className="w-3 h-3" />
                       <span>{activeTrack.inclineNode.level}</span>
                     </div>
-                    <h4 className="font-bold text-white text-sm">{activeTrack.inclineNode.title}</h4>
-                    <p className="text-xs text-gray-300 mt-1 leading-relaxed">
+                    <h4 className="font-bold text-slate-900 text-sm">{activeTrack.inclineNode.title}</h4>
+                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                       {activeTrack.inclineNode.description}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="font-mono text-xs font-bold text-emerald-400 block">
+                    <span className="text-xs font-bold text-indigo-700 block">
                       {formatCompensation(activeTrack.inclineNode.compRange, currency)}
                     </span>
-                    <span className="text-[10px] text-gray-400">
-                      Fit: {activeTrack.inclineNode.evScore}%
+                    <span className="text-[10px] text-slate-500">
+                      Match: {activeTrack.inclineNode.evScore}%
                     </span>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-white/10">
+                <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-indigo-100">
                   {activeTrack.inclineNode.skills.map((s) => (
-                    <span key={s} className="px-2 py-0.5 rounded text-[10px] bg-cyan-400/10 text-cyan-300 font-mono border border-cyan-400/20">
+                    <span key={s} className="px-2 py-0.5 rounded text-[10px] bg-white text-indigo-800 border border-indigo-200 font-medium">
                       {s}
                     </span>
                   ))}
@@ -1259,14 +1253,14 @@ export const CareerTreeView: React.FC = () => {
               </div>
 
               {/* Connecting Incline Stem */}
-              <div className="w-0.5 h-10 bg-gradient-to-b from-cyan-400 via-purple-400 to-transparent mt-2"></div>
+              <div className="w-0.5 h-8 bg-indigo-300 mt-2"></div>
             </div>
 
             {/* 4. CANOPY LEVEL (Top Executive Destinations) */}
             <div className="flex flex-col items-center">
-              <div className="flex items-center gap-2 font-mono text-[11px] text-gray-400 uppercase tracking-widest mb-4">
-                <Award className="w-4 h-4 text-purple-400" />
-                <span>Level 04 • Top Canopy Executive Destinations (Future Pivot Roles)</span>
+              <div className="flex items-center gap-2 text-[11px] text-slate-500 font-semibold uppercase tracking-wider mb-4">
+                <Award className="w-4 h-4 text-purple-600" />
+                <span>Level 04 • Long-Term Leadership Target</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
@@ -1278,40 +1272,40 @@ export const CareerTreeView: React.FC = () => {
                       onClick={() => setSelectedNode(canopy)}
                       className={`p-4 rounded-2xl transition-all cursor-pointer relative flex flex-col justify-between ${
                         isTarget
-                          ? 'bg-gradient-to-b from-[#1c1833] to-[#121122] border-2 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.25)] hover:scale-[1.02]'
-                          : 'bg-[#12141f]/70 border border-gray-800 opacity-65 hover:opacity-100 hover:border-gray-700'
+                          ? 'bg-purple-50/50 border-2 border-purple-500 shadow-sm hover:scale-[1.02]'
+                          : 'bg-slate-50 border border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       {isTarget && (
-                        <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-purple-500 text-white font-mono text-[9px] font-bold tracking-wider">
-                          TARGET DESTINATION
+                        <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-purple-600 text-white text-[9px] font-bold tracking-wider">
+                          TOP TARGET
                         </div>
                       )}
 
                       <div>
-                        <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 mb-1.5">
+                        <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5 font-medium">
                           <span>{canopy.level}</span>
-                          <span className={isTarget ? 'text-purple-300 font-bold' : ''}>
+                          <span className={isTarget ? 'text-purple-700 font-bold' : ''}>
                             {canopy.evScore}% Match
                           </span>
                         </div>
-                        <h5 className={`font-bold text-xs mb-1.5 ${isTarget ? 'text-white' : 'text-gray-300'}`}>
+                        <h5 className={`font-bold text-xs mb-1.5 ${isTarget ? 'text-slate-900' : 'text-slate-800'}`}>
                           {canopy.title}
                         </h5>
-                        <p className="text-[11px] text-gray-400 leading-relaxed mb-3">
+                        <p className="text-[11px] text-slate-600 leading-relaxed mb-3">
                           {canopy.description}
                         </p>
                       </div>
 
-                      <div className="pt-2 border-t border-white/5 space-y-2">
-                        <div className="flex items-center justify-between text-[11px] font-mono">
-                          <span className="text-gray-400">Comp Band:</span>
-                          <span className={isTarget ? 'text-purple-300 font-bold' : 'text-gray-400'}>
+                      <div className="pt-2 border-t border-slate-200/60 space-y-2">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-500">Pay Range:</span>
+                          <span className={isTarget ? 'text-purple-700 font-bold' : 'text-slate-700'}>
                             {formatCompensation(canopy.compRange, currency)}
                           </span>
                         </div>
                         {canopy.metricsDelta && (
-                          <div className="text-[10px] font-mono text-purple-300 font-semibold bg-purple-950/40 px-2 py-0.5 rounded text-center border border-purple-500/20">
+                          <div className="text-[10px] text-purple-800 font-semibold bg-purple-50 px-2 py-0.5 rounded text-center border border-purple-200">
                             {canopy.metricsDelta}
                           </div>
                         )}
@@ -1328,37 +1322,37 @@ export const CareerTreeView: React.FC = () => {
 
         {/* NODE INSPECTOR DRAWER / MODAL */}
         {selectedNode && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-            <div className="w-full max-w-2xl bg-[#141724] border border-cyan-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6">
+          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6 text-slate-800">
               {/* Header */}
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-xs font-mono text-cyan-400 tracking-wider uppercase block mb-1">
+                  <span className="text-xs text-blue-600 tracking-wider uppercase font-semibold block mb-1">
                     {selectedNode.level}
                   </span>
-                  <h3 className="font-bold text-xl sm:text-2xl text-white">
+                  <h3 className="font-bold text-xl sm:text-2xl text-slate-900">
                     {selectedNode.title}
                   </h3>
                 </div>
                 <button
                   onClick={() => setSelectedNode(null)}
-                  className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
               {/* Comp and Score Card */}
-              <div className="grid grid-cols-2 gap-3 p-4 rounded-xl bg-black/40 border border-white/5">
+              <div className="grid grid-cols-2 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                  <span className="text-[11px] text-gray-400 block font-mono">Estimated Comp Band</span>
-                  <span className="text-base font-bold text-cyan-300 font-mono">
+                  <span className="text-[11px] text-slate-500 block font-medium">Estimated Pay</span>
+                  <span className="text-base font-bold text-blue-700">
                     {formatCompensation(selectedNode.compRange, currency)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[11px] text-gray-400 block font-mono">CV Expected Value Score</span>
-                  <span className="text-base font-bold text-emerald-400 font-mono">
+                  <span className="text-[11px] text-slate-500 block font-medium">Profile Fit</span>
+                  <span className="text-base font-bold text-emerald-700">
                     {selectedNode.evScore} / 100
                   </span>
                 </div>
@@ -1366,8 +1360,8 @@ export const CareerTreeView: React.FC = () => {
 
               {/* Description */}
               <div>
-                <h5 className="text-xs font-mono text-gray-400 uppercase tracking-wider mb-1.5">Role Blueprint</h5>
-                <p className="text-sm text-gray-300 leading-relaxed">
+                <h5 className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1.5">What This Job Does</h5>
+                <p className="text-sm text-slate-700 leading-relaxed">
                   {selectedNode.description}
                 </p>
               </div>
@@ -1375,8 +1369,8 @@ export const CareerTreeView: React.FC = () => {
               {/* Strategic Overview */}
               {selectedNode.details?.overview && (
                 <div>
-                  <h5 className="text-xs font-mono text-gray-400 uppercase tracking-wider mb-1.5">Strategic Overview</h5>
-                  <p className="text-sm text-gray-300 leading-relaxed bg-white/[0.03] p-3.5 rounded-xl border border-white/5">
+                  <h5 className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1.5">Key Highlights</h5>
+                  <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                     {selectedNode.details.overview}
                   </p>
                 </div>
@@ -1384,12 +1378,12 @@ export const CareerTreeView: React.FC = () => {
 
               {/* Counselor Advice */}
               {selectedNode.details?.counselorAdvice && (
-                <div className="p-4 rounded-xl bg-purple-950/30 border border-purple-500/30">
-                  <div className="flex items-center gap-2 text-xs font-mono text-purple-300 font-semibold mb-1">
-                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                    <span>Aura Counselor Strategic Directive</span>
+                <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+                  <div className="flex items-center gap-2 text-xs text-blue-800 font-semibold mb-1">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Career Coach Tip</span>
                   </div>
-                  <p className="text-xs text-gray-300 leading-relaxed italic">
+                  <p className="text-xs text-slate-700 leading-relaxed italic">
                     "{selectedNode.details.counselorAdvice}"
                   </p>
                 </div>
@@ -1397,12 +1391,12 @@ export const CareerTreeView: React.FC = () => {
 
               {/* Skills Mastered */}
               <div>
-                <h5 className="text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">Required Core Competencies</h5>
+                <h5 className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-2">Important Skills Needed</h5>
                 <div className="flex flex-wrap gap-2">
                   {selectedNode.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="px-2.5 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 font-mono text-xs"
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium"
                     >
                       {skill}
                     </span>
@@ -1411,12 +1405,12 @@ export const CareerTreeView: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+              <div className="flex items-center justify-between pt-4 border-t border-slate-200">
                 <button
                   onClick={() => setSelectedNode(null)}
-                  className="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-medium text-gray-300 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
                 >
-                  Close Inspector
+                  Close
                 </button>
 
                 <button
@@ -1424,9 +1418,9 @@ export const CareerTreeView: React.FC = () => {
                     setSelectedNode(null);
                     setActiveModule('trainer');
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-cyan-400/20 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all flex items-center gap-2 shadow-sm cursor-pointer"
                 >
-                  <span>Practice Interview for this Role</span>
+                  <span>Practice Questions for this Role</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -1443,72 +1437,72 @@ export const CareerTreeView: React.FC = () => {
 
       {/* Role Calibration & Assignment Modal */}
       {isRoleModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl relative text-slate-800">
             <button
               onClick={() => setIsRoleModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
                 <UserCheck className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">Anchor Recent Role & Sprout Tree</h3>
-                <p className="text-[11px] text-gray-400">
-                  Account: <span className="font-mono text-indigo-400 font-bold">{currentUser?.username}</span>
+                <h3 className="text-sm font-bold text-slate-900">Set Current Job Title</h3>
+                <p className="text-[11px] text-slate-500">
+                  Profile: <span className="font-semibold text-blue-600">{currentUser?.username}</span>
                 </p>
               </div>
             </div>
 
             {roleSaveSuccess ? (
-              <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-center space-y-1">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
-                <p className="text-xs font-bold">Role Saved & Tree Sprouted!</p>
-                <p className="text-[11px] text-emerald-400/80">Your Career Trajectory Root is now anchored in the Career Vault.</p>
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-center space-y-1">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto" />
+                <p className="text-xs font-bold">Role Saved!</p>
+                <p className="text-[11px] text-slate-600">Your career path is now updated.</p>
               </div>
             ) : (
               <form onSubmit={handleSaveRole} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1">
-                    Job Title / Professional Role <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Job Title <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Application Support Lead, Platform Engineer, WFM Lead"
+                    placeholder="e.g. Operations Executive, Store Manager, Customer Service Lead"
                     value={roleInput}
                     onChange={(e) => setRoleInput(e.target.value)}
-                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white placeholder-slate-400"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1">
-                    Organization / Company
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Company Name
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. TCS, Concentrix, Evolent Health, Deloitte"
+                    placeholder="e.g. Reliance, HDFC, Flipkart, TCS"
                     value={companyInput}
                     onChange={(e) => setCompanyInput(e.target.value)}
-                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white placeholder-slate-400"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1">
-                    Candidate Full Name (Optional)
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Your Full Name (Optional)
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Rahul Sharma"
+                    placeholder="e.g. Priya Sharma"
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
-                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white placeholder-slate-400"
                   />
                 </div>
 
@@ -1516,14 +1510,14 @@ export const CareerTreeView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsRoleModalOpen(false)}
-                    className="px-3.5 py-1.5 rounded-xl bg-gray-800 text-gray-300 hover:text-white text-xs font-medium transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 text-xs font-medium transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSavingRole || !roleInput.trim()}
-                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-indigo-950 flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
                   >
                     {isSavingRole ? (
                       <>
@@ -1533,7 +1527,7 @@ export const CareerTreeView: React.FC = () => {
                     ) : (
                       <>
                         <UserCheck className="w-3.5 h-3.5" />
-                        <span>Save & Sprout Tree</span>
+                        <span>Save Job</span>
                       </>
                     )}
                   </button>

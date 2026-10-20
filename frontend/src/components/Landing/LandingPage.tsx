@@ -9,7 +9,6 @@ import {
   Star,
   Zap,
   Compass,
-  PlayCircle,
   X,
   Brain,
   Video,
@@ -484,51 +483,48 @@ export const LandingPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLogin
   };
 
   return (
-    <div className="min-h-screen bg-[#0c0f18] text-[#f1f3fd] font-sans antialiased overflow-x-hidden selection:bg-cyan-400 selection:text-black">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden selection:bg-blue-600 selection:text-white">
       
       {/* ----------------- PERSISTENT TOP NAVIGATION ----------------- */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#07090f]/90 backdrop-blur-xl border-b border-white/5">
+      <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400/30 to-purple-500/30 p-[1px] flex items-center justify-center shadow-lg shadow-cyan-500/20">
-              <div className="w-full h-full bg-[#0c0f18] rounded-xl flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-cyan-400" />
-              </div>
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-headline font-bold text-2xl tracking-tight text-white">Aura AI</span>
-              <span className="font-mono text-[10px] uppercase px-2 py-0.5 rounded bg-white/5 text-cyan-400 border border-cyan-400/30 font-semibold tracking-wider">
-                Career Agent v1.0
+              <span className="font-headline font-bold text-2xl tracking-tight text-slate-900">Aura AI</span>
+              <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-semibold tracking-wider">
+                Career Coach
               </span>
             </div>
           </div>
 
           {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-8 font-headline text-sm font-medium text-gray-400">
-            <a href="#simulator" className="hover:text-cyan-400 transition-colors flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-              Trajectory Tree
+          <nav className="hidden md:flex items-center gap-8 font-headline text-sm font-medium text-slate-600">
+            <a href="#simulator" className="hover:text-blue-600 transition-colors flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+              Career Path
             </a>
-            <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-            <a href="#matrix" className="hover:text-white transition-colors">Competency Matrix</a>
-            <a href="#testimonials" className="hover:text-white transition-colors">Testimonials</a>
+            <a href="#how-it-works" className="hover:text-slate-900 transition-colors">How It Works</a>
+            <a href="#testimonials" className="hover:text-slate-900 transition-colors">Reviews</a>
           </nav>
 
           {/* Action buttons */}
           <div className="flex items-center gap-4">
             <button
               onClick={scrollToAuth}
-              className="font-headline text-sm font-semibold text-gray-300 hover:text-white px-3 py-2 transition-colors cursor-pointer"
+              className="font-headline text-sm font-semibold text-slate-600 hover:text-slate-900 px-3 py-2 transition-colors cursor-pointer"
             >
               Sign In
             </button>
             <button
               onClick={scrollToAuth}
-              className="font-headline text-xs font-bold bg-cyan-400 hover:bg-cyan-300 text-black px-4 py-2.5 rounded-xl shadow-[0_0_20px_rgba(0,242,254,0.5)] hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2"
+              className="font-headline text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2"
             >
               <Compass className="w-4 h-4" />
-              <span>Launch Aura Counselor</span>
+              <span>Start With Aura</span>
             </button>
           </div>
         </div>
@@ -539,63 +535,57 @@ export const LandingPage: React.FC<{ onLoginSuccess?: () => void }> = ({ onLogin
 
         {/* HERO SECTION */}
         <section className="relative overflow-hidden pt-16 pb-20 px-6">
-          {/* Ambient Glow Gradients */}
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-gradient-to-b from-cyan-400/15 via-purple-600/10 to-transparent blur-[140px] pointer-events-none rounded-full"></div>
-          <div className="absolute top-96 right-10 w-[400px] h-[400px] bg-emerald-500/10 blur-[130px] pointer-events-none rounded-full"></div>
-
           <div className="max-w-5xl mx-auto text-center relative z-10">
             {/* Live Agent Pill */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#141724] border border-white/10 shadow-md mb-8">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-              <span className="font-mono text-xs text-cyan-400 font-semibold tracking-wider uppercase">
-                Autonomous Career Coach & Predictive Planner
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm mb-8">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              <span className="text-xs text-blue-700 font-semibold tracking-wider uppercase">
+                AI Career Coach for Every Professional
               </span>
-              <span className="text-white/20">•</span>
-              <span className="font-mono text-xs text-gray-400">Real-Time CV Calculation</span>
             </div>
 
-            <h1 className="font-headline font-bold text-4xl sm:text-6xl text-white tracking-tight leading-[1.15] mb-6">
-              Simulate Every Career Choice <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 text-transparent bg-clip-text">
-                Before You Make The Jump.
+            <h1 className="font-headline font-bold text-4xl sm:text-6xl text-slate-900 tracking-tight leading-[1.15] mb-6">
+              Build Your Resume, Plan Your Career, <br className="hidden sm:inline" />
+              <span className="text-blue-600">
+                and Land Jobs Faster.
               </span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-              Aura models your background, turns your real experience into structured stories, and charts an interactive career decision tree. See how each role and acquired skill unlocks downstream high-compensation leadership tracks.
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+              Talk with Aura in simple English. Tell us about your daily tasks and past jobs. We create your ready-to-use resume, show your next promotion steps, and search jobs across India.
             </p>
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
               <button
-                onClick={scrollToSimulator}
-                className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl font-headline font-bold text-sm sm:text-base bg-cyan-400 text-black shadow-[0_0_25px_rgba(0,242,254,0.4)] hover:shadow-[0_0_35px_rgba(0,242,254,0.7)] hover:-translate-y-0.5 transition-all cursor-pointer"
+                onClick={scrollToAuth}
+                className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl font-headline font-bold text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer"
               >
-                <GitFork className="w-5 h-5" />
-                <span>Explore Interactive Career Tree</span>
+                <Compass className="w-5 h-5" />
+                <span>Get Started Now</span>
               </button>
               <button
-                onClick={scrollToAuth}
-                className="inline-flex items-center gap-2 px-7 py-4 rounded-xl font-headline font-semibold text-sm sm:text-base bg-[#141724] border border-white/10 text-white hover:border-cyan-400/40 hover:bg-[#1b1f30] transition-all cursor-pointer"
+                onClick={scrollToSimulator}
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-headline font-semibold text-sm sm:text-base bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-sm"
               >
-                <PlayCircle className="w-5 h-5 text-cyan-400" />
-                <span>Beta Tester Sign In</span>
+                <GitFork className="w-5 h-5 text-blue-600" />
+                <span>See Example Career Paths</span>
               </button>
             </div>
 
             {/* Trust Stats */}
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 font-mono text-xs text-gray-400">
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-xs text-slate-500 font-medium">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>4.8M Career Transitions Calibrated</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>ATS-Friendly Resumes (Word & PDF)</span>
               </div>
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-cyan-400" />
-                <span>Dynamic Expected Value (EV) Engine</span>
+                <TrendingUp className="w-4 h-4 text-blue-600" />
+                <span>Real Promotion & Salary Growth</span>
               </div>
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-purple-400" />
-                <span>Personalized Skill Accrual Tracking</span>
+                <Zap className="w-4 h-4 text-amber-500" />
+                <span>Live Job Search & Google Maps</span>
               </div>
             </div>
           </div>
