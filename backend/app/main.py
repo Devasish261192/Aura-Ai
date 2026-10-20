@@ -18,23 +18,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.middleware("http")
-async def add_security_headers(request, call_next):
-    response = await call_next(request)
-    response.headers.setdefault(
-        "Content-Security-Policy",
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://auracareer.duckdns.org wss://auracareer.duckdns.org; frame-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';"
-    )
-    response.headers.setdefault(
-        "Strict-Transport-Security",
-        "max-age=31536000; includeSubDomains"
-    )
-    response.headers.setdefault(
-        "X-Frame-Options",
-        "SAMEORIGIN"
-    )
-    return response
-
 @app.on_event("startup")
 def on_startup():
     init_db()
